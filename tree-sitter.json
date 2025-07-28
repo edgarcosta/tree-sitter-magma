@@ -1,0 +1,15 @@
+{
+  "grammars": [
+    {
+      "name": "magma",
+      "source-directory": ".",
+      "grammar-path": "grammar.js",
+      "scope": "source.magma",
+      "file-types": ["magma", "m"]
+    }
+  ],
+  "metadata": {
+    "version": "0.1.0",
+    "license": "MIT"
+  }
+}
