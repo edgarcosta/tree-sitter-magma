@@ -40,7 +40,14 @@ Magma supports three types of comments:
 
 - **Single-line comments**: Start with `//`. All text from `//` to the end of the line is ignored.
 - **Block comments**: Start with `/*` and end with `*/`. They can span multiple lines and cannot be nested.
-- **Signature comments**: Used specifically for documenting `intrinsic` functions. They are enclosed in braces `{ ... }` immediately following the intrinsic's signature. This comment is stored with the intrinsic and can be accessed programmatically. The parser rule for this can be found in `interp/parser.y` at line 2548.
+- **Signature comments**: Used specifically for documenting `intrinsic` functions. They are enclosed in braces `{ ... }` immediately following the intrinsic's signature. This comment is stored with the intrinsic and can be accessed programmatically.
+
+### Forward Declarations
+Function and procedure declarations can be forwarded using the `forward` keyword, allowing you to declare them before they are fully defined.
+
+```magma
+forward MyFunction, MyProcedure;
+```
 
 ### Line Continuation
 - A backslash `\\` at the end of a line continues the statement on the next line.
@@ -97,6 +104,11 @@ for item in my_sequence do
     ...
 end for;
 
+// For-random loop
+for random i := 1 to 10 do
+    ...
+end for;
+
 // While loop
 while condition do
     ...
@@ -109,10 +121,10 @@ until condition;
 ```
 
 #### Loop Control
-- `break`: Exits the innermost loop.
-- `continue`: Skips to the next iteration of the innermost loop.
+- `break`: Exits the innermost loop. Can optionally take a loop label.
+- `continue`: Skips to the next iteration of the innermost loop. Can optionally take a loop label.
 
-### Exception Handling
+#### Exception Handling
 ```magma
 try
     ...
@@ -120,6 +132,10 @@ catch e
     // e contains the error object
     ...
 end try;
+```
+The `error` statement can also be made conditional:
+```magma
+error if condition, "message";
 ```
 
 ### Context and Previous Results
@@ -142,6 +158,7 @@ Magma provides extensive support for mathematical structures:
 - `EXTENSION_FIELD<base, polynomial>` - Field extensions
 - Integer rings, polynomial rings, etc.
 - Ideals: `IDEAL<ring, generators>`
+- Special ring constructors: `frac<...>`, `loc<...>`, `comp<...>` for rings of fractions, localizations, and completions. Note that `frac<>` may be deprecated as the parser contains a hardcoded error for it.
 
 #### Algebras
 - `ALGEBRA<field, generators>` - General algebras
@@ -270,15 +287,21 @@ end intrinsic;
 - `readi` - Read integer
 
 #### File Operations
-- `load`, `save` - Workspace operations
+- `load`, `save`, `restore` - Workspace operations
+- `iload` - An alternative to `load`.
+- `freeze` - Freeze the current workspace state.
 - `import`, `export` - Package operations
+- The `import` statement has a variant to load all symbols from a package: `import @"filename";`
+
+### System Commands
+- `quit`: Exits the Magma session. Can optionally take an exit code (e.g., `quit 1;`).
 
 ### Debugging and Verification
 
 #### Assertions
-- `assert condition` - Basic assertion
-- `assert2 condition` - Level 2 assertion  
-- `assert3 condition` - Level 3 assertion
+- `assert condition;` - Basic assertion.
+- `assert2 condition;` - Level 2 assertion.
+- `assert3 condition;` - Level 3 assertion.
 
 #### Requirements (for intrinsics)
 - `require condition : message` - General requirement
@@ -289,30 +312,20 @@ end intrinsic;
 - `time statement` - Time execution
 - `vtime name, level : statement` - Verbose timing
 
-### Package System
-
-#### Import/Export
-- `import "filename" : identifier_list`
-- `import @ "filename"` - Import entire file
-
-#### Module Organization
-- Packages organized hierarchically
-- Specification files (`.spec`) define package structure
-- System vs. user packages
-
 ### Special Features
 
 #### Pattern Matching
+
+- Case statements: `case expr: when pattern1: ... end case;`
 - Case expressions: `case<expr | pattern1 : result1, pattern2 : result2, ...>`
 - Default cases supported
 
 #### Where Clauses
 - Local bindings: `expression where variable is value`
-- Multiple bindings supported
+- Multiple bindings and `:=` are supported: `expression where x is 1, y := 2`
 
 #### Evaluation
 - `eval expression` - Dynamic evaluation
-- String evaluation capabilities
 
 ### Memory Management
 
@@ -339,7 +352,7 @@ Real literals follow standard floating-point notation.
 - **Precision specifier**: A real literal can have its precision specified with `p`. Example: `0.123456789p30` creates a real number with 30 decimal digits of precision.
 
 ### String Literals
-- **Double quotes**: `"..."`. Can contain newlines and escaped characters (e.g., `\\n`, `\\t`, `\\"`).
+- **Double quotes**: `"..."`. Can contain newlines and escaped characters (e.g., `\n`, `\t`, `\"`).
 - **Single quotes**: `'...'`. Interpreted as a literal identifier. Cannot contain newlines.
 
 ### Sequence and Cycle Literals
@@ -349,4 +362,4 @@ Real literals follow standard floating-point notation.
 ## Whitespace and Line Continuations
 
 - **Whitespace**: Spaces, tabs, and newlines are generally ignored between tokens.
-- **Line Continuation**: A backslash `\\` at the end of a line indicates that the statement continues on the next line. Whitespace between the backslash and the newline is skipped. 
+- **Line Continuation**: A backslash `\\` at the end of a line indicates that the statement continues on the next line. Whitespace between the backslash and the newline is skipped.

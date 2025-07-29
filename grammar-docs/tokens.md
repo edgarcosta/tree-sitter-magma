@@ -56,6 +56,9 @@ This file contains the token definitions extracted from the Magma parser.
 - `TOK_REDUCT_JOIN` - Reduction join (`&join`)
 - `TOK_REDUCT_CAT` - Reduction concatenation (`&cat`)
 
+### Mutation Operators
+- `TOK_MUTATION_OP` - Mutation operators (`+:=`, `*:=`, etc.)
+
 ## Delimiters and Special Symbols
 
 ### Brackets
@@ -231,6 +234,7 @@ These words are treated as keywords only in specific contexts (usually followed 
 - `sub`
 - `UnipotentMatrixGroup`
 - `ZModule`
+- `type` (used in `declare type` statements)
 
 ## Literals and Identifiers
 - `TOK_INTCONST` - Integer constants (e.g., `123`, `0xAF`, `0b101`).
@@ -245,4 +249,4 @@ These words are treated as keywords only in specific contexts (usually followed 
 ## Special Tokens
 - `TOK_PREV` - Previous result reference (`$1`, `$2`, etc.).
 - `TOK_SYM_POLY` - A symbolic polynomial expression (handled specially by the lexer).
-- `TOK_MUTATION_OP` - Mutation operators (`+:=`, `*:=`, etc.). 
+- `TOK_MUTATION_OP` - In-place modification operators (e.g., `+:=`, `*:_`, `and:=`). 

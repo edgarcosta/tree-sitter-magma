@@ -44,6 +44,7 @@ Some parsing decisions depend on context:
 - **Cycles vs. function calls** create the shift/reduce conflict
 - **Range syntax** `a..b` vs sequence indexing
 - **Where clauses** can appear in multiple contexts
+- **Intrinsic definitions** can include special options like `[~]` for coercion control.
 
 ### Dynamic Features
 - **Eval expressions** allow dynamic code evaluation
@@ -118,6 +119,10 @@ Tree-sitter prefers **right recursion** for performance:
 - The commutator/function call conflict may need **GLR parsing** or **dynamic precedence**
 - Tree-sitter's conflict resolution is different from yacc/bison
 - May need to restructure grammar to avoid conflicts
+
+### Intrinsic Details
+- Intrinsic definitions support optional flags that control type coercion and argument handling.
+- Argument types in intrinsics can be indexed, like `MyType[Index]`, which adds another layer of complexity to parsing their signatures.
 
 ### Performance Considerations
 - Tree-sitter parsers should be **fast and incremental**

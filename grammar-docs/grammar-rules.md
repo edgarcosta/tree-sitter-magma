@@ -14,6 +14,15 @@ program:
 ;
 ```
 
+## Directives
+Directives control the Magma environment.
+- `load "filename";`
+- `iload "filename";`
+- `save "filename";`
+- `restore "filename";`
+- `freeze;`
+- `clear;`
+
 ## Statements
 
 ### Assignment
@@ -29,11 +38,12 @@ lval_list TOK_BECOMES expr_list TOK_SEMI
 - **`repeat` loop**: `repeat ... until bool_expr;`
 - **`for` loop**: `for var := start to finish by step do ... end for;`
 - **`for-each` loop**: `for var in sequence do ... end for;`
+- **`for-random` loop**: `for random var in sequence do ... end for;`
 - **`case` statement**: `case expr: when val1: ... when val2, val3: ... else: ... end case;`
 
 ### Loop Control
-- `break;`: Exits the current loop.
-- `continue;`: Proceeds to the next iteration of the current loop.
+- `break;`: Exits the current loop. Can optionally be followed by a label.
+- `continue;`: Proceeds to the next iteration of the current loop. Can optionally be followed by a label.
 
 ### Procedure and Function Calls
 Procedure calls are statements. Function calls are expressions.
@@ -49,10 +59,16 @@ expr(expr_list)
 ### I/O and System
 - `print expr_list;`
 - `printf format, expr_list;`
+- `fprintf file, format, expr_list;`
 - `load "filename";`
 - `save "filename";`
 - `restore "filename";`
 - `clear;`
+- `quit;` or `quit code;`: Exits Magma, optionally with an integer exit code.
+
+### Timing Statements
+- `time <statement>`: Measures and prints the execution time of a statement.
+- `vtime <flag>, <level> : <statement>`: Verbose timing, conditional on a verbose flag.
 
 ## Constructors
 
@@ -74,6 +90,9 @@ These constructors create sets and sequences, including comprehensions.
 ### Tuple Constructor (`< ... >`)
 - `< 1, "hello", true >`
 
+### Special Sequence Constructors
+- `[* ... *]`: Starred sequence constructor.
+
 ### Map and Homomorphism Constructors
 - `map< D -> C | x :-> f(x) >`
 - `hom< G -> H | g :-> h >`
@@ -86,6 +105,7 @@ These constructors create sets and sequences, including comprehensions.
 Magma has a rich syntax for creating algebraic structures.
 - **Groups**: `PermutationGroup< ... >`, `MatrixGroup< ... >`, `FPGroup< ... >`, `AbelianGroup< ... >`
 - **Rings and Fields**: `PolynomialRing(R, n)`, `quo< R | I >`, `ext< F | f >`
+- **Special Ring Constructors**: `frac<R|I>`, `loc<R|I>`, `comp<R|I>`
 - **Algebras**: `MatrixAlgebra(F, n)`, `GroupAlgebra(G, F)`, `LieAlgebra(...)`
 
 ## Quantifiers
@@ -103,9 +123,10 @@ Quantifiers are expressions that return a boolean value or a witness.
 ## Special Expressions
 
 ### `where` Clause
-A `where` clause allows for local definitions within an expression.
+A `where` clause allows for local definitions within an expression. It supports multiple assignments and can use `is` or `:=`.
 ```magma
 f(x) where f is func< y | y^2 >
+(a+b)^2 where a := 1, b := 2
 ```
 This is equivalent to `(func<y|y^2>)(x)`.
 
@@ -120,6 +141,12 @@ This is equivalent to `(func<y|y^2>)(x)`.
 ### Ternary Conditional
 - `condition select expr1 else expr2`
 
+### Case Expression
+A `case` expression provides a way to select a value based on matching patterns, similar to a `case` statement but usable within an expression.
+```magma
+result := case< my_var | 1: "one", 2: "two", default: "other" >;
+```
+
 ### Back-quote for Record Field Access
 - `R`f`: Access field `f` of record `R`.
 - `R``"f"`: Access field whose name is given by a string.
@@ -127,6 +154,7 @@ This is equivalent to `(func<y|y^2>)(x)`.
 ### Error Handling
 - `try ... catch e ... end try;`
 - `error "message";`: Throws a runtime error.
+- `error if condition, "message";`: Throws a runtime error conditionally.
 - `assert condition;`: Halts execution if the condition is false.
 - `require condition;`: Used in intrinsics to check preconditions.
 
@@ -144,4 +172,7 @@ end intrinsic;
 ### `declare`
 - `declare type T;`: Declares a new object type.
 - `declare attributes T: attr1, attr2;`: Adds attributes to a type.
-- `declare verbose MyVerbose, 3;`: Declares a verbose flag with a maximum level. 
+- `declare verbose MyVerbose, 3;`: Declares a verbose flag with a maximum level.
+
+### `forward`
+- `forward MyFunc, MyProc;`: Forward-declares functions and procedures. 
