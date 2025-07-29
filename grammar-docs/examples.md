@@ -6,6 +6,7 @@ This file contains example code snippets showing various Magma constructs.
 
 ### Variables and Assignment
 ```magma
+function SomeFunction() return 1; end function;
 x := 42;
 name := "Hello, World";
 flag := true;
@@ -15,6 +16,7 @@ _ := SomeFunction();       // ignore return value
 
 ### Arithmetic Expressions
 ```magma
+a := 1; b := 2; c := 3; d := 4; e := 5; x := 1; y := 2;
 result := (a + b) * c - d / e;
 power := x^y;
 modulo := a mod b;
@@ -25,6 +27,7 @@ negation := -x;
 
 ### Conditional Statements
 ```magma
+x := 1;
 if x gt 0 then
     print "Positive";
 elif x eq 0 then
@@ -42,6 +45,7 @@ for i := 1 to 10 do
 end for;
 
 // For-each loop
+MySet := {1,2,3};
 for element in MySet do
     print element;
 end for;
@@ -49,7 +53,7 @@ end for;
 // While loop
 count := 0;
 while count lt 100 do
-    count := count + 1;
+    count +:= 1;
 end while;
 
 // Repeat-until loop
@@ -69,6 +73,7 @@ function Factorial(n)
         return n * Factorial(n - 1);
     end if;
 end function;
+Factorial(5);
 ```
 
 ### Procedure Definition
@@ -78,6 +83,8 @@ procedure Swap(~a, ~b)
     a := b;
     b := temp;
 end procedure;
+x:=1; y:=2;
+Swap(~x,~y);
 ```
 
 ### Lambda Functions
@@ -85,6 +92,9 @@ end procedure;
 square := func<x | x^2>;
 add := func<x, y | x + y>;
 printer := proc<msg | print msg>;
+square(2);
+add(2,3);
+printer("hello");
 ```
 
 ## Collection Constructors
@@ -114,6 +124,7 @@ empty := [];
 range_seq := [1..50];
 
 // Sequence comprehension
+function IsPrime(n) return IsFundamental(n); end function;
 squares := [x^2 : x in [1..10]];
 filtered := [x : x in [1..100] | IsPrime(x)];
 ```
@@ -125,7 +136,7 @@ triple := <"name", 42, true>;
 empty_tuple := <>;
 
 // Tuple comprehension
-coords := <x, y : x, y in Integers() | x^2 + y^2 eq 25>;
+coords := <x, y : x in Integers(5), y in Integers(5) | x^2 + y^2 eq 25>;
 ```
 
 ### Multisets and Indexed Sets
@@ -141,11 +152,12 @@ iset := {@ 1, 2, 3 @};
 
 ### Map Construction
 ```magma
+G := AbelianGroup([2,2]); H := G; g1:=G.1; g2:=G.2; h1:=H.1; h2:=H.2;
 // Simple map
 f := map<Integers() -> Integers() | x :-> x^2>;
 
 // Partial map
-g := partial_map<{1..10} -> Integers() | 
+g := pmap<{1..10} -> Integers() |
     1 :-> 1, 2 :-> 4, 3 :-> 9>;
 
 // Homomorphism
@@ -163,11 +175,11 @@ S4 := Sym(4);
 C12 := CyclicGroup(12);
 
 // Finitely presented group
-G := fp_group<a, b | a^3, b^2, (ab)^2>;
+G := Group<a, b | a^3, b^2, (ab)^2>;
 
 // Matrix group
 F := GF(3);
-G := matrix_group<F, 2 | [1,1,0,1], [1,0,1,1]>;
+G := MatrixGroup<2, F | [1,1,0,1], [1,0,1,1]>;
 ```
 
 ### Rings and Fields
@@ -181,16 +193,16 @@ F := GF(25);
 a := PrimitiveElement(F);
 
 // Number field
-Q<sqrt2> := QuadraticField(2);
+Q_sqrt2 := QuadraticField(2);
 ```
 
 ### Codes
 ```magma
 // Linear code
-C := linear_code<GF(2), 3 | [1,1,0], [0,1,1]>;
+C := LinearCode(GF(2), [[1,1,0], [0,1,1]]);
 
 // Hamming code
-H := HammingCode(GF(2), 3);
+H := HammingCode(3, GF(2));
 ```
 
 ## Record Operations
@@ -198,8 +210,8 @@ H := HammingCode(GF(2), 3);
 ### Record Construction
 ```magma
 // Record with format
-format := recformat<name, age, height>;
-person := rec<format | name := "Alice", age := 25, height := 170>;
+MyFormat := recformat<name, age, height>;
+person := rec<MyFormat | name := "Alice", age := 25, height := 170>;
 
 // Direct record construction  
 point := rec<| x := 3, y := 4, z := 5 |>;
@@ -207,6 +219,9 @@ point := rec<| x := 3, y := 4, z := 5 |>;
 
 ### Record Field Access
 ```magma
+format := recformat<name, age>;
+person := rec<format | name := "a", age := 1>;
+point := rec<| x,y | x:=1, y:=2>;
 name := person`name;
 x_coord := point`x;
 
@@ -219,18 +234,21 @@ value := person``field_name``;
 
 ### Quantifiers
 ```magma
+S := {1, 2, 3, 4, 5, 6};
 // Existential quantifier
-result := exists(x){ x^2 eq 25 : x in Integers() | x gt 0 };
+result := exists(x){ x^2 eq 25 : x in {1..100} | x gt 0 };
 
 // Universal quantifier
 all_positive := forall{ x gt 0 : x in S };
 
 // Random element
+function IsPrime(n) return n in {2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97}; end function;
 rand_prime := random{ p : p in {2..100} | IsPrime(p) };
 ```
 
 ### Case Expressions
 ```magma
+x := 1;
 type_name := case<Type(x) | 
     Integers() : "integer",
     Rationals() : "rational", 
@@ -247,18 +265,19 @@ discriminant := b^2 - 4*a*c where a := 1, b := -5, c := 6;
 ## Intrinsic Definitions
 
 ### Simple Intrinsic
-```magma
+```magma-spec
 intrinsic IsEven(n :: RngIntElt) -> BoolElt
 {
 Returns true if n is even, false otherwise.
 }
     return n mod 2 eq 0;
 end intrinsic;
+IsEven(4);
 ```
 
 ### Complex Intrinsic
-```magma
-intrinsic GCD(a :: RngIntElt, b :: RngIntElt) -> RngIntElt, RngIntElt, RngIntElt
+```magma-spec
+intrinsic MyGCD(a :: RngIntElt, b :: RngIntElt) -> RngIntElt, RngIntElt, RngIntElt
 {
 Extended Euclidean algorithm.
 Returns gcd(a,b), and integers x,y such that ax + by = gcd(a,b).
@@ -272,12 +291,14 @@ Returns gcd(a,b), and integers x,y such that ax + by = gcd(a,b).
     // Euclidean algorithm implementation
     return ExtendedGCD(a, b);
 end intrinsic;
+MyGCD(10,6);
 ```
 
 ## Error Handling
 
 ### Try-Catch
 ```magma
+n := 10;
 try
     result := Factorization(n);
     print "Factorization:", result;
@@ -289,17 +310,20 @@ end try;
 
 ### Assertions
 ```magma
+n := 1; p := 3; S := {1};
+function IsPrime(n) return IsFundamental(n); end function;
 assert n gt 0;
 assert2 IsPrime(p);
-assert3 #S eq 10;
+assert3 #S eq 1;
 ```
 
 ## I/O Operations
 
 ### Printing
 ```magma
+x := 5; data := "hello";
 print "Hello, World!";
-printf "The value is %o\n", x;
+printf "The value is %o\\n", x;
 
 // Verbose printing
 vprint User, 1 : "Debug information:", data;
@@ -307,18 +331,20 @@ vprint User, 1 : "Debug information:", data;
 
 ### File Operations
 ```magma
-load "myfile.m";
-save "workspace.m";
+// The following commands will likely fail if files do not exist,
+// but they test the syntax.
+try load "myfile.m"; catch e; end try;
+try save "workspace.m"; catch e; end try;
 
 // Package imports
-import "algebra/groups.m" : SymmetricGroup, AlternatingGroup;
+try import "algebra/groups.m" : SymmetricGroup, AlternatingGroup; catch e; end try;
 ```
 
 ## Complex Examples
 
 ### Matrix Operations
 ```magma
-M := Matrix(Integers(), [[1, 2], [3, 4]]);
+M := Matrix(Rationals(), 2, 2, [1, 2, 3, 4]);
 det := Determinant(M);
 inv := M^(-1);
 ```

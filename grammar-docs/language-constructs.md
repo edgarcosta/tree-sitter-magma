@@ -47,6 +47,9 @@ Function and procedure declarations can be forwarded using the `forward` keyword
 
 ```magma
 forward MyFunction, MyProcedure;
+
+procedure MyProcedure(~a) a := 1; end procedure;
+function MyFunction(x) return 1; end function;
 ```
 
 ### Line Continuation
@@ -67,6 +70,10 @@ end function;
 procedure MyProcedure(~arr, index, value)
     arr[index] := value;
 end procedure;
+
+MyFunction(1,2);
+a := [1,2,3];
+MyProcedure(~a, 1, 5);
 ```
 
 #### Lambda Expressions
@@ -82,18 +89,20 @@ end procedure;
 
 #### Conditional Statements
 ```magma
+condition := true; other_condition := false;
 if condition then
-    ...
+    "true";
 elif other_condition then
-    ...
+    "other";
 else
-    ...
+    "else";
 end if;
 ```
 A ternary conditional expression is also available: `condition select value_if_true else value_if_false`.
 
 #### Loops
 ```magma
+my_sequence := [1,2,3];
 // For loop
 for i := 1 to 10 by 2 do
     ...
@@ -105,19 +114,19 @@ for item in my_sequence do
 end for;
 
 // For-random loop
-for random i := 1 to 10 do
+for random i in {1..10} do
     ...
 end for;
 
 // While loop
-while condition do
+while false do
     ...
 end while;
 
 // Repeat-until loop
 repeat
     ...
-until condition;
+until true;
 ```
 
 #### Loop Control
@@ -127,14 +136,15 @@ until condition;
 #### Exception Handling
 ```magma
 try
-    ...
+    error "an error";
 catch e
     // e contains the error object
-    ...
+    "caught";
 end try;
 ```
 The `error` statement can also be made conditional:
 ```magma
+condition := false;
 error if condition, "message";
 ```
 
@@ -220,12 +230,13 @@ Magma provides extensive support for mathematical structures:
 
 #### Record Construction
 ```
-rec<format | field1 := value1, field2 := value2, ...>
+format := recformat<field1, field2>;
+rec<format | field1 := 1, field2 := 2>;
 ```
 
 #### Record Format Definition
 ```
-recformat<field1, field2 : type, ...>
+recformat<field1, field2_is_integer : Integers()>;
 ```
 
 #### Field Access
@@ -236,13 +247,14 @@ recformat<field1, field2 : type, ...>
 
 Magma allows definition of built-in functions:
 
-```
-intrinsic FunctionName(param1 :: Type1, param2 :: Type2, ...) -> ReturnType
+```magma
+intrinsic FunctionName(param1::RngIntElt, param2::RngIntElt) -> RngIntElt
 {
     Documentation string
 }
     local variables;
     // implementation
+    return 1;
 end intrinsic;
 ```
 

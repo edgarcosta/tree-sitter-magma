@@ -127,6 +127,10 @@ A `where` clause allows for local definitions within an expression. It supports 
 ```magma
 f(x) where f is func< y | y^2 >
 (a+b)^2 where a := 1, b := 2
+x := 5;
+f_of_x := func<f, x | f(x)>;
+f_of_x(func< y | y^2 >, x) where f is func< y | y^2 >;
+(a+b)^2 where a is 1, b is 2;
 ```
 This is equivalent to `(func<y|y^2>)(x)`.
 
@@ -144,6 +148,7 @@ This is equivalent to `(func<y|y^2>)(x)`.
 ### Case Expression
 A `case` expression provides a way to select a value based on matching patterns, similar to a `case` statement but usable within an expression.
 ```magma
+my_var := 1;
 result := case< my_var | 1: "one", 2: "two", default: "other" >;
 ```
 
@@ -169,8 +174,7 @@ intrinsic MyIntrinsic(x::Type1, ~y::Type2) -> RetType
 end intrinsic;
 ```
 
-### `declare`
-- `declare type T;`: Declares a new object type.
+### `declare`- `declare type T;`: Declares a new object type.
 - `declare attributes T: attr1, attr2;`: Adds attributes to a type.
 - `declare verbose MyVerbose, 3;`: Declares a verbose flag with a maximum level.
 
