@@ -291,7 +291,6 @@ module.exports = grammar({
 	),
 
 	// TODO: prevent functions from being wrapped in expressions
-	// TODO: fix it so that we can have empty blocks
 	
 	function_definition: $ => seq(
 	    // TODO: Can this be capitalized?
