@@ -252,7 +252,7 @@ intrinsic FunctionName(param1::RngIntElt, param2::RngIntElt) -> RngIntElt
 {
     Documentation string
 }
-    local variables;
+    local local_variable;
     // implementation
     return 1;
 end intrinsic;
