@@ -1,0 +1,64 @@
+================================================================================
+Basic assignment
+================================================================================
+
+x := 1;
+
+---
+
+(program
+  (assignment
+    left: (identifier)
+    right: (integer)))
+
+================================================================================
+Multiple assignment
+================================================================================
+
+a,b,c := 1,2,3;
+
+---
+
+(program
+  (assignment
+    left: (identifier)
+    left: (identifier)
+    left: (identifier)
+    right: (integer)
+    right: (integer)
+    right: (integer)))
+
+================================================================================
+Assignment with generator
+================================================================================
+
+F<a> := NumberField(x^2+1);
+
+---
+
+(program
+  (assignment
+    left: (gen_expression
+      (identifier)
+      (identifier))
+    right: (call
+      function: (identifier)
+      arguments: (argument_list
+        (binary_operator
+          left: (binary_operator
+            left: (identifier)
+            right: (integer))
+          right: (integer))))))
+
+================================================================================
+Augmented assignment 
+================================================================================
+
+x +:= 1;
+
+---
+
+(program
+  (augmented_assignment
+    left: (identifier)
+    right: (integer)))

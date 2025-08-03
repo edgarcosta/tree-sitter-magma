@@ -1,3 +1,43 @@
+// precedence table
+// TODO: fill this in with details from 
+// https://github.com/edgarcosta/tree-sitter-magma/blob/95816b192272e8d4eb6d986f18a2741476b26269/grammar-docs/precedence.md
+const PREC = {
+    parenthesized_expression: 1,
+    eval: 2,
+    where: 3,
+    eq: 4,
+    ternary: 5,
+    hathat: 6,
+    or: 7,
+    and: 8,
+    not: 9,
+    cmp: 10,
+    membership: 11,
+    join: 12,
+    diff: 13,
+    sdiff: 14,
+    meet: 15,
+    plus: 16,
+    times: 17,
+    tilde: 18,
+    cat: 19,
+    negate: 20,
+    power: 21,
+    coercion: 22,
+    at: 23,
+    dot: 24,
+    dollar: 25,
+    reduct: 26,
+    hash: 27,
+    assigned: 28,
+    sq_bracket: 29,
+    parenthesis: 30,
+    backquote: 31,
+    // TODO: what does double backquote mean?
+    call: 32,
+};
+
+
 module.exports = grammar({
     name: 'magma',
 
@@ -6,13 +46,31 @@ module.exports = grammar({
 	$.comment,      // comments
     ],
 
+    // A _statement_ is any valid sequence of symbols followed by a semicolon
+    // eg. a variable assignment, a function/intrinsic definition
+
+    // An _expression_ is a collection of symbols which evaluates to something (possibly nothing)
+    // eg. a + 3, NumberField(x^2 +1), a generator expression
+
+    // A _primary expression_ is a smaller unit, e.g. an integer, a real number,
+    // The distinction is taken from tree-sitter-python, so I don't know if it's necessary
+    // in our context, but it provides a cleaner structure
+
+    supertypes: $ => [
+	$._simple_statement,
+	$._compound_statement,
+	$.expression,
+	$.primary_expression,
+    ],
+    inline: $ => [
+	$._simple_statement
+    ],
+
     rules: {
-	// Program is the root rule - can contain statements, directives, intrinsics, or declarations
-	// TODO: every expression should end with semicolon unless otherwise specified - can this be done top level?
 	program: $ => choice(
 	    repeat(choice(
-		$.expression,
-		// $.statement,
+		// $.expression,
+		$._statement,
 		// $.directive,
 		// $.intrinsic,
 		// $.declaration
@@ -36,6 +94,7 @@ module.exports = grammar({
 	// ge: $ => 'ge',
 	// lt: $ => 'lt',
 	// le: $ => 'le',
+	// TODO: what are the prec rules for these?
 	// cmpeq: $ => 'cmpeq',
 	// cmpne: $ => 'cmpne',
 	// adj: $ => 'adj',
@@ -64,6 +123,119 @@ module.exports = grammar({
 	// // hat_hat: $ => '^^',
 	// slash: $ => '/',
 
+	
+	_statement: $ => seq(
+	    choice(
+	    $._simple_statement,
+	    $._compound_statement,
+	    ),
+	    ';',
+	),
+
+	_simple_statement: $ => choice(
+	    $.expression_statement,
+	    $.return_statement,
+	    $._definition,
+	    $._assignment,
+	),
+
+	expression_statement: $ => choice(
+	    $.expression,
+	    // $.assignment
+	),
+
+	_compound_statement: $ => "placeholder",
+
+	return_statement: $ => seq(
+	    "return",
+	    // TODO: can this be optional?
+	    $.expression
+	),
+
+	// TODO: includes 'not', '-', '~' ..?
+	unary_operator: $ => {
+	    const table = [
+		['not', PREC.not],
+		['-', PREC.negate],
+		['~', PREC.tilde]
+	    ];
+	    // @ts-ignore
+	    return choice(...table.map(([operator, precedence]) => prec.right(precedence, seq(
+		field('operator', operator),
+		field('right', $.expression),
+	    ))));
+	},
+	
+	binary_operator: $ => {
+	    const table = [
+		[prec.left, '+', PREC.plus],
+		[prec.left, '-', PREC.plus],
+		[prec.left, '*', PREC.times],
+		[prec.left, '/', PREC.times],
+		[prec.left, '//', PREC.times],
+		[prec.right, '^', PREC.power],
+		[prec.left, 'div', PREC.times],
+		[prec.left, 'rem', PREC.times],
+		[prec.left, '^^', PREC.hathat],
+		[prec.left, 'join', PREC.join],
+		[prec.left, 'diff', PREC.diff],
+		[prec.left, 'sdiff', PREC.sdiff],
+		[prec.left, 'meet', PREC.meet],
+		[prec.left, 'cat', PREC.meet],
+		
+	    ];
+
+	    // @ts-ignore
+	    return choice(...table.map(([fn, operator, precedence]) => fn(precedence, seq(
+		field('left', $.expression),
+		// @ts-ignore
+		field('operator', operator),
+		field('right', $.expression),
+	    ))));
+	},
+
+	// TODO: implement ternary operators
+	ternary_operator: $ => "placeholder",
+
+	// TODO: decide if this should be part of binary operator
+	comparison_operator: $ => {
+	    const table = [
+		['gt'],
+		['ge'],
+		['lt'],
+		['le'],
+		['eq'],
+		['ne'],
+		['cmpeq'],
+		['cmpne'],
+	    ];
+
+	    // @ts-ignore
+	    return choice(...table.map(([operator]) => prec.left(PREC.cmp, seq(
+		field('left', $.expression),
+		// @ts-ignore
+		field('operator', operator),
+		field('right', $.expression),
+	    ))));
+	    
+	},
+	// TODO: same as above
+	boolean_operator: $ => {
+	    const table = [
+		['or', PREC.or],
+		['xor', PREC.or],
+		['and', PREC.and],
+	    ];
+	    // @ts-ignore
+	    return choice(...table.map(([operator, precedence]) => prec.left(precedence, seq(
+		field('left', $.expression),
+		// @ts-ignore
+		field('operator', operator),
+		field('right', $.expression),
+	    ))));
+	},
+	
+	
 	// // Set operations
 	// diff: $ => 'diff',
 	// sdiff: $ => 'sdiff',
@@ -210,10 +382,6 @@ module.exports = grammar({
 	
 	// real_literal: $ => /\d+\.\d+([eE][+-]?\d+)?/,
 	
-	string_literal: $ => choice(
-	    seq('"', repeat(choice(/[^"\\]/, /\\./)), '"'),
-	    // seq("'", repeat(choice(/[^'\\]/, /\\./)), "'")
-	),
 
 
 	// Sequence and cycle literals (simplified for now)
@@ -272,14 +440,28 @@ module.exports = grammar({
 	//     $.cycle_literal
 	// ),
 
-	expression: $ => seq(
-	    choice(
-		$._definition,
-		$.assignment,
-		$.identifier,
-	    ),
-	    ';'
+	// TODO: should differentiate between expression and statement
+	expression: $ => choice(
+	    $.primary_expression,
+	    $.boolean_operator,
+	    $.comparison_operator,
 	),
+
+	primary_expression: $ => choice(
+	    $.identifier,
+	    $.integer,
+	    $.real,
+	    $.string,
+	    $.binary_operator,
+	    $.unary_operator,
+	    $.true,
+	    $.false,
+	    $.call,
+	),
+	
+	true: _ => 'True',
+	false: _ => 'False',
+	
 	expression_list: $ => 'placeholder_expr_list',
 
 	// TODO: add anonymous func's and proc's
@@ -306,7 +488,7 @@ module.exports = grammar({
 	    field('name', $.identifier),
 	    field('arguments', $.argument_list),
 	    '->',
-	    field('return_type', $.identifier),
+	    field('return_type', $.type),
 	    field('docstring',
 		  seq('{',
 		      /[^{}]*/,	// matches anything that's not a squirly brace
@@ -314,13 +496,24 @@ module.exports = grammar({
 	    optional(field('body', $.block)),
 	    'end intrinsic'
 	),
+
+	call: $ => prec(PREC.call, seq(
+	    field('function', $.primary_expression),
+	    field('arguments', $.argument_list),
+	)),
 	
+	// TODO: this should be expression
 	argument_list: $ => seq(
 	    '(',
 	    optional(commaSep1(
-		$.identifier
+		$.expression
 		)),
 	    ')',
+	),
+
+	_assignment: $ => choice(
+	    $.assignment,
+	    $.augmented_assignment
 	),
 	
 	assignment: $ => seq(
@@ -340,15 +533,15 @@ module.exports = grammar({
 	    ),
 	    field('right', $._right_hand_side),
 	),
-	// TODO: update 
+
 	_left_hand_side: $ => commaSep1(
 	    choice(
-		$.identifier,
+		$.identifier, // TODO: can probably be a primary expression? e.g. F[1] = ...
 		$.gen_expression,
 		'_'
 	    )),
 
-	_right_hand_side: $ => $.expression,
+	_right_hand_side: $ => commaSep1($.expression),
 
 	gen_expression: $ => seq(
 	    $.identifier,
@@ -357,21 +550,29 @@ module.exports = grammar({
 	    '>'
 	),
 
-	typed_identifier: $ => seq(
-	    field('identifier', $.identifier),
-	    '::',
-	    field('type', $.identifier)
+	// TODO: What about square brackets?
+	type: $ => choice(
+	    $.identifier,
+	    '.',
 	),
-
-	// TODO: we can have more things probably
-
+	typed_identifier: $ => seq(
+	    $.identifier,
+	    "::",
+	    $.type,
+	),
+	
 	identifier: $ => /[a-zA-Z_][a-zA-Z0-9_]*/,
-	block: $ => repeat1($.expression),
+	block: $ => repeat1($._statement),
 	string: $ => seq(
 	    '"',
-	    /[a-zA-Z_][a-zA-Z0-9_]*/,
+	    /[a-zA-Z0-9_]*/,
 	    '"'
 	),
+	integer: $ => /\d+/,
+	// TODO: implement scanner to allow scientific notation
+	real: $ => /\d+\.\d+/,
+	    // /\d+[\.\d+]?[eE][+-]?\d+/,
+	
     },
     
 });
