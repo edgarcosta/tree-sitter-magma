@@ -1,0 +1,55 @@
+================================================================================
+Function call
+================================================================================
+
+EllipticCurve("11a1");
+
+---
+(program
+  (expression_statement
+    (call
+      function: (identifier)
+      arguments: (argument_list
+        (string)))))
+
+================================================================================
+Basic definition function 
+================================================================================
+
+function test()
+
+end function;
+
+---
+
+(program
+  (function_definition
+    name: (identifier)
+    arguments: (argument_list)))
+
+================================================================================
+Function definition with arguments
+================================================================================
+
+function test(x,y)
+    x := x + y;
+    return x;
+end function;
+
+---
+
+(program
+  (function_definition
+    name: (identifier)
+    arguments: (argument_list
+      (identifier)
+      (identifier))
+    body: (block
+      (assignment
+        left: (identifier)
+        right: (binary_operator
+          left: (identifier)
+          right: (identifier)))
+      (return_statement
+        (identifier)))))
+

@@ -1,0 +1,40 @@
+================================================================================
+Basic intrinsic test
+================================================================================
+
+intrinsic test() -> type
+{ docstring }
+end intrinsic;
+
+---
+
+(program
+  (intrinsic_definition
+    name: (identifier)
+    arguments: (argument_list)
+    return_type: (type
+      (identifier))))
+
+================================================================================
+Intrinsic test with arguments
+================================================================================
+
+intrinsic test(x, y) -> .
+{ docstring }
+  return x + y;
+end intrinsic;
+
+---
+
+(program
+  (intrinsic_definition
+    name: (identifier)
+    arguments: (argument_list
+      (identifier)
+      (identifier))
+    return_type: (type)
+    body: (block
+      (return_statement
+        (binary_operator
+          left: (identifier)
+          right: (identifier))))))
