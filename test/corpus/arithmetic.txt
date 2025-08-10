@@ -17,6 +17,28 @@ a + b * c - d;
       right: (identifier))))
 
 ================================================================================
+Parenthesized expression
+================================================================================
+
+a + (b * (c - d)) / e;
+
+---
+
+(program
+  (expression_statement
+    (binary_operator
+      left: (identifier)
+      right: (binary_operator
+        left: (parenthesized_expression
+          (binary_operator
+            left: (identifier)
+            right: (parenthesized_expression
+              (binary_operator
+                left: (identifier)
+                right: (identifier)))))
+        right: (identifier)))))
+
+================================================================================
 Unary minus
 ================================================================================
 
@@ -46,7 +68,7 @@ Integers
       right: (integer))))
 
 ================================================================================
-Reals TODO: implement scanner for '1.2e4'
+Reals TODO: implement scanner for '1.2e4
 ================================================================================
 
 1.0;

@@ -35,6 +35,7 @@ end intrinsic;
     return_type: (type)
     body: (block
       (return_statement
-        (binary_operator
-          left: (identifier)
-          right: (identifier))))))
+        (expression_statement
+          (binary_operator
+            left: (identifier)
+            right: (identifier)))))))

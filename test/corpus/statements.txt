@@ -1,0 +1,15 @@
+================================================================================
+Multiple inline expressions
+================================================================================
+
+x, y, 2 + 4;
+
+---
+
+(program
+  (expression_statement
+    (identifier)
+    (identifier)
+    (binary_operator
+      left: (integer)
+      right: (integer))))
