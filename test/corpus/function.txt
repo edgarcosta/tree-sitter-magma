@@ -17,7 +17,7 @@ Basic definition function
 ================================================================================
 
 function test()
-
+    return 0;
 end function;
 
 ---
@@ -25,7 +25,11 @@ end function;
 (program
   (function_definition
     name: (identifier)
-    arguments: (argument_list)))
+    arguments: (argument_list)
+    body: (block
+      (return_statement
+        (expression_statement
+          (integer))))))
 
 ================================================================================
 Function definition with arguments

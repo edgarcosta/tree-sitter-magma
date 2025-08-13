@@ -156,16 +156,12 @@ module.exports = grammar({
 
 	return_statement: $ => seq(
 	    "return",
-	    // TODO: can this be optional?
-	    // can return multiple values!
-	    $.expression_statement
+		// TODO: functions can return multiple values!
+		// Procedures return nothing, and can only have empty return statements, as an early exit
+		// Functions must have a return statement with an expression (semantic validation)
+	    optional($.expression_statement)
 	),
 
-	// Procedures return nothing, and can only have empty return statements 
-	// as an early exit
-	return_statement_emtpy: $ => seq(
-		"return",
-	),
 
 	break_statement: $ => seq(
 	    prec.left('break'),
@@ -455,12 +451,12 @@ module.exports = grammar({
 	// But this might not be the parser's job to enforce
 	// Difficult to implement because it might appear in the middle of `body`
 	
-	// TODO: it must have a return statement!
+	// Function definition - semantic validation should ensure it has a return statement with expression
 	function_definition: $ => seq(
 	    'function',
 	    field('name', $.identifier),
 	    field('arguments', $.argument_list),
-	    optional(field('body', $.block)),
+	    field('body', $.block),
 	    'end function',
 	),
 
