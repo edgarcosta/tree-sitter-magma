@@ -54,3 +54,52 @@ end function;
         (expression_statement
           (identifier))))))
 
+
+================================================================================
+Procedure definition with no arguments
+================================================================================
+
+procedure main()
+    print "Hello, World!";
+end procedure;
+
+---
+
+(program
+  (procedure_definition
+    name: (identifier)
+    arguments: (argument_list)
+    body: (block
+      (print_statement
+        (string)))))
+
+================================================================================
+Procedure definition and modifying arguments
+================================================================================
+
+procedure foobar(~foo, ~bar)
+    print foo;
+    print bar;
+    foo, bar := bar, foo;
+end procedure;
+
+---
+
+(program
+  (procedure_definition
+    name: (identifier)
+    arguments: (argument_list
+      (unary_operator
+        right: (identifier))
+      (unary_operator
+        right: (identifier)))
+    body: (block
+      (print_statement
+        (identifier))
+      (print_statement
+        (identifier))
+      (assignment
+        left: (identifier)
+        left: (identifier)
+        right: (identifier)
+        right: (identifier)))))

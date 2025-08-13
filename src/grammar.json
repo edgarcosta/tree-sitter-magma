@@ -1335,6 +1335,10 @@
         {
           "type": "SYMBOL",
           "name": "intrinsic_definition"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "procedure_definition"
         }
       ]
     },
@@ -1380,6 +1384,51 @@
         {
           "type": "STRING",
           "value": "end function"
+        }
+      ]
+    },
+    "procedure_definition": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "procedure"
+        },
+        {
+          "type": "FIELD",
+          "name": "name",
+          "content": {
+            "type": "SYMBOL",
+            "name": "identifier"
+          }
+        },
+        {
+          "type": "FIELD",
+          "name": "arguments",
+          "content": {
+            "type": "SYMBOL",
+            "name": "argument_list"
+          }
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "FIELD",
+              "name": "body",
+              "content": {
+                "type": "SYMBOL",
+                "name": "block"
+              }
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "STRING",
+          "value": "end procedure"
         }
       ]
     },

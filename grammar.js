@@ -161,6 +161,12 @@ module.exports = grammar({
 	    $.expression_statement
 	),
 
+	// Procedures return nothing, and can only have empty return statements 
+	// as an early exit
+	return_statement_emtpy: $ => seq(
+		"return",
+	),
+
 	break_statement: $ => seq(
 	    prec.left('break'),
 	    optional($.identifier)
@@ -208,10 +214,9 @@ module.exports = grammar({
 		[prec.left, '-', PREC.plus],
 		[prec.left, '*', PREC.times],
 		[prec.left, '/', PREC.times],
-		[prec.left, '//', PREC.times],
 		[prec.right, '^', PREC.power],
 		[prec.left, 'div', PREC.times],
-		[prec.left, 'rem', PREC.times],
+		[prec.left, 'mod', PREC.times],
 		[prec.left, '^^', PREC.hathat],
 		[prec.left, 'join', PREC.join],
 		[prec.left, 'diff', PREC.diff],
@@ -438,17 +443,19 @@ module.exports = grammar({
 	expression_list: $ => 'placeholder_expr_list',
 
 	// TODO: add anonymous func's and proc's
-	// TODO: add procedures
+	// TODO: add foo := procedure, bar := function
 	
 	_definition: $ => choice(
 	    $.function_definition,
 	    $.intrinsic_definition,
+	    $.procedure_definition,
 	),
 
 	// TODO: functions should always have return statements!
 	// But this might not be the parser's job to enforce
 	// Difficult to implement because it might appear in the middle of `body`
 	
+	// TODO: it must have a return statement!
 	function_definition: $ => seq(
 	    'function',
 	    field('name', $.identifier),
@@ -457,12 +464,22 @@ module.exports = grammar({
 	    'end function',
 	),
 
+	// TODO: enable early exits via empty return statements
+	procedure_definition: $ => seq(
+	    'procedure',
+	    field('name', $.identifier),
+	    field('arguments', $.argument_list),
+	    optional(field('body', $.block)),
+	    'end procedure',
+	),
+
+	// TODO: it must have a return statement it has a return type!
 	intrinsic_definition: $ => seq(
 	    'intrinsic',
 	    field('name', $.identifier),
 	    field('arguments', $.argument_list),
 	    '->',
-	    field('return_type', $.type),
+	    optional(field('return_type', $.type)),
 	    field('docstring',
 		  seq('{',
 		      /[^{}]*/,	// matches anything that's not a squirly brace
