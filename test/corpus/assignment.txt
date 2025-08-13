@@ -51,6 +51,25 @@ F<a> := NumberField(x^2+1);
           right: (integer))))))
 
 ================================================================================
+Assignment with anonymous generator
+================================================================================
+
+_<x> := PolynomialRing(Integers());
+
+---
+
+(program
+  (assignment
+    left: (gen_expression
+      (identifier))
+    right: (call
+      function: (identifier)
+      arguments: (argument_list
+        (call
+          function: (identifier)
+          arguments: (argument_list))))))
+
+================================================================================
 Augmented assignment 
 ================================================================================
 

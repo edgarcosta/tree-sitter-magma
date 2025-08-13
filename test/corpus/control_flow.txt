@@ -1,0 +1,215 @@
+================================================================================
+Basic if statement
+================================================================================
+
+if IsPrime(m) then
+    m, "is prime";
+else
+    Factorization(m);
+end if;   
+---
+
+(program
+  (if_statement
+    condition: (call
+      function: (identifier)
+      arguments: (argument_list
+        (identifier)))
+    consequence: (block
+      (expression_statement
+        (identifier)
+        (string)))
+    alternative: (else_clause
+      consequence: (block
+        (expression_statement
+          (call
+            function: (identifier)
+            arguments: (argument_list
+              (identifier))))))))
+
+================================================================================
+Complex nested if statements
+================================================================================
+
+if x gt 1 then
+   if x lt 2 then
+      	print -x;
+   elif x eq 2 then
+   	print 2;
+   else
+	x := 0;
+   end if;
+end if;
+   
+---
+
+(program
+  (if_statement
+    condition: (comparison_operator
+      left: (identifier)
+      right: (integer))
+    consequence: (block
+      (if_statement
+        condition: (comparison_operator
+          left: (identifier)
+          right: (integer))
+        consequence: (block
+          (print_statement
+            (unary_operator
+              right: (identifier))))
+        alternative: (elif_clause
+          condition: (comparison_operator
+            left: (identifier)
+            right: (integer))
+          consequence: (block
+            (print_statement
+              (integer))))
+        alternative: (else_clause
+          consequence: (block
+            (assignment
+              left: (identifier)
+              right: (integer))))))))
+
+================================================================================
+Case statement
+================================================================================
+
+x := 73;
+case Sign(x):
+   when 1:
+      x, "is positive";
+   when 0:
+      x, "is zero";
+   when -1:
+      x, "is negative";
+end case;
+
+
+---
+
+; copied from https://magma.maths.usyd.edu.au/magma/handbook/text/11
+(program
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (case_statement
+    matchee: (call
+      function: (identifier)
+      arguments: (argument_list
+        (identifier)))
+    (when_clause
+      match: (integer)
+      consequence: (block
+        (expression_statement
+          (identifier)
+          (string))))
+    (when_clause
+      match: (integer)
+      consequence: (block
+        (expression_statement
+          (identifier)
+          (string))))
+    (when_clause
+      match: (unary_operator
+        right: (integer))
+      consequence: (block
+        (expression_statement
+          (identifier)
+          (string))))))
+
+================================================================================
+Ternary operator
+================================================================================
+
+s := (y gt 0) select 1 else -1;
+
+---
+
+(program
+  (assignment
+    left: (identifier)
+    right: (ternary_operator
+      conditional: (parenthesized_expression
+        (comparison_operator
+          left: (identifier)
+          right: (integer)))
+      then: (integer)
+      else: (unary_operator
+        right: (integer)))))
+
+
+================================================================================
+Nested ternary operator
+================================================================================
+
+(y gt 0) select 1 else (y eq 0 select 0 else -1);
+
+---
+
+(program
+  (expression_statement
+    (ternary_operator
+      conditional: (parenthesized_expression
+        (comparison_operator
+          left: (identifier)
+          right: (integer)))
+      then: (integer)
+      else: (parenthesized_expression
+        (comparison_operator
+          left: (identifier)
+          right: (ternary_operator
+            conditional: (integer)
+            then: (integer)
+            else: (unary_operator
+              right: (integer))))))))
+
+================================================================================
+Repeat statement
+================================================================================
+
+repeat
+    while IsEven(x) do
+        i +:= 1;
+        x div:= 2;
+    end while;
+    if x eq 1 then
+        break;
+    end if;
+    x := 3*x+1;
+    i +:= 1;
+until false;
+
+---
+; copied from https://magma.maths.usyd.edu.au/magma/handbook/text/13#86
+(program
+  (repeat_statement
+    body: (block
+      (while_statement
+        condition: (call
+          function: (identifier)
+          arguments: (argument_list
+            (identifier)))
+        body: (block
+          (augmented_assignment
+            left: (identifier)
+            right: (integer))
+          (augmented_assignment
+            left: (identifier)
+            right: (integer))))
+      (if_statement
+        condition: (comparison_operator
+          left: (identifier)
+          right: (integer))
+        consequence: (block
+          (break_statement)))
+      (assignment
+        left: (identifier)
+        right: (binary_operator
+          left: (binary_operator
+            left: (integer)
+            right: (identifier))
+          right: (integer)))
+      (augmented_assignment
+        left: (identifier)
+        right: (integer)))
+    condition: (false)))

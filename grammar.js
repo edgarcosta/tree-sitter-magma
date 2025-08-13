@@ -1,6 +1,7 @@
 // precedence table
 // TODO: fill this in with details from 
 // https://github.com/edgarcosta/tree-sitter-magma/blob/95816b192272e8d4eb6d986f18a2741476b26269/grammar-docs/precedence.md
+
 const PREC = {
     parenthesized_expression: 1,
     eval: 2,
@@ -37,6 +38,7 @@ const PREC = {
     call: 32,
 };
 
+// TODO: add line continuation character: \
 
 module.exports = grammar({
     name: 'magma',
@@ -46,6 +48,9 @@ module.exports = grammar({
 	$.comment,      // comments
     ],
 
+    conflicts: $ => [
+	[$.expression_statement, $.assignment]
+    ],
     // A _statement_ is any valid sequence of symbols followed by a semicolon
     // eg. a variable assignment, a function/intrinsic definition
 
@@ -62,10 +67,13 @@ module.exports = grammar({
 	$.expression,
 	$.primary_expression,
     ],
-    inline: $ => [
-	$._simple_statement
-    ],
 
+    inline: $ => [
+	$._simple_statement,
+	$._compound_statement,
+	$._left_hand_side,
+	// $._right_hand_side,
+    ],
     rules: {
 	program: $ => choice(
 	    repeat(choice(
@@ -126,33 +134,61 @@ module.exports = grammar({
 	
 	_statement: $ => seq(
 	    choice(
-	    $._simple_statement,
-	    $._compound_statement,
-	    ),
+		$._simple_statement,
+		$._compound_statement),
 	    ';',
 	),
 
 	_simple_statement: $ => choice(
 	    $.expression_statement,
 	    $.return_statement,
+	    $.break_statement,
+	    $.continue_statement,
+	    $.eval_statement,
+	    $.print_statement,
 	    $._definition,
 	    $._assignment,
 	),
 
-	expression_statement: $ => choice(
-	    $.expression,
-	    // $.assignment
-	),
-
-	_compound_statement: $ => "placeholder",
+	expression_statement: $ => commaSep1($.primary_expression),
+	//     // $.assignment
+	// ),
 
 	return_statement: $ => seq(
 	    "return",
 	    // TODO: can this be optional?
-	    $.expression
+	    // can return multiple values!
+	    $.expression_statement
 	),
 
-	// TODO: includes 'not', '-', '~' ..?
+	break_statement: $ => seq(
+	    prec.left('break'),
+	    optional($.identifier)
+	),
+
+	continue_statement: $ => seq(
+	    prec.left('continue'),
+	    optional($.identifier)
+	),
+
+	eval_statement: $ => seq(
+	    'eval',
+	    // can be anything that evaluates to a string!
+	    $.primary_expression
+	),
+
+	
+	print_statement: $ => seq(
+	    'print',
+	    commaSep1($.expression),
+	),
+
+	// MAYBE: consider moving 'not' to separate function
+	boolean_statement: $ => choice(
+	    $.unary_operator,
+	    $.binary_operator,
+	),
+	
 	unary_operator: $ => {
 	    const table = [
 		['not', PREC.not],
@@ -195,23 +231,20 @@ module.exports = grammar({
 	},
 
 	// TODO: implement ternary operators
-	ternary_operator: $ => "placeholder",
+	ternary_operator: $ => prec(PREC.ternary, seq(
+	    field('conditional', $.primary_expression),
+	    'select',
+	    field('then', $.expression),
+	    'else',
+	    field('else', $.expression))
+	),
 
 	// TODO: decide if this should be part of binary operator
 	comparison_operator: $ => {
-	    const table = [
-		['gt'],
-		['ge'],
-		['lt'],
-		['le'],
-		['eq'],
-		['ne'],
-		['cmpeq'],
-		['cmpne'],
-	    ];
+	    const table = ['gt', 'ge', 'lt', 'le', 'eq', 'ne', 'cmpeq', 'cmpne'];
 
 	    // @ts-ignore
-	    return choice(...table.map(([operator]) => prec.left(PREC.cmp, seq(
+	    return choice(...table.map((operator) => prec.left(PREC.cmp, seq(
 		field('left', $.expression),
 		// @ts-ignore
 		field('operator', operator),
@@ -219,7 +252,6 @@ module.exports = grammar({
 	    ))));
 	    
 	},
-	// TODO: same as above
 	boolean_operator: $ => {
 	    const table = [
 		['or', PREC.or],
@@ -335,19 +367,19 @@ module.exports = grammar({
 	// export: $ => 'export',
 
 	// Keywords - I/O and debugging
-	print: $ => 'print',
-	printf: $ => 'printf',
-	fprintf: $ => 'fprintf',
-	vprint: $ => 'vprint',
-	vprintf: $ => 'vprintf',
-	read: $ => 'read',
-	readi: $ => 'readi',
-	error: $ => 'error',
-	assert: $ => 'assert',
-	assert2: $ => 'assert2',
-	assert3: $ => 'assert3',
-	time: $ => 'time',
-	vtime: $ => 'vtime',
+	// print: $ => 'print',
+	// printf: $ => 'printf',
+	// fprintf: $ => 'fprintf',
+	// vprint: $ => 'vprint',
+	// vprintf: $ => 'vprintf',
+	// read: $ => 'read',
+	// readi: $ => 'readi',
+	// error: $ => 'error',
+	// assert: $ => 'assert',
+	// assert2: $ => 'assert2',
+	// assert3: $ => 'assert3',
+	// time: $ => 'time',
+	// vtime: $ => 'vtime',
 
 	// // Keywords - special constructs
 	// try: $ => 'try',
@@ -356,8 +388,6 @@ module.exports = grammar({
 	// // is: $ => 'is',
 	// exists: $ => 'exists',
 	// forall: $ => 'forall',
-	// select: $ => 'select',
-	// eval: $ => 'eval',
 	// assigned: $ => 'assigned',
 	// delete: $ => 'delete',
 	// quit: $ => 'quit',
@@ -373,80 +403,21 @@ module.exports = grammar({
 	// reduct_join: $ => '&join',
 	// reduct_cat: $ => '&cat',
 
-	// // Boolean literals
-	// bool_true: $ => 'true',
-	// bool_false: $ => 'false',
-
-	// Literals
-	// integer_literal: $ => /\d+/,
-	
-	// real_literal: $ => /\d+\.\d+([eE][+-]?\d+)?/,
-	
-
-
-	// Sequence and cycle literals (simplified for now)
-	sequence_literal: $ => seq('[', optional($.expression_list), ']'),
-	cycle_literal: $ => seq('(', $.expression_list, ')'),
-
-	// Basic structure placeholders - will be implemented in later tasks
-	// statement: $ => choice(
-	//     $.normal_statement,
-	//     seq($.time, $.normal_statement),
-	//     seq($.vtime, $.identifier, optional(seq($.comma, $.expression)), $.colon, $.normal_statement)
-	// ),
-
-	// normal_statement: $ => choice(
-	//   $.semi,  // null statement
-	//   'placeholder_statement'  // placeholder for other statements
-	// ),
-
-	// directive: $ => choice(
-	//     seq($.clear, $.semi),
-	//     seq($.load, $.directive_string, $.semi),
-	//     seq($.iload, $.directive_string, $.semi),
-	//     seq($.save, $.directive_string, $.semi),
-	//     seq($.restore, $.directive_string, $.semi),
-	//     seq($.freeze, $.semi)
-	// ),
-
-	// directive_string: $ => choice(
-	//     $.string_literal,
-	//     $.identifier
-	// ),
-
-	// declaration: $ => choice(
-	//     seq($.declare),
-
-	//     opt_elt_t: $ => seq($.leftsquare, $.identifier, $.rightsquare),
-
-	//     identifier_list: $ => seq($.identifier, repeat(seq($.comma, $.identifier))),
-
-	//     intrinsic: $ => seq(
-	// 	$.intrinsic,
-	// 	$.identifier,
-	// 	$.leftround,
-	// 	'placeholder_intrinsic_args',
-	// 	$.rightround,
-	// 	'placeholder_intrinsic_opt'
-	//     ),
-
-	// literal: $ => choice(
-	//     $.integer_literal,
-	//     $.real_literal,
-	//     $.string_literal,
-	//     $.bool_true,
-	//     $.bool_false,
-	//     $.sequence_literal,
-	//     $.cycle_literal
-	// ),
-
-	// TODO: should differentiate between expression and statement
 	expression: $ => choice(
 	    $.primary_expression,
 	    $.boolean_operator,
 	    $.comparison_operator,
 	),
-
+	
+	parenthesized_expression: $ => prec(
+	    PREC.parenthesized_expression,
+	    seq(
+		'(',
+		$.expression,
+		')'
+	    )),
+	// TODO: the expression (1,2) can mean permuation group cycle; implement this!
+	
 	primary_expression: $ => choice(
 	    $.identifier,
 	    $.integer,
@@ -454,13 +425,15 @@ module.exports = grammar({
 	    $.string,
 	    $.binary_operator,
 	    $.unary_operator,
+	    $.ternary_operator,
 	    $.true,
 	    $.false,
 	    $.call,
+	    $.parenthesized_expression, // should this really be here?
 	),
 	
-	true: _ => 'True',
-	false: _ => 'False',
+	true: _ => 'true',
+	false: _ => 'false',
 	
 	expression_list: $ => 'placeholder_expr_list',
 
@@ -472,10 +445,11 @@ module.exports = grammar({
 	    $.intrinsic_definition,
 	),
 
-	// TODO: prevent functions from being wrapped in expressions
+	// TODO: functions should always have return statements!
+	// But this might not be the parser's job to enforce
+	// Difficult to implement because it might appear in the middle of `body`
 	
 	function_definition: $ => seq(
-	    // TODO: Can this be capitalized?
 	    'function',
 	    field('name', $.identifier),
 	    field('arguments', $.argument_list),
@@ -521,22 +495,29 @@ module.exports = grammar({
 	    ':=',
 	    field('right', $._right_hand_side),
 	),
-	
+
+	// TODO: Refactor to make use of all binary operators
+	// we can use the operators
+	// join, meet, diff, sdiff, cat, *, +, -, /, ^, div, mod, and, or, xor
+	// 
 	augmented_assignment: $ => seq(
-	    field('left', $._left_hand_side),
+	    field('left', $.primary_expression),
 	    choice(
 		// TODO: Find out if there are more options here like in python!
 		'+:=',
 		'-:=',
 		'*:=',
 		'/:=',
+		'and:=',
+		'or:=',
+		'div:='
 	    ),
-	    field('right', $._right_hand_side),
+	    field('right', $.expression),
 	),
 
 	_left_hand_side: $ => commaSep1(
 	    choice(
-		$.identifier, // TODO: can probably be a primary expression? e.g. F[1] = ...
+		$.primary_expression, // TODO: is this too general?
 		$.gen_expression,
 		'_'
 	    )),
@@ -544,7 +525,7 @@ module.exports = grammar({
 	_right_hand_side: $ => commaSep1($.expression),
 
 	gen_expression: $ => seq(
-	    $.identifier,
+	    choice($.identifier, '_'),
 	    '<',
 	    commaSep1($.identifier),
 	    '>'
@@ -555,27 +536,98 @@ module.exports = grammar({
 	    $.identifier,
 	    '.',
 	),
+	// TODO: should this be token.immediate?
 	typed_identifier: $ => seq(
 	    $.identifier,
 	    "::",
 	    $.type,
 	),
 	
+
+
+	// Control flow
+	_compound_statement: $ => choice(
+	    $.if_statement,
+	    $.for_statement,
+	    $.while_statement,
+	    $.case_statement,
+	    $.repeat_statement
+	),
+	
+	if_statement: $ => seq(
+	    'if',
+	    field('condition', $.expression),
+	    'then',
+	    field('consequence', $.block),
+	    repeat(field('alternative', $.elif_clause)),
+	    optional(field('alternative', $.else_clause)),
+	    'end if'
+	),
+
+	elif_clause: $ => seq(
+	    'elif',
+	    field('condition', $.expression),
+	    'then',
+	    field('consequence', $.block),
+	),
+
+	else_clause: $ => seq(
+	    'else',
+	    field('consequence', $.block),
+	),
+
+	
+	for_statement: $ => "TODO: implement for loop",
+	// needs to take into account all the variations in
+	// https://magma.maths.usyd.edu.au/magma/handbook/text/13#86
+				     
+	while_statement: $ => seq(
+	    'while',
+	    field('condition', $.expression),
+	    'do',
+	    field('body', $.block),
+	    'end while',
+	),
+	
+	repeat_statement: $ => seq(
+	    'repeat',
+	    field('body', $.block),
+	    'until',
+	    field('condition', $.expression),
+	),
+	
+
+	// MAYBE: consider renaming "matchee"
+	case_statement: $ => seq(
+	    'case',
+	    field('matchee', $.primary_expression),
+	    ':',
+	    repeat1($.when_clause),
+	    'end case',
+	),
+
+	when_clause: $ => seq(
+	    'when',
+	    field('match', $.primary_expression),
+	    ':',
+	    field('consequence', $.block)
+	),
+
 	identifier: $ => /[a-zA-Z_][a-zA-Z0-9_]*/,
 	block: $ => repeat1($._statement),
-	string: $ => seq(
-	    '"',
-	    /[a-zA-Z0-9_]*/,
-	    '"'
-	),
+
+	// AI generated, hopefully works as intended
+	string: $ => /"[^"\\]*(?:\\.[^"\\]*)*"/,
+
 	integer: $ => /\d+/,
 	// TODO: implement scanner to allow scientific notation
 	real: $ => /\d+\.\d+/,
-	    // /\d+[\.\d+]?[eE][+-]?\d+/,
+	// /\d+[\.\d+]?[eE][+-]?\d+/,
 	
     },
-    
+
 });
+
 
 // Stolen from tree-sitter-python:
 /**

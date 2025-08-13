@@ -51,5 +51,6 @@ end function;
           left: (identifier)
           right: (identifier)))
       (return_statement
-        (identifier)))))
+        (expression_statement
+          (identifier))))))
 
