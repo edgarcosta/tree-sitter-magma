@@ -1,5 +1,4 @@
 {
-  "$schema": "https://tree-sitter.github.io/tree-sitter/assets/schemas/grammar.schema.json",
   "name": "magma",
   "rules": {
     "program": {
@@ -2357,7 +2356,7 @@
     },
     "double_dollar": {
       "type": "PREC_LEFT",
-      "value": 25,
+      "value": 27,
       "content": {
         "type": "SEQ",
         "members": [
@@ -2484,6 +2483,6 @@
     "_compound_statement",
     "expression",
     "primary_expression"
-  ],
-  "reserved": {}
+  ]
 }
+
