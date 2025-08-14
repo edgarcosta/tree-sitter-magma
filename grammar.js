@@ -56,6 +56,21 @@ expr TOK_BACKQUOTE_BACKQUOTE expr).
 
 // TODO: add line continuation character: \
 
+
+
+function aggregate_of($, left, right, has_universe) {
+	return seq(
+		left,
+		optional(has_universe ? seq(
+			field('universe', $.primary_expression),
+			'|'
+		) : seq()),
+		optional(commaSep1($.primary_expression)),
+		right
+	);
+}
+
+
 module.exports = grammar({
     name: 'magma',
 
@@ -472,6 +487,8 @@ module.exports = grammar({
 	    $.call,
 	    $.double_dollar,		// MAYBE: should this really be here?
 	    $.parenthesized_expression, // should this really be here?
+		$.literal_sequence,
+		$.aggregate,
 	),
 	
 	true: _ => 'true',
@@ -704,17 +721,29 @@ module.exports = grammar({
 	
 	
 	// Basic tokens:
-	
+
 	identifier: $ => /[a-zA-Z_][a-zA-Z0-9_]*/,
 	block: $ => repeat1($._statement),
-	// TODO: add all the sequence functionality from https://magma.maths.usyd.edu.au/magma/handbook/text/116#949
-	sequence: $ => seq(
-	    choice('[', '\['),
-	    optional(commaSep1($.primary_expression)),
+	// TODO: add all the aggregate functionality from https://magma.maths.usyd.edu.au/magma/handbook/text/116#949
+	// TODO: add formal sequences
+	// Literal sequence \[ 1, 2, 3 ], no expressions allowed
+	literal_sequence: $ => seq(
+	    '\\[',
+		optional(commaSep1($.integer)),
 	    ']'
 	),
-	    
-	
+
+	seqenum: $ => aggregate_of($, '[', ']', true),
+	list: $ => aggregate_of($, '[*', '*]', false),
+	tuple: $ => aggregate_of($, '<', '>', false),
+	set: $ => aggregate_of($, '{', '}', true),
+	indexed_set: $ => aggregate_of($, '{@', '@}', true),
+	multiset: $ => aggregate_of($, '{*', '*}', true),
+	aggregate: $ => choice(
+		$.seqenum, $.list, $.tuple, $.set, $.indexed_set, $.multiset
+	),
+
+
 	// AI generated, hopefully works as intended
 	string: $ => /"[^"\\]*(?:\\.[^"\\]*)*"/,
 
@@ -746,8 +775,13 @@ function commaSep1(rule) {
  *
  * @param {RuleOrLiteral} rule
  *
- * @param {RuleOrLiteral} separator
- *
+   // Function sets: {!1, 2, 3!}
+	    seq(
+		'{!',
+		optional(commaSep1($.primary_expression)),
+		'!}'
+	    )
+	),
  * @return {SeqRule}
  *
  */

@@ -1,0 +1,215 @@
+==================
+Standard sequences
+==================
+
+[1, 2, 3];
+
+---
+
+(program
+  (expression_statement
+    (aggregate
+      (seqenum
+        (integer)
+        (integer)
+        (integer)))))
+
+==================
+Empty standard sequence
+==================
+
+[];
+
+---
+
+(program
+  (expression_statement
+    (aggregate
+      (seqenum))))
+
+==================
+Starred sequences
+==================
+
+[* 1, 2, 3 *];
+
+---
+
+(program
+  (expression_statement
+    (aggregate
+      (list
+        (integer)
+        (integer)
+        (integer)))))
+
+==================
+Empty starred sequence
+==================
+
+[* *];
+
+---
+
+(program
+  (expression_statement
+    (aggregate
+      (list))))
+
+==================
+Tuples
+==================
+
+<1, 2, 3>;
+
+---
+
+(program
+  (expression_statement
+    (aggregate
+      (tuple
+        (integer)
+        (integer)
+        (integer)))))
+
+==================
+Empty tuple
+==================
+
+<>;
+
+---
+
+(program
+  (expression_statement
+    (aggregate
+      (tuple))))
+
+==================
+Sets
+==================
+
+{1, 2, 3};
+
+---
+
+(program
+  (expression_statement
+    (aggregate
+      (set
+        (integer)
+        (integer)
+        (integer)))))
+
+==================
+Empty set
+==================
+
+{};
+
+---
+
+(program
+  (expression_statement
+    (aggregate
+      (set))))
+
+==================
+Indexed sets
+==================
+
+{@1, 2, 3@};
+
+---
+
+(program
+  (expression_statement
+    (aggregate
+      (indexed_set
+        (integer)
+        (integer)
+        (integer)))))
+
+==================
+Empty indexed set
+==================
+
+{@@};
+
+---
+
+(program
+  (expression_statement
+    (aggregate
+      (indexed_set))))
+
+==================
+Multisets
+==================
+
+{*1, 2, 3*};
+
+---
+
+(program
+  (expression_statement
+    (aggregate
+      (multiset
+        (integer)
+        (integer)
+        (integer)))))
+
+==================
+Empty multiset
+==================
+
+{**};
+
+---
+
+(program
+  (expression_statement
+    (aggregate
+      (multiset))))
+
+
+==================
+Sequences with expressions
+==================
+
+[a + b, c * d, e^f];
+
+---
+
+(program
+  (expression_statement
+    (aggregate
+      (seqenum
+        (binary_operator
+          left: (identifier)
+          right: (identifier))
+        (binary_operator
+          left: (identifier)
+          right: (identifier))
+        (binary_operator
+          left: (identifier)
+          right: (identifier))))))
+
+==================
+Mixed content sequences
+==================
+
+[* 1, "hello", true, x + y *];
+
+---
+
+(program
+  (expression_statement
+    (aggregate
+      (list
+        (integer)
+        (string)
+        (true)
+        (binary_operator
+          left: (identifier)
+          right: (identifier))))))
