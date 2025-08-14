@@ -167,6 +167,7 @@ module.exports = grammar({
 	    $.print_statement,
 	    $._definition,
 	    $._assignment,
+		$.where_expression,
 	),
 
 	expression_statement: $ => commaSep1($.primary_expression),
@@ -270,6 +271,18 @@ module.exports = grammar({
 	    ))));
 	    
 	},
+
+	where_expression: $ => prec.left(PREC.where, seq(
+		field('value', $.expression),
+		'where',
+		field('variables', $.ident_underscore_list),
+		field('operator', choice('is', ':=')),
+		field('definition', $.expression),
+	)),
+	
+	ident_underscore_list: $ => commaSep1(
+		choice($.identifier, '_')
+	),
 	
 	boolean_operator: $ => {
 	    const table = [
@@ -434,8 +447,9 @@ module.exports = grammar({
 	    $.primary_expression,
 	    $.boolean_operator,
 	    $.comparison_operator,
+	    $.where_expression,
 	),
-	
+
 	parenthesized_expression: $ => prec(
 	    PREC.parenthesized_expression,
 	    seq(
@@ -740,3 +754,5 @@ function commaSep1(rule) {
 function sep1(rule, separator) {
     return seq(rule, repeat(seq(separator, rule)));
 }
+
+

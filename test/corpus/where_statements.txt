@@ -1,0 +1,140 @@
+=======================================================
+Basic where statement with "is"
+=======================================================
+
+x + y where x is 5;
+
+---
+
+    (program
+      (where_expression
+        (binary_operator
+          (identifier)
+          (identifier))
+        (ident_underscore_list
+          (identifier))
+        (integer)))
+
+=======================================================
+Basic where statement with ":="
+=======================================================
+
+
+a * b where a := 3;
+
+---
+
+    (program
+      (where_expression
+        (binary_operator
+          (identifier)
+          (identifier))
+        (ident_underscore_list
+          (identifier))
+        (integer)))
+
+=======================================================
+Where statement with function call
+=======================================================
+
+f(x) where x is 10;
+
+---
+
+    (program
+      (where_expression
+        (call
+          (identifier)
+          (argument_list
+            (identifier)))
+        (ident_underscore_list
+          (identifier))
+        (integer)))
+
+=======================================================
+Where statement with comparison
+=======================================================
+
+a eq b where a is 5;
+
+---
+
+    (program
+      (where_expression
+        (comparison_operator
+          (identifier)
+          (identifier))
+        (ident_underscore_list
+          (identifier))
+        (integer)))
+
+=======================================================
+Where statement with parenthesized expression
+=======================================================
+
+(x + y) * z where x is 1;
+
+---
+
+    (program
+      (where_expression
+        (binary_operator
+          (parenthesized_expression
+            (binary_operator
+              (identifier)
+              (identifier)))
+          (identifier))
+        (ident_underscore_list
+          (identifier))
+        (integer)))
+
+=======================================================
+Where statement with boolean operator
+=======================================================
+
+a and b where a is true;
+
+---
+
+    (program
+      (where_expression
+        (boolean_operator
+          (identifier)
+          (identifier))
+        (ident_underscore_list
+          (identifier))
+        (true)))
+
+
+=======================================================
+Where statement with unary operator
+=======================================================
+
+not p where p is false;
+
+---
+
+    (program
+      (where_expression
+        (unary_operator
+          (identifier))
+        (ident_underscore_list
+          (identifier))
+        (false)))
+
+=======================================================
+Where statement with arithmetic
+=======================================================
+
+n + 1 where n is 42;
+
+---
+
+    (program
+      (where_expression
+        (binary_operator
+          (identifier)
+          (integer))
+        (ident_underscore_list
+          (identifier))
+        (integer)))
