@@ -138,3 +138,28 @@ n + 1 where n is 42;
         (ident_underscore_list
           (identifier))
         (integer)))
+
+==================
+Left associativity
+==================
+
+a + b where b := 1 where a:=10 where a := 3;
+
+---
+
+    (program
+      (where_expression
+        (where_expression
+          (where_expression
+            (binary_operator
+              (identifier)
+              (identifier))
+            (ident_underscore_list
+              (identifier))
+            (integer))
+          (ident_underscore_list
+            (identifier))
+          (integer))
+        (ident_underscore_list
+          (identifier))
+        (integer)))
