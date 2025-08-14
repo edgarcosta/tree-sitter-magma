@@ -1,42 +1,58 @@
 // precedence table
-// TODO: fill this in with details from 
-// https://github.com/edgarcosta/tree-sitter-magma/blob/95816b192272e8d4eb6d986f18a2741476b26269/grammar-docs/precedence.md
-
+// precedence: low -> high
 const PREC = {
-    parenthesized_expression: 1,
-    eval: 2,
-    where: 3,
-    eq: 4,
-    ternary: 5,
-    hathat: 6,
-    or: 7,
-    and: 8,
-    not: 9,
-    cmp: 10,
-    membership: 11,
-    join: 12,
-    diff: 13,
-    sdiff: 14,
-    meet: 15,
-    plus: 16,
-    times: 17,
-    tilde: 18,
-    cat: 19,
-    negate: 20,
-    power: 21,
-    coercion: 22,
-    at: 23,
-    dot: 24,
-    dollar: 25,
-    reduct: 26,
-    hash: 27,
-    assigned: 28,
-    sq_bracket: 29,
-    parenthesis: 30,
-    backquote: 31,
-    // TODO: what does double backquote mean?
-    call: 32,
+	parenthesized_expression: 1, // TOK_LEFTROUND                   (left)
+	eval: 2,                 // TOK_EVAL
+	where: 3,                // TOK_WHERE TOK_IS TOK_BECOMES
+	eq: 4,                   // TOK_EQUALITY
+	arrow: 5,                // TOK_ARROW
+	ternary: 6,              // TOK_QUESTION TOK_SELECT TOK_ELSE   (right)
+	hathat: 7,               // TOK_HAT_HAT                         (nonassoc)
+	or: 8,                   // TOK_OR TOK_XOR                      (left)
+	and: 9,                  // TOK_AND                             (left)
+	not: 10,                 // TOK_NOT                             (right)
+	cmp: 11,                 // TOK_EQ TOK_CMPEQ TOK_CMPNE TOK_NE TOK_GT TOK_GE TOK_LT TOK_LE (left)
+	membership: 12,          // TOK_IN TOK_NOTIN TOK_ADJ TOK_NOTADJ TOK_SUBSET TOK_NOTSUBSET  (nonassoc)
+	join: 13,                // TOK_JOIN                            (left)
+	diff: 14,                // TOK_DIFF                            (left)
+	sdiff: 15,               // TOK_SDIFF                           (left)
+	meet: 16,                // TOK_MEET                            (left)
+	plus: 17,                // TOK_PLUS TOK_MINUS                  (left)
+	times: 18,               // TOK_DIV TOK_MOD TOK_STAR TOK_SLASH  (left)
+	tilde: 19,               // TOK_TILDE                           (left)
+	cat: 20,                 // TOK_CAT                             (left)
+	negate: 21,              // TOK_UMINUS                          (right)
+	power: 22,               // TOK_HAT                             (right)
+	bang: 23,                // TOK_BANG TOK_BANG_BANG              (right)
+	colon: 24,               // TOK_COLON TOK_COLON_COLON            (left)
+	at: 25,                  // TOK_AT TOK_ATAT                     (left)
+	dot: 26,                 // TOK_DOT                             (left)
+	dollar: 27,              // TOK_DOLLAR TOK_DOLLAR_DOLLAR        (nonassoc)
+	reduct: 28,              // TOK_REDUCT_PLUS TOK_REDUCT_MULT TOK_REDUCT_AND TOK_REDUCT_OR (nonassoc)
+	hash: 29,                // TOK_HASH                            (nonassoc)
+	utilde: 30,              // TOK_UTILDE                          (nonassoc)
+	assigned: 31,            // TOK_ASSIGNED                        (right)
+	sq_bracket: 32,          // TOK_LEFTSQUARE                      (left)   // indexing
+	parenthesis: 33, // TOK_LEFTROUND                   (left)
+	backquote: 34,           // TOK_BACKQUOTE TOK_BACKQUOTE_BACKQUOTE (left)
+	call: 35                 // function application; keep as top-most
 };
+
+
+// TODO: what does double backquote mean?
+/*
+
+Double Backquote: Used for dynamic selection. The name of the field is determined by evaluating an expression.
+The grammar defines this as an expression followed by a double backquote and another expression (
+
+expr TOK_BACKQUOTE_BACKQUOTE expr).
+
+    Example: MyRecord``"na" cat "me"
+
+        In this case, the expression "na" cat "me" is first evaluated to the string "name".
+		The result is then used to access the name field from the MyRecord object. This is useful when field names are constructed programmatically.
+*/
+
 
 // TODO: add line continuation character: \
 
