@@ -156,10 +156,12 @@ module.exports = grammar({
 
 	return_statement: $ => seq(
 	    "return",
-	    // TODO: can this be optional?
-	    // can return multiple values!
-	    $.expression_statement
+		// TODO: functions can return multiple values!
+		// Procedures return nothing, and can only have empty return statements, as an early exit
+		// Functions must have a return statement with an expression (semantic validation)
+	    optional($.expression_statement)
 	),
+
 
 	break_statement: $ => seq(
 	    prec.left('break'),
@@ -208,10 +210,9 @@ module.exports = grammar({
 		[prec.left, '-', PREC.plus],
 		[prec.left, '*', PREC.times],
 		[prec.left, '/', PREC.times],
-		[prec.left, '//', PREC.times],
 		[prec.right, '^', PREC.power],
 		[prec.left, 'div', PREC.times],
-		[prec.left, 'rem', PREC.times],
+		[prec.left, 'mod', PREC.times],
 		[prec.left, '^^', PREC.hathat],
 		[prec.left, 'join', PREC.join],
 		[prec.left, 'diff', PREC.diff],
@@ -437,31 +438,43 @@ module.exports = grammar({
 	expression_list: $ => 'placeholder_expr_list',
 
 	// TODO: add anonymous func's and proc's
-	// TODO: add procedures
+	// TODO: add foo := procedure, bar := function
 	
 	_definition: $ => choice(
 	    $.function_definition,
 	    $.intrinsic_definition,
+	    $.procedure_definition,
 	),
 
 	// TODO: functions should always have return statements!
 	// But this might not be the parser's job to enforce
 	// Difficult to implement because it might appear in the middle of `body`
 	
+	// Function definition - semantic validation should ensure it has a return statement with expression
 	function_definition: $ => seq(
 	    'function',
 	    field('name', $.identifier),
 	    field('arguments', $.argument_list),
-	    optional(field('body', $.block)),
+	    field('body', $.block),
 	    'end function',
 	),
 
+	// TODO: enable early exits via empty return statements
+	procedure_definition: $ => seq(
+	    'procedure',
+	    field('name', $.identifier),
+	    field('arguments', $.argument_list),
+	    optional(field('body', $.block)),
+	    'end procedure',
+	),
+
+	// TODO: it must have a return statement it has a return type!
 	intrinsic_definition: $ => seq(
 	    'intrinsic',
 	    field('name', $.identifier),
 	    field('arguments', $.argument_list),
 	    '->',
-	    field('return_type', $.type),
+	    optional(field('return_type', $.type)),
 	    field('docstring',
 		  seq('{',
 		      /[^{}]*/,	// matches anything that's not a squirly brace
