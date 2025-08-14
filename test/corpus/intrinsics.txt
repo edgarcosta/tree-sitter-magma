@@ -30,8 +30,8 @@ end intrinsic;
   (intrinsic_definition
     name: (identifier)
     arguments: (argument_list
-      (identifier)
-      (identifier))
+	argument: (identifier)
+	argument: (identifier))
     return_type: (type)
     body: (block
       (return_statement

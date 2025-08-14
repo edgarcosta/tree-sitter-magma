@@ -1,3 +1,0 @@
-for i := 1 to 13 do
-    i +:= 1;
-end for;
