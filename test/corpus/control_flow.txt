@@ -213,3 +213,46 @@ until false;
         left: (identifier)
         right: (integer)))
     condition: (false)))
+
+
+================================================================================
+Basic for loop
+================================================================================
+
+for i := 1 to 13 do
+    i +:= 1;
+end for;
+
+---
+
+(program
+  (for_statement
+    quantifier: (for_quantifier
+      (identifier)
+      (integer)
+      (integer))
+    body: (block
+      (augmented_assignment
+        left: (identifier)
+        right: (integer)))))
+
+================================================================================
+Enumerated for loop
+================================================================================
+
+for i -> x in X do
+    print i,x;
+end for;
+
+--- 
+
+(program
+  (for_statement
+    quantifier: (for_quantifier
+      (identifier)
+      (identifier)
+      (identifier))
+    body: (block
+      (print_statement
+        (identifier)
+        (identifier)))))

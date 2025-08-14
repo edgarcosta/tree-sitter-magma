@@ -598,6 +598,47 @@
     }
   },
   {
+    "type": "for_quantifier",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "primary_expression",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "for_statement",
+    "named": true,
+    "fields": {
+      "body": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "block",
+            "named": true
+          }
+        ]
+      },
+      "quantifier": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "for_quantifier",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "function_definition",
     "named": true,
     "fields": {
@@ -1081,6 +1122,10 @@
     "named": false
   },
   {
+    "type": "by",
+    "named": false
+  },
+  {
     "type": "case",
     "named": false
   },
@@ -1129,6 +1174,10 @@
     "named": false
   },
   {
+    "type": "end for",
+    "named": false
+  },
+  {
     "type": "end function",
     "named": false
   },
@@ -1157,8 +1206,8 @@
     "named": true
   },
   {
-    "type": "for_statement",
-    "named": true
+    "type": "for",
+    "named": false
   },
   {
     "type": "function",
@@ -1178,6 +1227,10 @@
   },
   {
     "type": "if",
+    "named": false
+  },
+  {
+    "type": "in",
     "named": false
   },
   {
@@ -1225,6 +1278,10 @@
     "named": false
   },
   {
+    "type": "random",
+    "named": false
+  },
+  {
     "type": "real",
     "named": true
   },
@@ -1254,6 +1311,10 @@
   },
   {
     "type": "then",
+    "named": false
+  },
+  {
+    "type": "to",
     "named": false
   },
   {

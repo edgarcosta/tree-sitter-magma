@@ -230,7 +230,6 @@ module.exports = grammar({
 	    ))));
 	},
 
-	// TODO: implement ternary operators
 	ternary_operator: $ => prec(PREC.ternary, seq(
 	    field('conditional', $.primary_expression),
 	    'select',
@@ -577,7 +576,27 @@ module.exports = grammar({
 	),
 
 	
-	for_statement: $ => "TODO: implement for loop",
+	for_statement: $ => seq(
+	    'for',
+	    field('quantifier', $.for_quantifier),
+	    'do',
+	    field('body', $.block),
+	    'end for'
+	),
+
+	for_quantifier: $ => choice(
+	    seq($.identifier,
+		':=', $.primary_expression,
+		'to', $.primary_expression,
+		optional(seq('by', $.primary_expression))
+	       ),
+	    seq(
+		optional('random'),
+		$.identifier,
+		optional(seq('->', $.identifier)),
+		'in',
+		$.primary_expression),
+	),
 	// needs to take into account all the variations in
 	// https://magma.maths.usyd.edu.au/magma/handbook/text/13#86
 				     
@@ -615,7 +634,14 @@ module.exports = grammar({
 
 	identifier: $ => /[a-zA-Z_][a-zA-Z0-9_]*/,
 	block: $ => repeat1($._statement),
-
+	// TODO: add all the sequence functionality from https://magma.maths.usyd.edu.au/magma/handbook/text/116#949
+	sequence: $ => seq(
+	    choice('[', '\['),
+	    optional(commaSep1($.primary_expression)),
+	    ']'
+	),
+	    
+	
 	// AI generated, hopefully works as intended
 	string: $ => /"[^"\\]*(?:\\.[^"\\]*)*"/,
 
