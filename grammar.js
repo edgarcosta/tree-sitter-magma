@@ -65,7 +65,10 @@ module.exports = grammar({
     ],
 
     conflicts: $ => [
-	[$.expression_statement, $.assignment]
+	[$.expression_statement, $.assignment],
+	[$.function_definition, $.primary_expression, $.procedure_definition],
+	// [$.procedure_definition, $.primary_expression],
+	// [$.procedure_definition, $.function_definition],
     ],
     // A _statement_ is any valid sequence of symbols followed by a semicolon
     // eg. a variable assignment, a function/intrinsic definition
@@ -172,9 +175,8 @@ module.exports = grammar({
 
 	return_statement: $ => seq(
 	    "return",
-		// TODO: functions can return multiple values!
-		// Procedures return nothing, and can only have empty return statements, as an early exit
-		// Functions must have a return statement with an expression (semantic validation)
+	    // Procedures return nothing, and can only have empty return statements, as an early exit
+	    // Functions must have a return statement with an expression (semantic validation)
 	    optional($.expression_statement)
 	),
 
@@ -247,7 +249,6 @@ module.exports = grammar({
 	    ))));
 	},
 
-	// TODO: implement ternary operators
 	ternary_operator: $ => prec(PREC.ternary, seq(
 	    field('conditional', $.primary_expression),
 	    'select',
@@ -269,6 +270,7 @@ module.exports = grammar({
 	    ))));
 	    
 	},
+	
 	boolean_operator: $ => {
 	    const table = [
 		['or', PREC.or],
@@ -371,10 +373,18 @@ module.exports = grammar({
 	// forward: $ => 'forward',
 	// intrinsic: $ => 'intrinsic',
 	// local: $ => 'local',
+	// TODO: add local which has syntax:
+	// local var1, var2, ... varn;
 
 	// // Keywords - declarations and directives
 	// declare: $ => 'declare',
+	// TODO: add declare which has syntax:
+	// declare attributes X: Y, Z; 
+	// declare type T[E]: Supertype;
+	// declare verbose fn, lvl;
+	
 	// clear: $ => 'clear',
+	// TODO: clear only appears as "clear;" - implement this
 	// load: $ => 'load',
 	// iload: $ => 'iload',
 	// save: $ => 'save',
@@ -395,8 +405,8 @@ module.exports = grammar({
 	// assert: $ => 'assert',
 	// assert2: $ => 'assert2',
 	// assert3: $ => 'assert3',
-	// time: $ => 'time',
-	// vtime: $ => 'vtime',
+	// time: $ => 'time', // TODO: timed_statement?
+	// vtime: $ => 'vtime', 
 
 	// // Keywords - special constructs
 	// try: $ => 'try',
@@ -446,6 +456,7 @@ module.exports = grammar({
 	    $.true,
 	    $.false,
 	    $.call,
+	    $.double_dollar,		// MAYBE: should this really be here?
 	    $.parenthesized_expression, // should this really be here?
 	),
 	
@@ -469,8 +480,10 @@ module.exports = grammar({
 	
 	// Function definition - semantic validation should ensure it has a return statement with expression
 	function_definition: $ => seq(
-	    'function',
-	    field('name', $.identifier),
+	    choice(
+		seq('function', field('name', $.identifier)),
+		seq(field('name', $.identifier), ':=', 'function')
+	    ),
 	    field('arguments', $.argument_list),
 	    field('body', $.block),
 	    'end function',
@@ -478,8 +491,10 @@ module.exports = grammar({
 
 	// TODO: enable early exits via empty return statements
 	procedure_definition: $ => seq(
-	    'procedure',
-	    field('name', $.identifier),
+	    choice(
+		seq('procedure', field('name', $.identifier)),
+		seq(field('name', $.identifier), ':=', 'procedure')
+	    ),
 	    field('arguments', $.argument_list),
 	    optional(field('body', $.block)),
 	    'end procedure',
@@ -504,15 +519,21 @@ module.exports = grammar({
 	    field('function', $.primary_expression),
 	    field('arguments', $.argument_list),
 	)),
-	
-	// TODO: this should be expression
+
 	argument_list: $ => seq(
 	    '(',
-	    optional(commaSep1(
-		$.expression
-		)),
+	    optional(commaSep1(field('argument', $.expression))),
+	    optional($._optional_argument_list),
 	    ')',
 	),
+	
+	_optional_argument_list: $ => seq(
+	    ':',
+	    commaSep1(
+		field('optional_argument', seq(
+		    $.identifier,
+		    ':=',
+		    field('default_value', $.primary_expression))))),
 
 	_assignment: $ => choice(
 	    $.assignment,
@@ -606,7 +627,27 @@ module.exports = grammar({
 	),
 
 	
-	for_statement: $ => "TODO: implement for loop",
+	for_statement: $ => seq(
+	    'for',
+	    field('quantifier', $.for_quantifier),
+	    'do',
+	    field('body', $.block),
+	    'end for'
+	),
+
+	for_quantifier: $ => choice(
+	    seq($.identifier,
+		':=', $.primary_expression,
+		'to', $.primary_expression,
+		optional(seq('by', $.primary_expression))
+	       ),
+	    seq(
+		optional('random'),
+		$.identifier,
+		optional(seq('->', $.identifier)),
+		'in',
+		$.primary_expression),
+	),
 	// needs to take into account all the variations in
 	// https://magma.maths.usyd.edu.au/magma/handbook/text/13#86
 				     
@@ -642,9 +683,24 @@ module.exports = grammar({
 	    field('consequence', $.block)
 	),
 
+	// Misc:
+	// MAYBE: rename this to parent_function or something?
+	double_dollar: $ => prec.left(
+	    PREC.dollar, seq("$$", $.argument_list)),
+	
+	
+	// Basic tokens:
+	
 	identifier: $ => /[a-zA-Z_][a-zA-Z0-9_]*/,
 	block: $ => repeat1($._statement),
-
+	// TODO: add all the sequence functionality from https://magma.maths.usyd.edu.au/magma/handbook/text/116#949
+	sequence: $ => seq(
+	    choice('[', '\['),
+	    optional(commaSep1($.primary_expression)),
+	    ']'
+	),
+	    
+	
 	// AI generated, hopefully works as intended
 	string: $ => /"[^"\\]*(?:\\.[^"\\]*)*"/,
 

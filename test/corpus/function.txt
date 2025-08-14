@@ -10,7 +10,7 @@ EllipticCurve("11a1");
     (call
       function: (identifier)
       arguments: (argument_list
-        (string)))))
+        argument: (string)))))
 
 ================================================================================
 Basic definition function 
@@ -35,9 +35,9 @@ end function;
 Function definition with arguments
 ================================================================================
 
-function test(x,y)
+function test(x,y : z := 3)
     x := x + y;
-    return x;
+    return x + z;
 end function;
 
 ---
@@ -46,8 +46,10 @@ end function;
   (function_definition
     name: (identifier)
     arguments: (argument_list
-      (identifier)
-      (identifier))
+      argument: (identifier)
+      argument: (identifier)
+      optional_argument: (identifier)
+      default_value: (integer))
     body: (block
       (assignment
         left: (identifier)
@@ -56,8 +58,54 @@ end function;
           right: (identifier)))
       (return_statement
         (expression_statement
-          (identifier))))))
+          (binary_operator
+            left: (identifier)
+            right: (identifier)))))))
 
+================================================================================
+Function definition with := notation
+================================================================================
+
+fibonacci := function(n)
+   if n le 2 then
+      return 1;
+   else
+      return $$(n-1) + $$(n-2);
+   end if;
+end function;
+
+---
+
+; copied from example H2E1
+(program
+  (function_definition
+    name: (identifier)
+    arguments: (argument_list
+      argument: (identifier))
+    body: (block
+      (if_statement
+        condition: (comparison_operator
+          left: (identifier)
+          right: (integer))
+        consequence: (block
+          (return_statement
+            (expression_statement
+              (integer))))
+        alternative: (else_clause
+          consequence: (block
+            (return_statement
+              (expression_statement
+                (binary_operator
+                  left: (double_dollar
+                    (argument_list
+                      argument: (binary_operator
+                        left: (identifier)
+                        right: (integer))))
+                  right: (double_dollar
+                    (argument_list
+                      argument: (binary_operator
+                        left: (identifier)
+                        right: (integer)))))))))))))
 
 ================================================================================
 Procedure definition with no arguments
@@ -93,9 +141,9 @@ end procedure;
   (procedure_definition
     name: (identifier)
     arguments: (argument_list
-      (unary_operator
+      argument: (unary_operator
         right: (identifier))
-      (unary_operator
+      argument: (unary_operator
         right: (identifier)))
     body: (block
       (print_statement
@@ -107,3 +155,50 @@ end procedure;
         left: (identifier)
         right: (identifier)
         right: (identifier)))))
+
+================================================================================
+Procedure definition with := notation
+================================================================================
+
+CheckPythagoras := procedure(x, y, z, ~h)
+    if x^2+y^2 eq z^2 then
+        h := true;
+    else
+        h := false;
+    end if;
+end procedure;
+
+---
+
+; adapted from example H2E5
+(program
+  (procedure_definition
+    name: (identifier)
+    arguments: (argument_list
+      argument: (identifier)
+      argument: (identifier)
+      argument: (identifier)
+      argument: (unary_operator
+        right: (identifier)))
+    body: (block
+      (if_statement
+        condition: (comparison_operator
+          left: (binary_operator
+            left: (binary_operator
+              left: (identifier)
+              right: (integer))
+            right: (binary_operator
+              left: (identifier)
+              right: (integer)))
+          right: (binary_operator
+            left: (identifier)
+            right: (integer)))
+        consequence: (block
+          (assignment
+            left: (identifier)
+            right: (true)))
+        alternative: (else_clause
+          consequence: (block
+            (assignment
+              left: (identifier)
+              right: (false))))))))

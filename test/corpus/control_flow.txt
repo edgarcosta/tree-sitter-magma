@@ -14,7 +14,7 @@ end if;
     condition: (call
       function: (identifier)
       arguments: (argument_list
-        (identifier)))
+        argument: (identifier)))
     consequence: (block
       (expression_statement
         (identifier)
@@ -25,7 +25,7 @@ end if;
           (call
             function: (identifier)
             arguments: (argument_list
-              (identifier))))))))
+              argument: (identifier))))))))
 
 ================================================================================
 Complex nested if statements
@@ -96,7 +96,7 @@ end case;
     matchee: (call
       function: (identifier)
       arguments: (argument_list
-        (identifier)))
+        argument: (identifier)))
     (when_clause
       match: (integer)
       consequence: (block
@@ -188,7 +188,7 @@ until false;
         condition: (call
           function: (identifier)
           arguments: (argument_list
-            (identifier)))
+            argument: (identifier)))
         body: (block
           (augmented_assignment
             left: (identifier)
@@ -213,3 +213,46 @@ until false;
         left: (identifier)
         right: (integer)))
     condition: (false)))
+
+
+================================================================================
+Basic for loop
+================================================================================
+
+for i := 1 to 13 do
+    i +:= 1;
+end for;
+
+---
+
+(program
+  (for_statement
+    quantifier: (for_quantifier
+      (identifier)
+      (integer)
+      (integer))
+    body: (block
+      (augmented_assignment
+        left: (identifier)
+        right: (integer)))))
+
+================================================================================
+Enumerated for loop
+================================================================================
+
+for i -> x in X do
+    print i,x;
+end for;
+
+--- 
+
+(program
+  (for_statement
+    quantifier: (for_quantifier
+      (identifier)
+      (identifier)
+      (identifier))
+    body: (block
+      (print_statement
+        (identifier)
+        (identifier)))))
