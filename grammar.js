@@ -39,24 +39,9 @@ const PREC = {
 };
 
 
-// TODO: what does double backquote mean?
-/*
-
-Double Backquote: Used for dynamic selection. The name of the field is determined by evaluating an expression.
-The grammar defines this as an expression followed by a double backquote and another expression (
-
-expr TOK_BACKQUOTE_BACKQUOTE expr).
-
-    Example: MyRecord``"na" cat "me"
-
-        In this case, the expression "na" cat "me" is first evaluated to the string "name".
-		The result is then used to access the name field from the MyRecord object. This is useful when field names are constructed programmatically.
-*/
-
-
 // TODO: add line continuation character: \
 
-
+// MAYBE: should this be at the bottom like the other helper functions?
 
 function aggregate_of($, left, right, has_universe) {
 	return seq(
@@ -182,7 +167,7 @@ module.exports = grammar({
 	    $.print_statement,
 	    $._definition,
 	    $._assignment,
-		$.where_expression,
+	    $.where_expression,
 	),
 
 	expression_statement: $ => commaSep1($.primary_expression),
@@ -482,6 +467,7 @@ module.exports = grammar({
 	    $.binary_operator,
 	    $.unary_operator,
 	    $.ternary_operator,
+	    $.attribute,
 	    $.true,
 	    $.false,
 	    $.call,
@@ -623,8 +609,25 @@ module.exports = grammar({
 	    "::",
 	    $.type,
 	),
-	
 
+	attribute: $ => choice(
+	    $._backquote,
+	    $._double_backquote
+	),
+	
+	_backquote: $ => seq(
+	    prec.left(PREC.backquote, seq(
+		$.primary_expression,
+		'`',
+		$.identifier))
+	),
+
+	_double_backquote: $ => seq(
+	    prec.left(PREC.backquote, seq(
+		$.primary_expression,
+		'``',
+		$.expression))
+	),
 
 	// Control flow
 	_compound_statement: $ => choice(

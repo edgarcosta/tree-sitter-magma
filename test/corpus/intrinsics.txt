@@ -39,3 +39,30 @@ end intrinsic;
           (binary_operator
             left: (identifier)
             right: (identifier)))))))
+
+================================================================================
+Attributes
+================================================================================
+
+F`Signature; 
+F``"Signature"; 
+F``("Signa" cat "ture"); 
+
+---
+
+(program
+  (expression_statement
+    (attribute
+      (identifier)
+      (identifier)))
+  (expression_statement
+    (attribute
+      (identifier)
+      (string)))
+  (expression_statement
+    (attribute
+      (identifier)
+      (parenthesized_expression
+        (binary_operator
+          left: (string)
+          right: (string))))))
