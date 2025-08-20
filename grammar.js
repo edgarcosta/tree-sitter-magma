@@ -274,11 +274,11 @@ module.exports = grammar({
 	},
 
 	where_expression: $ => prec.left(PREC.where, seq(
-		field('value', $.expression),
-		'where',
-		field('variables', choice($.identifier, $.anonymous_identifier)),
-		field('operator', choice('is', ':=')),
-		field('definition', $.expression),
+	    field('value', $.expression),
+	    'where',
+	    field('variables', commaSep1(choice($.identifier, $.anonymous_identifier))),
+	    field('operator', choice('is', ':=')),
+	    field('definition', $.expression),
 	)),
 	
 	boolean_operator: $ => {
