@@ -33,7 +33,7 @@ const PREC = {
 	utilde: 30,              // TOK_UTILDE                          (nonassoc)
 	assigned: 31,            // TOK_ASSIGNED                        (right)
 	sq_bracket: 32,          // TOK_LEFTSQUARE                      (left)   // indexing
-	parenthesis: 33, // TOK_LEFTROUND                   (left)
+	parenthesis: 33, 		 // TOK_LEFTROUND                   (left)
 	backquote: 34,           // TOK_BACKQUOTE TOK_BACKQUOTE_BACKQUOTE (left)
 	call: 35                 // function application; keep as top-most
 };
@@ -43,6 +43,7 @@ const PREC = {
 
 // MAYBE: should this be at the bottom like the other helper functions?
 
+// TODO: add option to support trailing comma
 function aggregate_of($, left, right, has_universe) {
 	return seq(
 		left,
@@ -275,14 +276,10 @@ module.exports = grammar({
 	where_expression: $ => prec.left(PREC.where, seq(
 		field('value', $.expression),
 		'where',
-		field('variables', $.ident_underscore_list),
+		field('variables', choice($.identifier, $.anonymous_identifier)),
 		field('operator', choice('is', ':=')),
 		field('definition', $.expression),
 	)),
-	
-	ident_underscore_list: $ => commaSep1(
-		choice($.identifier, '_')
-	),
 	
 	boolean_operator: $ => {
 	    const table = [
@@ -724,8 +721,10 @@ module.exports = grammar({
 	
 	
 	// Basic tokens:
-
+	
+	// TODO: fix regex such that "_" by itself is not a valid identifier
 	identifier: $ => /[a-zA-Z_][a-zA-Z0-9_]*/,
+	anonymous_identifier: $ => '_',
 	block: $ => repeat1($._statement),
 	// TODO: add all the aggregate functionality from https://magma.maths.usyd.edu.au/magma/handbook/text/116#949
 	// TODO: add formal sequences
