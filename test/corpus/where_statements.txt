@@ -11,8 +11,7 @@ x + y where x is 5;
         (binary_operator
           (identifier)
           (identifier))
-        (ident_underscore_list
-          (identifier))
+        (identifier)
         (integer)))
 
 =======================================================
@@ -29,8 +28,7 @@ a * b where a := 3;
         (binary_operator
           (identifier)
           (identifier))
-        (ident_underscore_list
-          (identifier))
+        (identifier)
         (integer)))
 
 =======================================================
@@ -47,8 +45,7 @@ f(x) where x is 10;
           (identifier)
           (argument_list
             (identifier)))
-        (ident_underscore_list
-          (identifier))
+        (identifier)
         (integer)))
 
 =======================================================
@@ -64,8 +61,7 @@ a eq b where a is 5;
         (comparison_operator
           (identifier)
           (identifier))
-        (ident_underscore_list
-          (identifier))
+        (identifier)
         (integer)))
 
 =======================================================
@@ -84,8 +80,7 @@ Where statement with parenthesized expression
               (identifier)
               (identifier)))
           (identifier))
-        (ident_underscore_list
-          (identifier))
+        (identifier)
         (integer)))
 
 =======================================================
@@ -101,8 +96,7 @@ a and b where a is true;
         (boolean_operator
           (identifier)
           (identifier))
-        (ident_underscore_list
-          (identifier))
+        (identifier)
         (true)))
 
 
@@ -118,8 +112,7 @@ not p where p is false;
       (where_expression
         (unary_operator
           (identifier))
-        (ident_underscore_list
-          (identifier))
+        (identifier)
         (false)))
 
 =======================================================
@@ -135,8 +128,7 @@ n + 1 where n is 42;
         (binary_operator
           (identifier)
           (integer))
-        (ident_underscore_list
-          (identifier))
+        (identifier)
         (integer)))
 
 ==================
@@ -154,12 +146,9 @@ a + b where b := 1 where a:=10 where a := 3;
             (binary_operator
               (identifier)
               (identifier))
-            (ident_underscore_list
-              (identifier))
+            (identifier)
             (integer))
-          (ident_underscore_list
-            (identifier))
+          (identifier)
           (integer))
-        (ident_underscore_list
-          (identifier))
+        (identifier)
         (integer)))
