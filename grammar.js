@@ -279,7 +279,8 @@ module.exports = grammar({
 		field('operator', choice('is', ':=')),
 		field('definition', $.expression),
 	)),
-	
+
+	// TODO: underscore this so it doesn't show up as separate token in parse tree
 	ident_underscore_list: $ => commaSep1(
 		choice($.identifier, '_')
 	),
@@ -491,10 +492,6 @@ module.exports = grammar({
 	    $.procedure_definition,
 	),
 
-	// TODO: functions should always have return statements!
-	// But this might not be the parser's job to enforce
-	// Difficult to implement because it might appear in the middle of `body`
-	
 	// Function definition - semantic validation should ensure it has a return statement with expression
 	function_definition: $ => seq(
 	    choice(
@@ -506,7 +503,6 @@ module.exports = grammar({
 	    'end function',
 	),
 
-	// TODO: enable early exits via empty return statements
 	procedure_definition: $ => seq(
 	    choice(
 		seq('procedure', field('name', $.identifier)),
@@ -517,7 +513,6 @@ module.exports = grammar({
 	    'end procedure',
 	),
 
-	// TODO: it must have a return statement it has a return type!
 	intrinsic_definition: $ => seq(
 	    'intrinsic',
 	    field('name', $.identifier),
@@ -669,6 +664,7 @@ module.exports = grammar({
 	    'end for'
 	),
 
+	// TODO: add fields in this
 	for_quantifier: $ => choice(
 	    seq($.identifier,
 		':=', $.primary_expression,
