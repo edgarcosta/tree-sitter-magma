@@ -229,8 +229,8 @@ end for;
   (for_statement
     quantifier: (for_quantifier
       (identifier)
-      (integer)
-      (integer))
+      from: (integer)
+      to: (integer))
     body: (block
       (augmented_assignment
         left: (identifier)
@@ -246,12 +246,12 @@ for i:=1 to 10 by 2 do i; end for;
 
 (program
   (for_statement
-    (for_quantifier
+    quantifier: (for_quantifier
       (identifier)
-      (integer)
-      (integer)
-      (integer))
-    (block
+      from: (integer)
+      to: (integer)
+      by: (integer))
+    body: (block
       (expression_statement
         (identifier)))))
 
@@ -269,9 +269,9 @@ end for;
 (program
   (for_statement
     quantifier: (for_quantifier
-      (identifier)
-      (identifier)
-      (identifier))
+      index: (identifier)
+      element: (identifier)
+      parent: (identifier))
     body: (block
       (print_statement
         (identifier)

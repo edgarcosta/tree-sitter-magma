@@ -1,5 +1,5 @@
 =======================================================
-Basic where statement with "is"
+Basic where expression with "is"
 =======================================================
 
 x + y where x is 5;
@@ -15,7 +15,7 @@ x + y where x is 5;
         (integer)))
 
 =======================================================
-Basic where statement with ":="
+Basic where expression with ":="
 =======================================================
 
 
@@ -32,7 +32,7 @@ a * b where a := 3;
         (integer)))
 
 =======================================================
-Where statement with function call
+Where expression with function call
 =======================================================
 
 f(x) where x is 10;
@@ -49,7 +49,7 @@ f(x) where x is 10;
         (integer)))
 
 =======================================================
-Where statement with comparison
+Where expression with comparison
 =======================================================
 
 a eq b where a is 5;
@@ -65,7 +65,7 @@ a eq b where a is 5;
         (integer)))
 
 =======================================================
-Where statement with parenthesized expression
+Where expression with parenthesized expression
 =======================================================
 
 (x + y) * z where x is 1;
@@ -84,7 +84,7 @@ Where statement with parenthesized expression
         (integer)))
 
 =======================================================
-Where statement with boolean operator
+Where expression with boolean operator
 =======================================================
 
 a and b where a is true;
@@ -101,7 +101,7 @@ a and b where a is true;
 
 
 =======================================================
-Where statement with unary operator
+Where expression with unary operator
 =======================================================
 
 not p where p is false;
@@ -116,7 +116,7 @@ not p where p is false;
         (false)))
 
 =======================================================
-Where statement with arithmetic
+Where expression with arithmetic
 =======================================================
 
 n + 1 where n is 42;
@@ -131,9 +131,9 @@ n + 1 where n is 42;
         (identifier)
         (integer)))
 
-==================
+=======================================================
 Left associativity
-==================
+=======================================================
 
 a + b where b := 1 where a:=10 where a := 3;
 
@@ -153,9 +153,9 @@ a + b where b := 1 where a:=10 where a := 3;
         (identifier)
         (integer)))
 
-==================
-Anon
-==================
+=======================================================
+Where expression with anonymous identifier
+=======================================================
 
 a + p where _, p := IsPrimePower(a) where a := 9;
 

@@ -51,6 +51,23 @@ F<a> := NumberField(x^2+1);
           right: (integer))))))
 
 ================================================================================
+Assignment with anonymous identifier
+================================================================================
+
+p, _ := IsPrimePower(9);
+
+---
+
+(program
+  (assignment
+    left: (identifier)
+    left: (anonymous_identifier)
+    right: (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (integer)))))
+
+================================================================================
 Assignment with anonymous generator
 ================================================================================
 

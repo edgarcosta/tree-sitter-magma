@@ -38,6 +38,9 @@ const PREC = {
 	call: 35                 // function application; keep as top-most
 };
 
+const MAPS = [
+    'hom', 'map', 'pmap'
+]
 
 // TODO: add line continuation character: \
 
@@ -239,7 +242,11 @@ module.exports = grammar({
 		[prec.left, 'sdiff', PREC.sdiff],
 		[prec.left, 'meet', PREC.meet],
 		[prec.left, 'cat', PREC.meet],
-		
+		[prec.left, '@', PREC.at],
+		[prec.left, '@@', PREC.at],
+		[prec.right, '!', PREC.bang],
+		[prec.right, '!!', PREC.bang],
+		[prec.left, '.', PREC.dot],
 	    ];
 
 	    // @ts-ignore
@@ -444,7 +451,7 @@ module.exports = grammar({
 	    $.primary_expression,
 	    $.boolean_operator,
 	    $.comparison_operator,
-	    $.where_expression,
+	    $.where_expression,	// MAYBE: Should this be a primary expression?
 	),
 
 	parenthesized_expression: $ => prec(
@@ -454,6 +461,7 @@ module.exports = grammar({
 		$.expression,
 		')'
 	    )),
+
 	// TODO: the expression (1,2) can mean permuation group cycle; implement this!
 	
 	primary_expression: $ => choice(
@@ -465,13 +473,14 @@ module.exports = grammar({
 	    $.unary_operator,
 	    $.ternary_operator,
 	    $.attribute,
+	    $.map,
 	    $.true,
 	    $.false,
 	    $.call,
 	    $.double_dollar,		// MAYBE: should this really be here?
 	    $.parenthesized_expression, // should this really be here?
-		$.literal_sequence,
-		$.aggregate,
+	    $.literal_sequence,
+	    $.aggregate,
 	),
 	
 	true: _ => 'true',
@@ -577,7 +586,7 @@ module.exports = grammar({
 	    choice(
 		$.primary_expression, // TODO: is this too general?
 		$.gen_expression,
-		'_'
+		$.anonymous_identifier
 	    )),
 
 	_right_hand_side: $ => commaSep1($.expression),
@@ -620,6 +629,29 @@ module.exports = grammar({
 		$.expression))
 	),
 
+	// Maps
+
+	map: $ => {
+	    return choice(...MAPS.map((name) => seq(
+		name,
+		'<',
+		field('domain', $.primary_expression),
+		'->',
+		field('codomain', $.primary_expression),
+		'|',
+		field('map_constructor', $._map_constructor),
+		'>',
+	    )));
+	},
+
+	// TODO: this should probably be changed, but the naive solution runs into
+	// parsing errors.
+	_map_constructor: $ => commaSep1(
+	    seq(
+		optional(seq(field('domain_element', $.identifier), ':->')),
+		field('image', $.primary_expression))
+	),
+	
 	// Control flow
 	_compound_statement: $ => choice(
 	    $.if_statement,
@@ -660,19 +692,22 @@ module.exports = grammar({
 	    'end for'
 	),
 
-	// TODO: add fields in this
+	// TODO: clean up structure of tokens here
 	for_quantifier: $ => choice(
 	    seq($.identifier,
-		':=', $.primary_expression,
-		'to', $.primary_expression,
-		optional(seq('by', $.primary_expression))
+		':=', field('from', $.primary_expression),
+		'to', field('to', $.primary_expression),
+		optional(seq(
+		    'by', field('by', $.primary_expression)))
 	       ),
 	    seq(
 		optional('random'),
-		$.identifier,
-		optional(seq('->', $.identifier)),
+		optional(seq(
+		    field('index', $.identifier),
+		    '->')),
+		field('element', $.identifier),
 		'in',
-		$.primary_expression),
+		field('parent', $.primary_expression)),
 	),
 	// needs to take into account all the variations in
 	// https://magma.maths.usyd.edu.au/magma/handbook/text/13#86
@@ -717,8 +752,8 @@ module.exports = grammar({
 	
 	// Basic tokens:
 	
-	// TODO: fix regex such that "_" by itself is not a valid identifier
-	identifier: $ => /[a-zA-Z_][a-zA-Z0-9_]*/,
+	// DONE: fix regex such that "_" by itself is not a valid identifier
+	identifier: $ => /[_]*[a-zA-Z][a-zA-Z0-9_]*/,
 	anonymous_identifier: $ => '_',
 	block: $ => repeat1($._statement),
 	// TODO: add all the aggregate functionality from https://magma.maths.usyd.edu.au/magma/handbook/text/116#949
