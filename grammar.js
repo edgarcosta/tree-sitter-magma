@@ -42,7 +42,9 @@ const MAPS = [
     'hom', 'map', 'pmap'
 ]
 
-// TODO: add line continuation character: \
+// TODO: add line continuation character: \ // Is this necessary?
+// TODO: move expression tests to new test file
+// TODO: add ext, quo, ideal etc.
 
 // MAYBE: should this be at the bottom like the other helper functions?
 
@@ -167,11 +169,12 @@ module.exports = grammar({
 	    $.return_statement,
 	    $.break_statement,
 	    $.continue_statement,
-	    $.eval_statement,
 	    $.print_statement,
+	    $.assert_statement,
 	    $._definition,
 	    $._assignment,
 	    $.where_expression,
+	    $.try_catch_statement,
 	),
 
 	expression_statement: $ => commaSep1($.primary_expression),
@@ -196,16 +199,37 @@ module.exports = grammar({
 	    optional($.identifier)
 	),
 
-	eval_statement: $ => seq(
+	// TODO: eval actually works like an expression:
+	// (eval "1 + 2") + eval "3"; // returns 6.
+	// I don't immediately see a clean way to handle this,
+	// since
+	// eval "1 + 2" + eval "3"; // Errors
+	// but currently it parses just fine
+
+	eval_expression: $ => prec.left(PREC.eval, seq(
 	    'eval',
 	    // can be anything that evaluates to a string!
-	    $.primary_expression
+	    $.primary_expression)
 	),
 
-	
 	print_statement: $ => seq(
 	    'print',
 	    commaSep1($.expression),
+	),
+
+	assert_statement: $ => seq(
+	    /assert[12]*/,
+	    $.expression,
+	),
+
+
+	try_catch_statement: $ => seq(
+	    'try',
+	    $.block,
+	    'catch',
+	    field('error', $.identifier),
+	    $.block,
+	    'end try',
 	),
 
 	// MAYBE: consider moving 'not' to separate function
@@ -218,7 +242,8 @@ module.exports = grammar({
 	    const table = [
 		['not', PREC.not],
 		['-', PREC.negate],
-		['~', PREC.tilde]
+		['~', PREC.tilde],
+		['#', PREC.hash],
 	    ];
 	    // @ts-ignore
 	    return choice(...table.map(([operator, precedence]) => prec.right(precedence, seq(
@@ -452,6 +477,7 @@ module.exports = grammar({
 	    $.boolean_operator,
 	    $.comparison_operator,
 	    $.where_expression,	// MAYBE: Should this be a primary expression?
+	    $.eval_expression
 	),
 
 	parenthesized_expression: $ => prec(
@@ -474,6 +500,7 @@ module.exports = grammar({
 	    $.ternary_operator,
 	    $.attribute,
 	    $.map,
+	    $.seq_slice,
 	    $.true,
 	    $.false,
 	    $.call,
@@ -646,6 +673,9 @@ module.exports = grammar({
 
 	// TODO: this should probably be changed, but the naive solution runs into
 	// parsing errors.
+	// In particular, right now it's technically legal to do things like
+	// map< A -> B | x, y -> z>;
+	// which probably isn't valid
 	_map_constructor: $ => commaSep1(
 	    seq(
 		optional(seq(field('domain_element', $.identifier), ':->')),
@@ -756,6 +786,9 @@ module.exports = grammar({
 	identifier: $ => /[_]*[a-zA-Z][a-zA-Z0-9_]*/,
 	anonymous_identifier: $ => '_',
 	block: $ => repeat1($._statement),
+
+	// Aggregates
+	
 	// TODO: add all the aggregate functionality from https://magma.maths.usyd.edu.au/magma/handbook/text/116#949
 	// TODO: add formal sequences
 	// Literal sequence \[ 1, 2, 3 ], no expressions allowed
@@ -775,6 +808,10 @@ module.exports = grammar({
 		$.seqenum, $.list, $.tuple, $.set, $.indexed_set, $.multiset
 	),
 
+	seq_slice: $ => prec.left(PREC.sq_bracket, seq(
+	    field('parent', $.primary_expression),
+	    commaSep1($.seqenum))
+	),
 
 	// AI generated, hopefully works as intended
 	string: $ => /"[^"\\]*(?:\\.[^"\\]*)*"/,

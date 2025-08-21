@@ -213,3 +213,42 @@ Mixed content sequences
         (binary_operator
           left: (identifier)
           right: (identifier))))))
+
+==================
+Multi-index of sequence
+==================
+
+S[2][2] := 4;
+
+---
+
+(program
+  (assignment
+    left: (seq_slice
+      parent: (seq_slice
+        parent: (identifier)
+        (seqenum
+          (integer)))
+      (seqenum
+        (integer)))
+    right: (integer)))
+
+==================
+Multi-index with nested sequence
+==================
+
+x := S[ [2, 3], 2 ];
+
+---
+
+(program
+  (assignment
+    left: (identifier)
+    right: (seq_slice
+      parent: (identifier)
+      (seqenum
+        (aggregate
+          (seqenum
+            (integer)
+            (integer)))
+        (integer)))))

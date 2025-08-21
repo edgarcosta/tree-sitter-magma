@@ -13,3 +13,54 @@ x, y, 2 + 4;
     (binary_operator
       left: (integer)
       right: (integer))))
+
+================================================================================
+Try-catch and print statements
+================================================================================
+
+try print x; catch e print x; end try;
+
+---
+
+(program
+  (try_catch_statement
+    (block
+      (print_statement
+        (identifier)))
+    error: (identifier)
+    (block
+      (print_statement
+        (identifier)))))
+
+================================================================================
+Eval expression
+================================================================================
+
+(eval "1+2") + eval "3";
+
+---
+
+(program
+  (expression_statement
+    (binary_operator
+      left: (parenthesized_expression
+        (eval_expression
+          (string)))
+      right: (eval_expression
+        (string)))))
+
+================================================================================
+Assert statement
+================================================================================
+
+assert2 1 + 2 eq 3;
+
+---
+
+(program
+  (assert_statement
+    (comparison_operator
+      left: (binary_operator
+        left: (integer)
+        right: (integer))
+      right: (integer))))
