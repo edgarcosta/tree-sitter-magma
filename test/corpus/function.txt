@@ -25,7 +25,7 @@ end function;
 (program
   (function_definition
     name: (identifier)
-    arguments: (argument_list)
+    parameters: (parameters)
     body: (block
       (return_statement
         (expression_statement
@@ -45,11 +45,12 @@ end function;
 (program
   (function_definition
     name: (identifier)
-    arguments: (argument_list
-      argument: (identifier)
-      argument: (identifier)
-      optional_argument: (identifier)
-      default_value: (integer))
+    parameters: (parameters
+      (identifier)
+      (identifier)
+      (optional_parameter
+        name: (identifier)
+        value: (integer)))
     body: (block
       (assignment
         left: (identifier)
@@ -80,8 +81,8 @@ end function;
 (program
   (function_definition
     name: (identifier)
-    arguments: (argument_list
-      argument: (identifier))
+    parameters: (parameters
+      (identifier))
     body: (block
       (if_statement
         condition: (comparison_operator
@@ -120,7 +121,7 @@ end procedure;
 (program
   (procedure_definition
     name: (identifier)
-    arguments: (argument_list)
+    parameters: (parameters)
     body: (block
       (print_statement
         (string)))))
@@ -140,11 +141,11 @@ end procedure;
 (program
   (procedure_definition
     name: (identifier)
-    arguments: (argument_list
-      argument: (unary_operator
-        right: (identifier))
-      argument: (unary_operator
-        right: (identifier)))
+    parameters: (parameters
+      (ref_identifier
+        (identifier))
+      (ref_identifier
+        (identifier)))
     body: (block
       (print_statement
         (identifier))
@@ -174,12 +175,12 @@ end procedure;
 (program
   (procedure_definition
     name: (identifier)
-    arguments: (argument_list
-      argument: (identifier)
-      argument: (identifier)
-      argument: (identifier)
-      argument: (unary_operator
-        right: (identifier)))
+    parameters: (parameters
+      (identifier)
+      (identifier)
+      (identifier)
+      (ref_identifier
+        (identifier)))
     body: (block
       (if_statement
         condition: (comparison_operator

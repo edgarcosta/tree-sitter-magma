@@ -11,10 +11,8 @@ end intrinsic;
 (program
   (intrinsic_definition
     name: (identifier)
-    arguments: (argument_list)
-    return_type: (type
-      (identifier))))
-
+    return_type: (identifier)))
+    
 ================================================================================
 Intrinsic test with arguments
 ================================================================================
@@ -29,17 +27,15 @@ end intrinsic;
 (program
   (intrinsic_definition
     name: (identifier)
-    arguments: (argument_list
-	argument: (identifier)
-	argument: (identifier))
-    return_type: (type)
+    parameters: (identifier)
+    parameters: (identifier)
     body: (block
       (return_statement
         (expression_statement
           (binary_operator
             left: (identifier)
             right: (identifier)))))))
-
+	    
 ================================================================================
 Attributes
 ================================================================================

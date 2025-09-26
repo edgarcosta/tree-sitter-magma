@@ -1,0 +1,153 @@
+================================================================================
+Basic map
+================================================================================
+
+map<A -> B | Graph>;
+
+---
+
+(program
+  (expression_statement
+    (map
+      domain: (identifier)
+      codomain: (identifier)
+      image: (identifier))))
+      
+================================================================================
+Partial map with complicated mapping rule
+================================================================================
+
+pmap<k -> Parent(f) | x :-> Evaluate(P!Eltseq(x),sigma)>;
+
+---
+
+(program
+  (expression_statement
+    (map
+      domain: (identifier)
+      codomain: (call
+        function: (identifier)
+        arguments: (argument_list
+          argument: (identifier)))
+      domain_element: (identifier)
+      image: (call
+        function: (identifier)
+        arguments: (argument_list
+          argument: (binary_operator
+            left: (identifier)
+            right: (call
+              function: (identifier)
+              arguments: (argument_list
+                argument: (identifier))))
+          argument: (identifier))))))
+
+================================================================================
+Hom with several entries
+================================================================================
+
+hom<Mod -> N | W![3, 2, 1, 0], W![3*(M!F.1 + 1), 2*(M!F.1 + 1), M!F.1 + 1, 0] >;
+
+---
+
+(program
+  (expression_statement
+    (map
+      domain: (identifier)
+      codomain: (identifier)
+      image: (binary_operator
+        left: (identifier)
+        right: (aggregate
+          (seqenum
+            (integer)
+            (integer)
+            (integer)
+            (integer))))
+      image: (binary_operator
+        left: (identifier)
+        right: (aggregate
+          (seqenum
+            (binary_operator
+              left: (integer)
+              right: (parenthesized_expression
+                (binary_operator
+                  left: (binary_operator
+                    left: (identifier)
+                    right: (binary_operator
+                      left: (identifier)
+                      right: (integer)))
+                  right: (integer))))
+            (binary_operator
+              left: (integer)
+              right: (parenthesized_expression
+                (binary_operator
+                  left: (binary_operator
+                    left: (identifier)
+                    right: (binary_operator
+                      left: (identifier)
+                      right: (integer)))
+                  right: (integer))))
+            (binary_operator
+              left: (binary_operator
+                left: (identifier)
+                right: (binary_operator
+                  left: (identifier)
+                  right: (integer)))
+              right: (integer))
+            (integer)))))))
+	    
+================================================================================
+Hom with several entries
+================================================================================
+
+hom<Domain(f) -> Codomain(g) | g :-> 1, h :-> Sqrt(2)/2>;
+
+---
+
+(program
+  (expression_statement
+    (map
+      domain: (call
+        function: (identifier)
+        arguments: (argument_list
+          argument: (identifier)))
+      codomain: (call
+        function: (identifier)
+        arguments: (argument_list
+          argument: (identifier)))
+      domain_element: (identifier)
+      image: (integer)
+      domain_element: (identifier)
+      image: (binary_operator
+        left: (call
+          function: (identifier)
+          arguments: (argument_list
+            argument: (integer)))
+        right: (integer)))))
+
+================================================================================
+pmap with tuples 
+================================================================================
+
+pmap< F -> Zm | <1, 1>, <z, 0>, <z^2, 4> >;
+
+---
+
+(program
+  (expression_statement
+    (map
+      domain: (identifier)
+      codomain: (identifier)
+      image: (aggregate
+        (tuple
+          (integer)
+          (integer)))
+      image: (aggregate
+        (tuple
+          (identifier)
+          (integer)))
+      image: (aggregate
+        (tuple
+          (binary_operator
+            left: (identifier)
+            right: (integer))
+          (integer))))))

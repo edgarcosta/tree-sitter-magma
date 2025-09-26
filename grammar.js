@@ -39,28 +39,23 @@ const PREC = {
 };
 
 const MAPS = [
-    'hom', 'map', 'pmap'
+    'hom', 'map', 'pmap', 'iso',
+]
+
+const CONSTRUCTORS = [
+    'ideal', 'lideal', 'rideal', 'case', 'quo', 'sub', 'ext','ncl', 'elt', 'cop',
+    'Group', 'AbelianGroup', 'MatrixGroup', 'PolycyclicGroup', 'PermutationGroup', 'FPGroup',  
+    'Semigroup', 'Monoid',
+    'func', 'proc'
 ]
 
 // TODO: add line continuation character: \ // Is this necessary?
 // TODO: move expression tests to new test file
 // TODO: add ext, quo, ideal etc.
+// TODO: add random in front of enumerated structures, cf paragraph before H10E8
+// TODO: add exists/forall in front of enumerated structures, cf H10E12
 
 // MAYBE: should this be at the bottom like the other helper functions?
-
-// TODO: add option to support trailing comma
-function aggregate_of($, left, right, has_universe) {
-	return seq(
-		left,
-		optional(has_universe ? seq(
-			field('universe', $.primary_expression),
-			'|'
-		) : seq()),
-		optional(commaSep1($.primary_expression)),
-		right
-	);
-}
-
 
 module.exports = grammar({
     name: 'magma',
@@ -91,6 +86,7 @@ module.exports = grammar({
 	$._compound_statement,
 	$.expression,
 	$.primary_expression,
+	$.parameter
     ],
 
     inline: $ => [
@@ -489,6 +485,7 @@ module.exports = grammar({
 	    )),
 
 	// TODO: the expression (1,2) can mean permuation group cycle; implement this!
+	// NB: It can also mean commutator! cf Chapter 70 of the documentation pdf
 	
 	primary_expression: $ => choice(
 	    $.identifier,
@@ -530,27 +527,62 @@ module.exports = grammar({
 		seq('function', field('name', $.identifier)),
 		seq(field('name', $.identifier), ':=', 'function')
 	    ),
-	    field('arguments', $.argument_list),
+	    field('parameters', $.parameters),
 	    field('body', $.block),
 	    'end function',
 	),
-
+	
 	procedure_definition: $ => seq(
 	    choice(
 		seq('procedure', field('name', $.identifier)),
 		seq(field('name', $.identifier), ':=', 'procedure')
 	    ),
-	    field('arguments', $.argument_list),
+	    field('parameters', $.parameters),
 	    optional(field('body', $.block)),
 	    'end procedure',
 	),
+    
+	parameters: $ => seq(
+	    '(',
+	    optional(commaSep1($.parameter)),
+	    optional(seq(
+		':',
+		commaSep1($.optional_parameter))),
+	    ')'
+	),
 
+	// TODO: technically, this is not valid syntax for e.g. functions;
+	// can only pass typed identifiers to intrinsics, and only identifiers to functions
+	// but for simplicity we count this as a semantic and not syntactic difference
+	parameter: $ => choice(
+	    $.identifier,
+	    $.typed_identifier,
+	    $.ref_identifier
+	),
+
+	ref_identifier: $ => seq(
+	    '~',
+	    $.identifier,
+	),
+	
+	// TODO: should this be token.immediate?
+	typed_identifier: $ => seq(
+	    $.identifier,
+	    "::",
+	    $._type,
+	),
+
+	optional_parameter: $ => seq(
+	    field('name', $.identifier),
+	    ':=',
+	    field('value', $.primary_expression)
+	),
+	
 	intrinsic_definition: $ => seq(
 	    'intrinsic',
 	    field('name', $.identifier),
-	    field('arguments', $.argument_list),
-	    '->',
-	    optional(field('return_type', $.type)),
+	    field('parameters', $._intrinsic_parameters),
+	    optional(seq('->', field('return_type', $._type))),
 	    field('docstring',
 		  seq('{',
 		      /[^{}]*/,	// matches anything that's not a squirly brace
@@ -558,6 +590,22 @@ module.exports = grammar({
 	    optional(field('body', $.block)),
 	    'end intrinsic'
 	),
+	
+	_intrinsic_parameters: $ => seq(
+	    '(',
+	    optional(commaSep1($._intrinsic_parameter)),
+	    optional(seq(
+		':',
+		commaSep1($.optional_parameter))),
+	    ')'
+	),
+
+	_intrinsic_parameter: $ => choice(
+	    $.identifier,
+	    seq('~', $.identifier),
+	    $.typed_identifier
+	),
+
 
 	call: $ => prec(PREC.call, seq(
 	    field('function', $.primary_expression),
@@ -566,18 +614,21 @@ module.exports = grammar({
 
 	argument_list: $ => seq(
 	    '(',
-	    optional(commaSep1(field('argument', $.expression))),
-	    optional($._optional_argument_list),
+	    optional(commaSep1(field('argument', $.primary_expression))),
+	    optional(seq(
+		':',
+		commaSep1($.optional_argument))),
 	    ')',
 	),
 	
 	_optional_argument_list: $ => seq(
 	    ':',
-	    commaSep1(
-		field('optional_argument', seq(
-		    $.identifier,
-		    ':=',
-		    field('default_value', $.primary_expression))))),
+	    commaSep1($.optional_argument)),
+
+	optional_argument: $ => seq(
+	    field('argument', $.identifier),
+	    ':=',
+	    field('default_value', $.primary_expression)),
 
 	_assignment: $ => choice(
 	    $.assignment,
@@ -626,15 +677,11 @@ module.exports = grammar({
 	),
 
 	// TODO: What about square brackets?
-	type: $ => choice(
+	// should include anything described here:
+	// https://magma.maths.usyd.edu.au/magma/handbook/text/24
+	_type: $ => choice(
 	    $.identifier,
 	    '.',
-	),
-	// TODO: should this be token.immediate?
-	typed_identifier: $ => seq(
-	    $.identifier,
-	    "::",
-	    $.type,
 	),
 
 	attribute: $ => choice(
@@ -657,7 +704,7 @@ module.exports = grammar({
 	),
 
 	// Maps
-
+	// TODO: pmap can also take 
 	map: $ => {
 	    return choice(...MAPS.map((name) => seq(
 		name,
@@ -858,4 +905,28 @@ function sep1(rule, separator) {
     return seq(rule, repeat(seq(separator, rule)));
 }
 
+// // Possible choices of parameters for {function, procedure, intrinsic}
+// function parameter_choices($, def_type)  {
+//     switch (def_type) {
+//     case 'function':
+// 	return $.identifier;
+//     case 'procedure':
+// 	return choice($.identifier, $.ref_identifier);
+//     case 'intrinsic':
+// 	return choice($.identifier, $.ref_identifier, $.typed_identifier);
+//     }
+// }
+
+// TODO: add option to support trailing comma
+function aggregate_of($, left, right, has_universe) {
+	return seq(
+		left,
+		optional(has_universe ? seq(
+			field('universe', $.primary_expression),
+			'|'
+		) : seq()),
+		optional(commaSep1($.primary_expression)),
+		right
+	);
+}
 
