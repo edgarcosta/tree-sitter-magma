@@ -167,6 +167,7 @@ module.exports = grammar({
 	    $.continue_statement,
 	    $.print_statement,
 	    $.assert_statement,
+	    $.declare_statement,
 	    $._definition,
 	    $._assignment,
 	    $.where_expression,
@@ -208,16 +209,47 @@ module.exports = grammar({
 	    $.primary_expression)
 	),
 
+	// MAYBE: make these into separate statements,
+	// since they have slightly different semantics
 	print_statement: $ => seq(
-	    'print',
+	    choice('print', 'printf', 'fprint'),
 	    commaSep1($.expression),
 	),
 
 	assert_statement: $ => seq(
-	    /assert[12]*/,
+	    choice('assert', 'assert1', 'assert2'),
 	    $.expression,
 	),
 
+	declare_statement: $ => seq(
+	    'declare',
+	    choice(
+		$.attribute_declaration,
+		$.type_declaration,
+		$.verbosity_declaration,
+	    )
+	),
+	
+	attribute_declaration: $ => seq(
+	    'attributes',
+	    field('category', $.identifier),
+	    ':',
+	    field('attribute',
+		commaSep1($.identifier))
+	),
+
+	type_declaration: $ => seq(
+	    'type',
+	    $.type,
+	    optional(seq(
+		':', field('supertype', commaSep1($.identifier))))
+	),
+
+	verbosity_declaration: $ => seq(
+	    'verbose',
+	    field('function', $.identifier),
+	    field('level', $.integer)
+	),
 
 	try_catch_statement: $ => seq(
 	    'try',
@@ -240,6 +272,7 @@ module.exports = grammar({
 		['-', PREC.negate],
 		['~', PREC.tilde],
 		['#', PREC.hash],
+		['assigned', PREC.assigned],
 	    ];
 	    // @ts-ignore
 	    return choice(...table.map(([operator, precedence]) => prec.right(precedence, seq(
@@ -404,25 +437,14 @@ module.exports = grammar({
 	// default: $ => 'default',
 
 	// // Keywords - functions and procedures
-	// function: $ => 'function',
-	// func: $ => 'func',
-	// procedure: $ => 'procedure',
-	// proc: $ => 'proc',
 	// forward: $ => 'forward',
-	// intrinsic: $ => 'intrinsic',
 	// local: $ => 'local',
 	// TODO: add local which has syntax:
 	// local var1, var2, ... varn;
 
 	// // Keywords - declarations and directives
-	// declare: $ => 'declare',
-	// TODO: add declare which has syntax:
-	// declare attributes X: Y, Z; 
-	// declare type T[E]: Supertype;
-	// declare verbose fn, lvl;
 	
-	// clear: $ => 'clear',
-	// TODO: clear only appears as "clear;" - implement this
+	clear: $ => 'clear',
 	// load: $ => 'load',
 	// iload: $ => 'iload',
 	// save: $ => 'save',
@@ -569,7 +591,7 @@ module.exports = grammar({
 	typed_identifier: $ => seq(
 	    $.identifier,
 	    "::",
-	    $._type,
+	    $.type,
 	),
 
 	optional_parameter: $ => seq(
@@ -582,7 +604,7 @@ module.exports = grammar({
 	    'intrinsic',
 	    field('name', $.identifier),
 	    field('parameters', $._intrinsic_parameters),
-	    optional(seq('->', field('return_type', $._type))),
+	    optional(seq('->', field('return_type', $.type))),
 	    field('docstring',
 		  seq('{',
 		      /[^{}]*/,	// matches anything that's not a squirly brace
@@ -679,9 +701,10 @@ module.exports = grammar({
 	// TODO: What about square brackets?
 	// should include anything described here:
 	// https://magma.maths.usyd.edu.au/magma/handbook/text/24
-	_type: $ => choice(
+	type: $ => choice(
 	    $.identifier,
 	    '.',
+	    seq($.identifier, '[', $.identifier, ']')
 	),
 
 	attribute: $ => choice(
