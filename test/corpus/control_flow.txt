@@ -118,6 +118,36 @@ end case;
           (string))))))
 
 ================================================================================
+Case statement with else
+================================================================================
+
+case Sign(x):
+   when 1:
+      x, "is positive";
+   else:
+      x, "is non-positive";
+end case;
+
+---
+
+(program
+  (case_statement
+    matchee: (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (identifier)))
+    (when_clause
+      match: (integer)
+      consequence: (block
+        (expression_statement
+          (identifier)
+          (string))))
+    else: (block
+      (expression_statement
+        (identifier)
+        (string)))))
+
+================================================================================
 Ternary operator
 ================================================================================
 
