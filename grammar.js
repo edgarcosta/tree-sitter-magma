@@ -42,6 +42,7 @@ const MAPS = [
     'hom', 'map', 'pmap', 'iso',
 ]
 
+// TODO: finish adding constructors
 const CONSTRUCTORS = [
     'ideal', 'lideal', 'rideal', 'case', 'quo', 'sub', 'ext','ncl', 'elt', 'cop',
     'Group', 'AbelianGroup', 'MatrixGroup', 'PolycyclicGroup', 'PermutationGroup', 'FPGroup',  
@@ -68,8 +69,6 @@ module.exports = grammar({
     conflicts: $ => [
 	[$.expression_statement, $.assignment],
 	[$.function_definition, $.primary_expression, $.procedure_definition],
-	// [$.procedure_definition, $.primary_expression],
-	// [$.procedure_definition, $.function_definition],
     ],
     // A _statement_ is any valid sequence of symbols followed by a semicolon
     // eg. a variable assignment, a function/intrinsic definition
@@ -86,7 +85,7 @@ module.exports = grammar({
 	$._compound_statement,
 	$.expression,
 	$.primary_expression,
-	$.parameter
+	$.parameter,
     ],
 
     inline: $ => [
@@ -116,13 +115,6 @@ module.exports = grammar({
 
 	// Core tokens converted from yacc %token declarations
 
-	// Comparison operators
-	// eq: $ => 'eq',
-	// ne: $ => 'ne',
-	// gt: $ => 'gt',
-	// ge: $ => 'ge',
-	// lt: $ => 'lt',
-	// le: $ => 'le',
 	// TODO: what are the prec rules for these?
 	// cmpeq: $ => 'cmpeq',
 	// cmpne: $ => 'cmpne',
@@ -216,8 +208,16 @@ module.exports = grammar({
 	    commaSep1($.expression),
 	),
 
+	vprint_statement: $ => seq(
+	    choice('vprint', 'vprintf'),
+	    field('flag', $.identifier),
+	    optional(seq(',', field('n', $.integer))),
+	    ':',
+	    commaSep1($.expression),
+	),
+
 	assert_statement: $ => seq(
-	    choice('assert', 'assert1', 'assert2'),
+	    choice('assert', 'assert2', 'assert3'),
 	    $.expression,
 	),
 
@@ -301,6 +301,12 @@ module.exports = grammar({
 		[prec.right, '!', PREC.bang],
 		[prec.right, '!!', PREC.bang],
 		[prec.left, '.', PREC.dot],
+		[prec.left, 'in', PREC.membership],
+		[prec.left, 'notin', PREC.membership],
+		[prec.left, 'adj', PREC.membership],
+		[prec.left, 'notadj', PREC.membership],
+		[prec.left, 'subset', PREC.membership],
+		[prec.left, 'notsubset', PREC.membership],
 	    ];
 
 	    // @ts-ignore
@@ -417,23 +423,6 @@ module.exports = grammar({
 	// backquote_backquote: $ => '``',
 
 	// Keywords - control flow
-	// if: $ => 'if',
-	// then: $ => 'then',
-	// else: $ => 'else',
-	// elif: $ => 'elif',
-	// end: $ => 'end',
-	// while: $ => 'while',
-	// do: $ => 'do',
-	// repeat: $ => 'repeat',
-	// until: $ => 'until',
-	// for: $ => 'for',
-	// to: $ => 'to',
-	// by: $ => 'by',
-	// break: $ => 'break',
-	// continue: $ => 'continue',
-	// return: $ => 'return',
-	// case: $ => 'case',
-	// when: $ => 'when',
 	// default: $ => 'default',
 
 	// // Keywords - functions and procedures
@@ -454,17 +443,9 @@ module.exports = grammar({
 	// export: $ => 'export',
 
 	// Keywords - I/O and debugging
-	// print: $ => 'print',
-	// printf: $ => 'printf',
-	// fprintf: $ => 'fprintf',
-	// vprint: $ => 'vprint',
-	// vprintf: $ => 'vprintf',
 	// read: $ => 'read',
 	// readi: $ => 'readi',
 	// error: $ => 'error',
-	// assert: $ => 'assert',
-	// assert2: $ => 'assert2',
-	// assert3: $ => 'assert3',
 	// time: $ => 'time', // TODO: timed_statement?
 	// vtime: $ => 'vtime', 
 
@@ -834,8 +815,16 @@ module.exports = grammar({
 	    field('matchee', $.primary_expression),
 	    ':',
 	    repeat1($.when_clause),
+	    optional(seq('else:', field('else', $.block))),
 	    'end case',
 	),
+	
+	// TODO: implement alternative syntax:
+	// > greeting := case< Random(1, 3) |
+	// >     1 : "Hello.",
+	// >     2 : "G'day.",
+	// >     default : "Pleased to meet you." >;
+	// > print greeting;
 
 	when_clause: $ => seq(
 	    'when',
