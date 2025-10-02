@@ -99,11 +99,8 @@ module.exports = grammar({
 	    repeat(choice(
 		// $.expression,
 		$._statement,
-		// $.directive,
-		// $.intrinsic,
-		// $.declaration
+		// $.declaration // MAYBE: consider making declarations a separate entity on this level
 	    )),
-	    // Empty program -- is this really necessary?
 	    seq()
 	),
 	
@@ -114,35 +111,6 @@ module.exports = grammar({
 	),
 
 	// Core tokens converted from yacc %token declarations
-
-	// TODO: what are the prec rules for these?
-	// cmpeq: $ => 'cmpeq',
-	// cmpne: $ => 'cmpne',
-	// adj: $ => 'adj',
-	// notadj: $ => 'notadj',
-
-	// // Logical operators
-	// not: $ => 'not',
-	// and: $ => 'and',
-	// or: $ => 'or',
-	// xor: $ => 'xor',
-
-	// // Set operators
-	// // in: $ => 'in',
-	// notin: $ => 'notin',
-	// subset: $ => 'subset',
-	// notsubset: $ => 'notsubset',
-
-	// // Arithmetic operators
-	// plus: $ => '+',
-	// minus: $ => '-',
-	// star: $ => '*',
-	// div: $ => 'div',
-	// mod: $ => 'mod',
-	// hat: $ => '^',
-	// // TODO: what does ^^ do?
-	// // hat_hat: $ => '^^',
-	// slash: $ => '/',
 
 	
 	_statement: $ => seq(
@@ -158,10 +126,13 @@ module.exports = grammar({
 	    $.break_statement,
 	    $.continue_statement,
 	    $.print_statement,
+	    $.vprint_statement,
 	    $.assert_statement,
 	    $.declare_statement,
+	    $.local_statement,
 	    $._definition,
 	    $._assignment,
+	    $._directive,
 	    $.where_expression,
 	    $.try_catch_statement,
 	),
@@ -229,6 +200,11 @@ module.exports = grammar({
 		$.verbosity_declaration,
 	    )
 	),
+
+	local_statement: $ => seq(
+	    'local',
+	    commaSep1($.expression),
+	),
 	
 	attribute_declaration: $ => seq(
 	    'attributes',
@@ -248,6 +224,7 @@ module.exports = grammar({
 	verbosity_declaration: $ => seq(
 	    'verbose',
 	    field('function', $.identifier),
+	    ',',
 	    field('level', $.integer)
 	),
 
@@ -295,7 +272,7 @@ module.exports = grammar({
 		[prec.left, 'diff', PREC.diff],
 		[prec.left, 'sdiff', PREC.sdiff],
 		[prec.left, 'meet', PREC.meet],
-		[prec.left, 'cat', PREC.meet],
+		[prec.left, 'cat', PREC.cat],
 		[prec.left, '@', PREC.at],
 		[prec.left, '@@', PREC.at],
 		[prec.right, '!', PREC.bang],
@@ -336,10 +313,20 @@ module.exports = grammar({
 		// @ts-ignore
 		field('operator', operator),
 		field('right', $.expression),
-	    ))));
-	    
+	    ))));  
 	},
 
+
+	reduct_operator: $ => {
+	    const table = ['+', '-', '*', 'and', 'or', 'meet', 'join', 'cat'];
+
+	    // @ts-ignore
+	    return choice(...table.map((sym) => prec.left(PREC.reduct, seq(
+		field('operator', '&'+ sym),
+		field('right', $.expression),
+	    ))));
+	},
+	
 	where_expression: $ => prec.left(PREC.where, seq(
 	    field('value', $.expression),
 	    'where',
@@ -364,17 +351,6 @@ module.exports = grammar({
 	},
 	
 	
-	// // Set operations
-	// diff: $ => 'diff',
-	// sdiff: $ => 'sdiff',
-	// meet: $ => 'meet',
-	// join: $ => 'join',
-
-	// // Special operators
-	// hash: $ => '#',
-	// cat: $ => 'cat',
-	// tilde: $ => '~',
-
 	// // Delimiters
 	// leftangle: $ => '<',
 	// rightangle: $ => '>',
@@ -396,14 +372,9 @@ module.exports = grammar({
 	// star_rightsquare: $ => '*]',
 
 	// // Special symbols
-	// arrow: $ => '->',
-	// at: $ => '@',
-	// atat: $ => '@@',
 	// bar: $ => '|',
 	// bar_arrow: $ => '|->',
 	// becomes: $ => ':=',
-	// bang: $ => '!',
-	// bang_bang: $ => '!!',
 	// colon: $ => ':',
 	// colon_colon: $ => '::',
 	// comma: $ => ',',
@@ -418,29 +389,21 @@ module.exports = grammar({
 	// underscore: $ => '_',
 	// undefconst: $ => 'undefined',
 
-	// // Backquotes
-	// backquote: $ => '`',
-	// backquote_backquote: $ => '``',
-
 	// Keywords - control flow
 	// default: $ => 'default',
 
 	// // Keywords - functions and procedures
+	// TODO: add forward
 	// forward: $ => 'forward',
 	// local: $ => 'local',
-	// TODO: add local which has syntax:
-	// local var1, var2, ... varn;
 
 	// // Keywords - declarations and directives
+
 	
-	clear: $ => 'clear',
-	// load: $ => 'load',
-	// iload: $ => 'iload',
 	// save: $ => 'save',
 	// restore: $ => 'restore',
 	// freeze: $ => 'freeze',
 	// import: $ => 'import',
-	// export: $ => 'export',
 
 	// Keywords - I/O and debugging
 	// read: $ => 'read',
@@ -461,15 +424,39 @@ module.exports = grammar({
 	// quit: $ => 'quit',
 
 
-	// // Reduction operators
-	// reduct_plus: $ => '&+',
-	// reduct_minus: $ => '&-',
-	// reduct_mult: $ => '&*',
-	// reduct_and: $ => '&and',
-	// reduct_or: $ => '&or',
-	// reduct_meet: $ => '&meet',
-	// reduct_join: $ => '&join',
-	// reduct_cat: $ => '&cat',
+	
+	// --- Directives ---
+	_directive: $ => choice(
+	    $.clear,
+	    $.freeze,
+	    $.load_directive,
+	    $.save_directive,
+	    $.import_directive,
+	),
+	
+	// should only appear alone:
+	clear: $ => 'clear',
+	freeze: $ => 'freeze',
+
+
+	load_directive: $ => seq(
+	    choice('load', 'iload'),
+	    $.string
+	),
+
+	save_directive: $ => seq(
+	    choice('save', 'restore'),
+	    $.string
+	),
+
+	import_directive: $ => seq(
+	    'import',
+	    field('filename', $.string),
+	    ':',
+	    field('variable', commaSep1($.identifier))
+	),
+
+	// --- Expressions ---
 
 	expression: $ => choice(
 	    $.primary_expression,
@@ -498,6 +485,7 @@ module.exports = grammar({
 	    $.binary_operator,
 	    $.unary_operator,
 	    $.ternary_operator,
+	    $.reduct_operator,
 	    $.attribute,
 	    $.map,
 	    $.seq_slice,
@@ -515,9 +503,6 @@ module.exports = grammar({
 	
 	expression_list: $ => 'placeholder_expr_list',
 
-	// TODO: add anonymous func's and proc's
-	// TODO: add foo := procedure, bar := function
-	
 	_definition: $ => choice(
 	    $.function_definition,
 	    $.intrinsic_definition,
@@ -557,6 +542,7 @@ module.exports = grammar({
 	// TODO: technically, this is not valid syntax for e.g. functions;
 	// can only pass typed identifiers to intrinsics, and only identifiers to functions
 	// but for simplicity we count this as a semantic and not syntactic difference
+
 	parameter: $ => choice(
 	    $.identifier,
 	    $.typed_identifier,
@@ -568,12 +554,13 @@ module.exports = grammar({
 	    $.identifier,
 	),
 	
-	// TODO: should this be token.immediate?
-	typed_identifier: $ => seq(
+	// MAYBE: should this be token.immediate?
+	// what's the precedence?
+	typed_identifier: $ => prec.left(PREC.colon, seq(
 	    $.identifier,
 	    "::",
 	    $.type,
-	),
+	)),
 
 	optional_parameter: $ => seq(
 	    field('name', $.identifier),
@@ -863,10 +850,24 @@ module.exports = grammar({
 	set: $ => aggregate_of($, '{', '}', true),
 	indexed_set: $ => aggregate_of($, '{@', '@}', true),
 	multiset: $ => aggregate_of($, '{*', '*}', true),
-	aggregate: $ => choice(
-		$.seqenum, $.list, $.tuple, $.set, $.indexed_set, $.multiset
-	),
 
+	aggregate: $ => choice(
+	    $.seqenum,
+	    $.list,
+	    $.tuple,
+	    $.set,
+	    $.indexed_set,
+	    $.multiset,
+	),
+	// reduct_plus: $ => '&+',
+	// reduct_minus: $ => '&-',
+	// reduct_mult: $ => '&*',
+	// reduct_and: $ => '&and',
+	// reduct_or: $ => '&or',
+	// reduct_meet: $ => '&meet',
+	// reduct_join: $ => '&join',
+	// reduct_cat: $ => '&cat',
+	
 	seq_slice: $ => prec.left(PREC.sq_bracket, seq(
 	    field('parent', $.primary_expression),
 	    commaSep1($.seqenum))

@@ -33,6 +33,36 @@ try print x; catch e print x; end try;
         (identifier)))))
 
 ================================================================================
+vprint statement
+================================================================================
+
+vprint User1: "Computing order...";
+
+---
+
+(program
+  (vprint_statement
+    flag: (identifier)
+    (string)))
+
+
+================================================================================
+vprintf statement
+================================================================================
+
+vprintf PRProspection, 4 : "Value %o, Threshold %o\n", value, threshold;
+
+---
+
+(program
+  (vprint_statement
+    flag: (identifier)
+    n: (integer)
+    (string)
+    (identifier)
+    (identifier)))
+
+================================================================================
 Eval expression
 ================================================================================
 
@@ -64,3 +94,49 @@ assert2 1 + 2 eq 3;
         left: (integer)
         right: (integer))
       right: (integer))))
+
+================================================================================
+Declare verbose statement
+================================================================================
+
+declare verbose MyAlgorithm, 3;
+
+---
+
+(program
+  (declare_statement
+    (verbosity_declaration
+      function: (identifier)
+      level: (integer))))
+
+================================================================================
+Declare attributes statement
+================================================================================
+
+declare attributes MyRat: Numer, Denom;
+
+--- 
+
+(program
+  (declare_statement
+    (attribute_declaration
+      category: (identifier)
+      attribute: (identifier)
+      attribute: (identifier))))
+
+================================================================================
+Local variables declaration
+================================================================================
+
+local A, outers, NS, CS;
+
+---
+
+(program
+  (local_statement
+    (identifier)
+    (identifier)
+    (identifier)
+    (identifier)))
+
+

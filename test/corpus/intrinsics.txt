@@ -11,7 +11,8 @@ end intrinsic;
 (program
   (intrinsic_definition
     name: (identifier)
-    return_type: (identifier)))
+    return_type: (type
+      (identifier))))
     
 ================================================================================
 Intrinsic test with arguments
@@ -29,6 +30,7 @@ end intrinsic;
     name: (identifier)
     parameters: (identifier)
     parameters: (identifier)
+    return_type: (type)
     body: (block
       (return_statement
         (expression_statement

@@ -252,3 +252,20 @@ x := S[ [2, 3], 2 ];
             (integer)
             (integer)))
         (integer)))))
+
+==================
+Reduction of aggregates
+==================
+
+&*{1,2,3};
+
+---
+
+(program
+  (expression_statement
+    (reduct_operator
+      right: (aggregate
+        (set
+          (integer)
+          (integer)
+          (integer))))))
