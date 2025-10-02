@@ -614,24 +614,16 @@ module.exports = grammar({
 	    field('right', $._right_hand_side),
 	),
 
-	// TODO: Refactor to make use of all binary operators
-	// we can use the operators
-	// join, meet, diff, sdiff, cat, *, +, -, /, ^, div, mod, and, or, xor
-	// 
-	augmented_assignment: $ => seq(
-	    field('left', $.primary_expression),
-	    choice(
-		// TODO: Find out if there are more options here like in python!
-		'+:=',
-		'-:=',
-		'*:=',
-		'/:=',
-		'and:=',
-		'or:=',
-		'div:='
-	    ),
-	    field('right', $.expression),
-	),
+	augmented_assignment: $ => {
+	    const table =  ['join', 'meet', 'diff', 'sdiff', 'cat', '*', '+', '-', '/', '^', 'div', 'mod', 'and', 'or', 'xor'];
+
+	    return choice(...table.map((symbol) =>
+		seq(
+		    field('left', $.primary_expression),
+		    symbol + ':=',
+		    field('right', $.expression)
+		)));
+	},
 
 	_left_hand_side: $ => commaSep1(
 	    choice(
