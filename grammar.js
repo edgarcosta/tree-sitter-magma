@@ -110,9 +110,6 @@ module.exports = grammar({
 	    seq('/*', /[^*]*\*+([^/*][^*]*\*+)*/, '/')
 	),
 
-	// Core tokens converted from yacc %token declarations
-
-	
 	_statement: $ => seq(
 	    choice(
 		$._simple_statement,
@@ -135,11 +132,10 @@ module.exports = grammar({
 	    $._directive,
 	    $.where_expression,
 	    $.try_catch_statement,
+	    $.error_statement,
 	),
 
 	expression_statement: $ => commaSep1($.primary_expression),
-	//     // $.assignment
-	// ),
 
 	return_statement: $ => seq(
 	    "return",
@@ -201,6 +197,7 @@ module.exports = grammar({
 	    )
 	),
 
+	// MAYBE: should these be directives? Doesn't affect parsing directly, unless we can access _directive token
 	local_statement: $ => seq(
 	    'local',
 	    commaSep1($.expression),
@@ -235,6 +232,16 @@ module.exports = grammar({
 	    field('error', $.identifier),
 	    $.block,
 	    'end try',
+	),
+
+	error_statement: $ => seq(
+	    'error',
+	    choice(
+		commaSep1($.expression),
+		seq('if',
+		    field('condition', $.expression),
+		    ',',
+		    commaSep1($.expression)))
 	),
 
 	// MAYBE: consider moving 'not' to separate function
@@ -371,39 +378,10 @@ module.exports = grammar({
 	// leftsquare_star: $ => '[*',
 	// star_rightsquare: $ => '*]',
 
-	// // Special symbols
-	// bar: $ => '|',
-	// bar_arrow: $ => '|->',
-	// becomes: $ => ':=',
-	// colon: $ => ':',
-	// colon_colon: $ => '::',
-	// comma: $ => ',',
-	// dollar: $ => '$',
-	// dollar_dollar: $ => '$$',
-	// dot: $ => '.',
-	// dotdot: $ => '..',
-	// dotdotdot: $ => '...',
-	// semi: $ => ';',
-	// equality: $ => '=',
-	// star_star: $ => '**',
-	// underscore: $ => '_',
-	// undefconst: $ => 'undefined',
-
-	// Keywords - control flow
-	// default: $ => 'default',
 
 	// // Keywords - functions and procedures
-	// TODO: add forward
-	// forward: $ => 'forward',
-	// local: $ => 'local',
 
 	// // Keywords - declarations and directives
-
-	
-	// save: $ => 'save',
-	// restore: $ => 'restore',
-	// freeze: $ => 'freeze',
-	// import: $ => 'import',
 
 	// Keywords - I/O and debugging
 	// read: $ => 'read',
@@ -429,6 +407,7 @@ module.exports = grammar({
 	_directive: $ => choice(
 	    $.clear,
 	    $.freeze,
+	    $.forward,
 	    $.load_directive,
 	    $.save_directive,
 	    $.import_directive,
@@ -438,6 +417,10 @@ module.exports = grammar({
 	clear: $ => 'clear',
 	freeze: $ => 'freeze',
 
+	forward: $ => seq(
+	    'forward',
+	    $.identifier
+	),
 
 	load_directive: $ => seq(
 	    choice('load', 'iload'),
@@ -859,15 +842,7 @@ module.exports = grammar({
 	    $.indexed_set,
 	    $.multiset,
 	),
-	// reduct_plus: $ => '&+',
-	// reduct_minus: $ => '&-',
-	// reduct_mult: $ => '&*',
-	// reduct_and: $ => '&and',
-	// reduct_or: $ => '&or',
-	// reduct_meet: $ => '&meet',
-	// reduct_join: $ => '&join',
-	// reduct_cat: $ => '&cat',
-	
+
 	seq_slice: $ => prec.left(PREC.sq_bracket, seq(
 	    field('parent', $.primary_expression),
 	    commaSep1($.seqenum))

@@ -139,4 +139,29 @@ local A, outers, NS, CS;
     (identifier)
     (identifier)))
 
+================================================================================
+Error statement
+================================================================================
 
+error "Runtime error in 'MyFunc'";
+
+---
+
+(program
+  (error_statement
+    (string)))
+
+================================================================================
+Error statement with if
+================================================================================
+
+error if 1 gt 0, "Oops!";
+
+---
+
+(program
+  (error_statement
+    condition: (comparison_operator
+      left: (integer)
+      right: (integer))
+    (string)))
