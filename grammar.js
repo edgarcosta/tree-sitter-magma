@@ -46,14 +46,16 @@ const MAPS = [
 const CONSTRUCTORS = [
     'ideal', 'lideal', 'rideal', 'case', 'quo', 'sub', 'ext','ncl', 'elt', 'cop',
     'Group', 'AbelianGroup', 'MatrixGroup', 'PolycyclicGroup', 'PermutationGroup', 'FPGroup',  
-    'Semigroup', 'Monoid',
-    'func', 'proc'
+    'Semigroup', 'Monoid', 'car' // Cartesian product
+    'func', 'proc', 'case' // case takes "default" in there!
 ]
 
 // TODO: add line continuation character: \ // Is this necessary?
 // TODO: move expression tests to new test file
-// TODO: add ext, quo, ideal etc.
 // TODO: add random in front of enumerated structures, cf paragraph before H10E8
+// e.g. random{x : x in [1..5]};
+// set keywords:
+// random, exists (10.7), forall, rep
 // TODO: add exists/forall in front of enumerated structures, cf H10E12
 
 // MAYBE: should this be at the bottom like the other helper functions?
@@ -670,7 +672,6 @@ module.exports = grammar({
 	),
 
 	// Maps
-	// TODO: pmap can also take 
 	map: $ => {
 	    return choice(...MAPS.map((name) => seq(
 		name,
@@ -752,6 +753,7 @@ module.exports = grammar({
 		'in',
 		field('parent', $.primary_expression)),
 	),
+
 	// needs to take into account all the variations in
 	// https://magma.maths.usyd.edu.au/magma/handbook/text/13#86
 				     
