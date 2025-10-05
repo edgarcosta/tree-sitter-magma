@@ -257,7 +257,7 @@ x := S[ [2, 3], 2 ];
 Reduction of aggregates
 ==================
 
-&*{1,2,3};
+&*{1, 2, 3};
 
 ---
 
@@ -269,3 +269,178 @@ Reduction of aggregates
           (integer)
           (integer)
           (integer))))))
+
+
+==================
+Sequence with ..
+==================
+
+[0..9];
+
+---
+
+(program
+  (expression_statement
+    (aggregate
+      (seqenum
+        (range
+          start: (integer)
+          end: (integer))))))
+	  
+====================================
+Sequence with .., by and universe
+====================================
+
+[Integers() | 0..9 by 2];
+
+---
+
+(program
+  (expression_statement
+    (aggregate
+      (seqenum
+        universe: (call
+          function: (identifier)
+          arguments: (argument_list))
+        (range
+          start: (integer)
+          end: (integer)
+          by: (integer))))))
+
+====================================
+Subsequence 
+====================================
+
+[x^2 : x in [1..5]];
+
+--- 
+(program
+  (expression_statement
+    (aggregate
+      (seqenum
+        (binary_operator
+          left: (identifier)
+          right: (integer))
+        (binary_operator
+          left: (identifier)
+          right: (aggregate
+            (seqenum
+              (range
+                start: (integer)
+                end: (integer)))))))))
+
+
+====================================
+Subsequence with index and condition
+====================================
+
+[x^i : i -> x in [1..5] | IsEven(x)];
+
+---
+
+(program
+  (expression_statement
+    (aggregate
+      (seqenum
+        (binary_operator
+          left: (identifier)
+          right: (identifier))
+        (iterable_binding
+          index: (identifier)
+          element: (identifier)
+          parent: (aggregate
+            (seqenum
+              (range
+                start: (integer)
+                end: (integer)))))
+        condition: (call
+          function: (identifier)
+          arguments: (argument_list
+            argument: (identifier)))))))
+
+====================================
+Existential quantifier on set
+====================================
+
+exists(t){ <x, y> : x, y in [ t^3 : t in [-10..10] ] | x + y eq 218 };
+
+---
+; H10E12
+(program
+  (expression_statement
+    (quantified_set
+      (identifier)
+      (set
+        (aggregate
+          (tuple
+            (identifier)
+            (identifier)))
+        (iterable_binding
+          element: (identifier)
+          element: (identifier)
+          parent: (aggregate
+            (seqenum
+              (binary_operator
+                left: (identifier)
+                right: (integer))
+              (iterable_binding
+                element: (identifier)
+                parent: (aggregate
+                  (seqenum
+                    (range
+                      start: (unary_operator
+                        right: (integer))
+                      end: (integer))))))))
+        condition: (comparison_operator
+          left: (binary_operator
+            left: (identifier)
+            right: (identifier))
+          right: (integer))))))
+
+====================================
+Random element of set
+====================================
+
+random{ x : x in F | IsPrimitive(x) };
+
+---
+
+(program
+  (expression_statement
+    (random_element_of_set
+      (set
+        (identifier)
+        (iterable_binding
+          element: (identifier)
+          parent: (identifier))
+        condition: (call
+          function: (identifier)
+          arguments: (argument_list
+            argument: (identifier)))))))
+
+====================================
+Representative of set
+====================================
+
+rep {x^2 : x in [1..5] | IsEven(x) };
+
+---
+
+(program
+  (expression_statement
+    (representative_of_set
+      (set
+        (binary_operator
+          left: (identifier)
+          right: (integer))
+        (iterable_binding
+          element: (identifier)
+          parent: (aggregate
+            (seqenum
+              (range
+                start: (integer)
+                end: (integer)))))
+        condition: (call
+          function: (identifier)
+          arguments: (argument_list
+            argument: (identifier)))))))

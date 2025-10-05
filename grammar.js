@@ -46,19 +46,15 @@ const MAPS = [
 const CONSTRUCTORS = [
     'ideal', 'lideal', 'rideal', 'case', 'quo', 'sub', 'ext','ncl', 'elt', 'cop',
     'Group', 'AbelianGroup', 'MatrixGroup', 'PolycyclicGroup', 'PermutationGroup', 'FPGroup',  
-    'Semigroup', 'Monoid', 'car' // Cartesian product
+    'Semigroup', 'Monoid', 'car', // Cartesian product
     'func', 'proc', 'case' // case takes "default" in there!
 ]
 
 // TODO: add line continuation character: \ // Is this necessary?
 // TODO: move expression tests to new test file
-// TODO: add random in front of enumerated structures, cf paragraph before H10E8
 // e.g. random{x : x in [1..5]};
 // set keywords:
 // random, exists (10.7), forall, rep
-// TODO: add exists/forall in front of enumerated structures, cf H10E12
-
-// MAYBE: should this be at the bottom like the other helper functions?
 
 module.exports = grammar({
     name: 'magma',
@@ -71,6 +67,10 @@ module.exports = grammar({
     conflicts: $ => [
 	[$.expression_statement, $.assignment],
 	[$.function_definition, $.primary_expression, $.procedure_definition],
+	[$.set],
+	[$.seqenum],
+	[$.indexed_set],
+	[$.multiset],
     ],
     // A _statement_ is any valid sequence of symbols followed by a semicolon
     // eg. a variable assignment, a function/intrinsic definition
@@ -247,10 +247,6 @@ module.exports = grammar({
 	),
 
 	// MAYBE: consider moving 'not' to separate function
-	boolean_statement: $ => choice(
-	    $.unary_operator,
-	    $.binary_operator,
-	),
 	
 	unary_operator: $ => {
 	    const table = [
@@ -445,8 +441,6 @@ module.exports = grammar({
 
 	expression: $ => choice(
 	    $.primary_expression,
-	    $.boolean_operator,
-	    $.comparison_operator,
 	    $.where_expression,	// MAYBE: Should this be a primary expression?
 	    $.eval_expression
 	),
@@ -461,7 +455,6 @@ module.exports = grammar({
 
 	// TODO: the expression (1,2) can mean permuation group cycle; implement this!
 	// NB: It can also mean commutator! cf Chapter 70 of the documentation pdf
-	
 	primary_expression: $ => choice(
 	    $.identifier,
 	    $.integer,
@@ -471,6 +464,8 @@ module.exports = grammar({
 	    $.unary_operator,
 	    $.ternary_operator,
 	    $.reduct_operator,
+	    $.boolean_operator,
+	    $.comparison_operator,
 	    $.attribute,
 	    $.map,
 	    $.seq_slice,
@@ -481,13 +476,12 @@ module.exports = grammar({
 	    $.parenthesized_expression, // should this really be here?
 	    $.literal_sequence,
 	    $.aggregate,
+	    $._set_operator,
 	),
 	
 	true: _ => 'true',
 	false: _ => 'false',
 	
-	expression_list: $ => 'placeholder_expr_list',
-
 	_definition: $ => choice(
 	    $.function_definition,
 	    $.intrinsic_definition,
@@ -746,12 +740,16 @@ module.exports = grammar({
 	       ),
 	    seq(
 		optional('random'),
-		optional(seq(
-		    field('index', $.identifier),
-		    '->')),
-		field('element', $.identifier),
-		'in',
-		field('parent', $.primary_expression)),
+		$.iterable_binding)
+	),
+
+	iterable_binding: $ => seq(
+	    optional(seq(
+		field('index', $.identifier),
+		'->')),
+	    commaSep1(field('element', $.identifier)),
+	    'in',
+	    field('parent', $.primary_expression)
 	),
 
 	// needs to take into account all the variations in
@@ -827,7 +825,7 @@ module.exports = grammar({
 	set: $ => aggregate_of($, '{', '}', true),
 	indexed_set: $ => aggregate_of($, '{@', '@}', true),
 	multiset: $ => aggregate_of($, '{*', '*}', true),
-
+	
 	aggregate: $ => choice(
 	    $.seqenum,
 	    $.list,
@@ -837,6 +835,34 @@ module.exports = grammar({
 	    $.multiset,
 	),
 
+
+	range: $ => seq(
+	    field('start', $.primary_expression),
+	    '..',
+	    field('end', $.primary_expression),
+	    optional(seq('by', field('by', $.primary_expression)))
+	),
+
+
+	_set_operator: $ => choice(
+	    $.quantified_set,
+	    $.random_element_of_set,
+	    $.representative_of_set,
+	),
+	// TODO: think of a better name for this
+	quantified_set: $ => seq(
+	    choice('exists', 'forall'),
+	    '(',
+	    commaSep1($.identifier),
+	    ')',
+	    $.set
+	),
+
+	random_element_of_set: $ => seq('random', $.set),
+
+	representative_of_set: $ => seq('rep', $.set),
+	
+	
 	seq_slice: $ => prec.left(PREC.sq_bracket, seq(
 	    field('parent', $.primary_expression),
 	    commaSep1($.seqenum))
@@ -902,13 +928,25 @@ function sep1(rule, separator) {
 // TODO: add option to support trailing comma
 function aggregate_of($, left, right, has_universe) {
 	return seq(
-		left,
-		optional(has_universe ? seq(
-			field('universe', $.primary_expression),
-			'|'
-		) : seq()),
-		optional(commaSep1($.primary_expression)),
-		right
+	    left,
+	    // universe
+	    optional(has_universe ? seq(
+		field('universe', $.primary_expression),
+		'|'
+	    ) : seq()),
+	    // elements
+	    optional(
+		choice(commaSep1($.primary_expression), $.range)
+	    ),
+	    // specify parent(s) of element(s)
+	    optional(
+		seq(':', commaSep1($.iterable_binding)) 
+	    ),
+	    // conditions
+	    optional(
+		seq('|', field('condition', $.primary_expression))
+	    ),
+	    right
 	);
 }
 
