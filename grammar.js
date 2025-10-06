@@ -52,9 +52,6 @@ const CONSTRUCTORS = [
 
 // TODO: add line continuation character: \ // Is this necessary?
 // TODO: move expression tests to new test file
-// e.g. random{x : x in [1..5]};
-// set keywords:
-// random, exists (10.7), forall, rep
 
 module.exports = grammar({
     name: 'magma',
@@ -67,10 +64,6 @@ module.exports = grammar({
     conflicts: $ => [
 	[$.expression_statement, $.assignment],
 	[$.function_definition, $.primary_expression, $.procedure_definition],
-	[$.set],
-	[$.seqenum],
-	[$.indexed_set],
-	[$.multiset],
     ],
     // A _statement_ is any valid sequence of symbols followed by a semicolon
     // eg. a variable assignment, a function/intrinsic definition
@@ -940,11 +933,11 @@ function aggregate_of($, left, right, has_universe) {
 	    ),
 	    // specify parent(s) of element(s)
 	    optional(
-		seq(':', commaSep1($.iterable_binding)) 
-	    ),
-	    // conditions
-	    optional(
-		seq('|', field('condition', $.primary_expression))
+		seq(':', commaSep1($.iterable_binding),
+		// conditions
+		optional(
+		    seq('|', field('condition', $.primary_expression)))
+		),
 	    ),
 	    right
 	);
