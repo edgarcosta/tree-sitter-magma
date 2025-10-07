@@ -61,6 +61,7 @@ module.exports = grammar({
     extras: $ => [
 	/\s/,           // whitespace
 	$.comment,      // comments
+	'\\',            // line continuation
     ],
 
     conflicts: $ => [
@@ -121,13 +122,14 @@ module.exports = grammar({
 	    $.continue_statement,
 	    $.print_statement,
 	    $.vprint_statement,
+	    $.time_statement,
+	    $.vtime_statement,
 	    $.assert_statement,
 	    $.declare_statement,
 	    $.local_statement,
 	    $._definition,
 	    $._assignment,
 	    $._directive,
-	    $.where_expression,
 	    $.try_catch_statement,
 	    $.error_statement,
 	),
@@ -138,7 +140,7 @@ module.exports = grammar({
 	    "return",
 	    // Procedures return nothing, and can only have empty return statements, as an early exit
 	    // Functions must have a return statement with an expression (semantic validation)
-	    optional($.expression_statement)
+	    optional(commaSep1($.expression))
 	),
 
 
@@ -185,6 +187,21 @@ module.exports = grammar({
 	    $.expression,
 	),
 
+	time_statement: $ => seq(
+	    'time',
+	    $._statement,
+	),
+
+	vtime_statement: $ => seq(
+	    'vtime',
+	    $.expression,
+	    field('flag', $.identifier),
+	    optional(seq(',', field('n', $.integer))),
+	    ':',
+	    $._statement,
+	),
+	
+	
 	declare_statement: $ => seq(
 	    'declare',
 	    choice(
@@ -401,6 +418,7 @@ module.exports = grammar({
 	    $.clear,
 	    $.freeze,
 	    $.forward,
+	    $.delete,
 	    $.load_directive,
 	    $.save_directive,
 	    $.import_directive,
@@ -409,10 +427,15 @@ module.exports = grammar({
 	// should only appear alone:
 	clear: $ => 'clear',
 	freeze: $ => 'freeze',
-
+	
 	forward: $ => seq(
 	    'forward',
 	    $.identifier
+	),
+
+	delete: $ => seq(
+	    'delete',
+	    $.primary_expression
 	),
 
 	load_directive: $ => seq(
@@ -469,6 +492,7 @@ module.exports = grammar({
 	    $.true,
 	    $.false,
 	    $.call,
+	    $.dollar,
 	    $.double_dollar,		// MAYBE: should this really be here?
 	    $.parenthesized_expression, // should this really be here?
 	    $.literal_sequence,
@@ -806,6 +830,12 @@ module.exports = grammar({
 	),
 
 	// Misc:
+
+	dollar: $ => seq(
+	    '$',
+	    token.immediate(/\d+/)
+	),
+	    
 	// MAYBE: rename this to parent_function or something?
 	double_dollar: $ => prec.left(
 	    PREC.dollar, seq("$$", $.argument_list)),
@@ -862,9 +892,10 @@ module.exports = grammar({
 	// TODO: think of a better name for this
 	quantified_set: $ => seq(
 	    choice('exists', 'forall'),
-	    '(',
-	    commaSep1($.identifier),
-	    ')',
+	    optional(seq(
+		'(',
+		commaSep1($.identifier),
+		')')),
 	    $.set
 	),
 
