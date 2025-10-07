@@ -189,7 +189,8 @@ module.exports = grammar({
 
 	time_statement: $ => seq(
 	    'time',
-	    $._statement,
+	    // _statement requires a semicolon, so using it here would require two!
+	    choice($._simple_statement, $._compound_statement)
 	),
 
 	vtime_statement: $ => seq(
@@ -198,7 +199,7 @@ module.exports = grammar({
 	    field('flag', $.identifier),
 	    optional(seq(',', field('n', $.integer))),
 	    ':',
-	    $._statement,
+	    choice($._simple_statement, $._compound_statement)
 	),
 	
 	
@@ -435,7 +436,7 @@ module.exports = grammar({
 
 	delete: $ => seq(
 	    'delete',
-	    $.primary_expression
+	    commaSep1($.primary_expression)
 	),
 
 	load_directive: $ => seq(
