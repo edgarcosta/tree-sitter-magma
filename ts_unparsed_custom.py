@@ -2,6 +2,7 @@
 import argparse, json, os, sys, importlib
 from typing import List, Tuple, Set
 from tree_sitter import Language, Parser
+from pathlib import Path
 
 # If your grammar exports 'statement' as a supertype, list it here.
 PREFERRED_SUPERTYPES = {"statement"}
@@ -81,6 +82,72 @@ def unique_by_span(nodes: List) -> List:
             uniq.append(n)
     return uniq
 
+def get_files_recursively(path: str, extensions: Set[str] = None) -> List[str]:
+    """Get all files recursively from a path, optionally filtered by extensions."""
+    path_obj = Path(path)
+    files = []
+    
+    if path_obj.is_file():
+        return [str(path_obj)]
+    elif path_obj.is_dir():
+        for file_path in path_obj.rglob("*"):
+            if file_path.is_file():
+                # If extensions are specified, filter by them
+                if extensions is None or file_path.suffix.lower() in extensions:
+                    files.append(str(file_path))
+    else:
+        raise FileNotFoundError(f"Path does not exist: {path}")
+    
+    return sorted(files)
+
+def process_single_file(file_path: str, parser: Parser, have_supertype: bool, mode: str) -> dict:
+    """Process a single file and return results."""
+    try:
+        src_bytes = open(file_path, "rb").read()
+    except Exception as e:
+        return {
+            "file": os.path.abspath(file_path),
+            "error": f"read error: {e}",
+            "count": 0,
+            "unparsed_statements": []
+        }
+    
+    src_text = src_bytes.decode("utf8", errors="replace")
+    tree = parser.parse(src_bytes)
+    root = tree.root_node
+
+    if mode == "explicit":
+        err_like = gather_errors_explicit(root)
+    else:
+        err_like = gather_errors_subtree(root)
+
+    if not err_like:
+        return {
+            "file": os.path.abspath(file_path),
+            "count": 0,
+            "unparsed_statements": []
+        }
+
+    # Map each error-ish node to its enclosing statement-ish node.
+    stmts = [nearest_statement(n, have_supertype) for n in err_like]
+    stmts = unique_by_span(stmts)
+
+    items = []
+    for s in stmts:
+        items.append({
+            "type": s.type,
+            "line_start": s.start_point.row + 1,
+            "line_end": s.end_point.row + 1,
+            "byte_start": s.start_byte,
+            "byte_end": s.end_byte
+        })
+    
+    return {
+        "file": os.path.abspath(file_path),
+        "count": len(items),
+        "unparsed_statements": items
+    }
+
 def width_for_linecount(n):
     return max(1, len(str(n)))
 
@@ -95,19 +162,14 @@ def render_lines(src_text: str, a_row: int, b_row: int) -> List[str]:
 
 def main():
     ap = argparse.ArgumentParser(description="Report statements containing Tree-sitter parse errors for a custom grammar.")
-    ap.add_argument("path", help="source file to analyze")
+    ap.add_argument("path", help="source file or directory to analyze")
     ap.add_argument("--lib", required=True, help="path to your compiled language shared library (.so/.dylib/.dll)")
     ap.add_argument("--lang", required=True, help="language name as exported by the shared library")
     ap.add_argument("--json", action="store_true", help="emit JSON")
     ap.add_argument("--mode", choices=["explicit","subtree"], default="explicit",
                     help="explicit: ERROR/MISSING nodes only; subtree: minimal has_error subtrees")
+    ap.add_argument("--ext", nargs="*", help="file extensions to include when scanning directories (e.g., .m .magma)")
     args = ap.parse_args()
-
-    try:
-        src_bytes = open(args.path, "rb").read()
-    except Exception as e:
-        sys.stderr.write(f"read error: {e}\n"); sys.exit(2)
-    src_text = src_bytes.decode("utf8", errors="replace")
 
     # Try multiple loading strategies to support both old and new Python APIs:
     # 1) Preferred for tree-sitter >= 0.25: import the generated Python package
@@ -157,75 +219,95 @@ def main():
         sys.exit(2)
 
     parser = Parser(language=lang)
-    tree = parser.parse(src_bytes)
-    root = tree.root_node
 
     # Detect whether grammar exposes a 'statement' supertype.
     # Tree-sitter bindings do not expose supertypes list, so we infer by name usage.
     have_supertype = True  # optimistic: many grammars define a 'statement' rule
     # If that assumption is wrong for your grammar, set to False or rename the rule.
 
-    if args.mode == "explicit":
-        err_like = gather_errors_explicit(root)
-    else:
-        err_like = gather_errors_subtree(root)
+    # Get files to process
+    try:
+        extensions = set(args.ext) if args.ext else None
+        files = get_files_recursively(args.path, extensions)
+    except FileNotFoundError as e:
+        sys.stderr.write(f"{e}\n")
+        sys.exit(2)
 
-    if not err_like:
+    if not files:
         if args.json:
             print(json.dumps({
-                "file": os.path.abspath(args.path),
                 "language": args.lang,
-                "count": 0,
-                "unparsed_statements": []
+                "mode": args.mode,
+                "total_files": 0,
+                "files_with_errors": 0,
+                "total_errors": 0,
+                "results": []
             }, indent=2))
         else:
-            print("No unparseable regions found.")
+            print("No files found to analyze.")
         return
 
-    # Map each error-ish node to its enclosing statement-ish node.
-    stmts = [nearest_statement(n, have_supertype) for n in err_like]
-    stmts = unique_by_span(stmts)
+    # Process all files
+    results = []
+    total_errors = 0
+    files_with_errors = 0
+
+    for file_path in files:
+        result = process_single_file(file_path, parser, have_supertype, args.mode)
+        results.append(result)
+        
+        if "error" in result:
+            continue
+            
+        if result["count"] > 0:
+            files_with_errors += 1
+            total_errors += result["count"]
 
     if args.json:
-        items = []
-        for s in stmts:
-            items.append({
-                "type": s.type,
-                "line_start": s.start_point.row + 1,
-                "line_end":   s.end_point.row + 1,
-                "byte_start": s.start_byte,
-                "byte_end":   s.end_byte
-            })
         print(json.dumps({
-            "file": os.path.abspath(args.path),
             "language": args.lang,
             "mode": args.mode,
-            "count": len(items),
-            "unparsed_statements": items
+            "total_files": len(files),
+            "files_with_errors": files_with_errors,
+            "total_errors": total_errors,
+            "results": results
         }, indent=2))
         return
 
-    print(f"File: {os.path.abspath(args.path)}")
+    # Text output
     print(f"Language: {args.lang}  Mode: {args.mode}")
-    print(f"Unparseable statements: {len(stmts)}\n")
+    print(f"Total files: {len(files)}")
+    print(f"Files with errors: {files_with_errors}")
+    print(f"Total unparseable statements: {total_errors}\n")
 
-    for i, s in enumerate(stmts, 1):
-        a_row, b_row = s.start_point.row, s.end_point.row
-        a_col, b_col = s.start_point.column, s.end_point.column
-        print(f"[{i}] type={s.type} lines={a_row+1}-{b_row+1} cols={a_col+1}-{b_col+1} bytes={s.start_byte}-{s.end_byte}")
+    for result in results:
+        if "error" in result:
+            print(f"ERROR processing {result['file']}: {result['error']}")
+            continue
+            
+        if result["count"] == 0:
+            continue
 
-        inner = []
-        for n in iter_named(s):
-            if getattr(n, "is_error", False):
-                inner.append("ERROR")
-            elif getattr(n, "is_missing", False):
-                inner.append(f"MISSING<{n.type}>")
-        if inner:
-            print(f"    inner: {', '.join(inner)}")
-        print()
-        for line in render_lines(src_text, a_row, b_row):
-            print("    " + line)
-        print()
+        print(f"File: {result['file']}")
+        print(f"Unparseable statements: {result['count']}\n")
+
+        # For text output, we need to re-read the file to show the actual content
+        try:
+            with open(result['file'], 'rb') as f:
+                src_bytes = f.read()
+            src_text = src_bytes.decode("utf8", errors="replace")
+        except Exception as e:
+            print(f"    Could not read file for display: {e}\n")
+            continue
+
+        for i, stmt in enumerate(result['unparsed_statements'], 1):
+            a_row, b_row = stmt['line_start'] - 1, stmt['line_end'] - 1
+            a_col, b_col = 0, 0  # We don't have column info in JSON
+            print(f"[{i}] type={stmt['type']} lines={stmt['line_start']}-{stmt['line_end']} bytes={stmt['byte_start']}-{stmt['byte_end']}")
+            print()
+            for line in render_lines(src_text, a_row, b_row):
+                print("    " + line)
+            print()
 
 if __name__ == "__main__":
     main()
