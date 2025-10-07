@@ -46,9 +46,10 @@ const MAPS = [
 const CONSTRUCTORS = [
     'ideal', 'lideal', 'rideal', 'case', 'quo', 'sub', 'ext','ncl', 'elt', 'cop',
     'Group', 'AbelianGroup', 'MatrixGroup', 'PolycyclicGroup', 'PermutationGroup', 'FPGroup',
+    'Graph',
     'LinearCode', 'Network',
     'Semigroup', 'Monoid', 'car', // Cartesian product
-    'func', 'proc', 'case' // case takes "default" in there!
+    'func', 'proc', 'case', 'recformat', 'rec' // case takes "default" in there!
 ]
 
 // TODO: add line continuation character: \ // Is this necessary?
@@ -451,6 +452,7 @@ module.exports = grammar({
 	// NB: It can also mean commutator! cf Chapter 70 of the documentation pdf
 	primary_expression: $ => choice(
 	    $.identifier,
+	    $.anonymous_identifier,
 	    $.integer,
 	    $.real,
 	    $.string,
@@ -619,14 +621,13 @@ module.exports = grammar({
 	_left_hand_side: $ => commaSep1(
 	    choice(
 		$.primary_expression, // TODO: is this too general?
-		$.gen_expression,
-		$.anonymous_identifier
+		$.anonymous_constructor
 	    )),
 
 	_right_hand_side: $ => commaSep1($.expression),
 
-	gen_expression: $ => seq(
-	    choice($.identifier, '_'),
+	anonymous_constructor: $ => seq(
+	    $.anonymous_identifier,
 	    '<',
 	    commaSep1($.identifier),
 	    '>'
@@ -686,18 +687,17 @@ module.exports = grammar({
 	),
 
 	// Constructors
-	constructor: $ => {
-	    // @ts-ignore
-	    return choice(...CONSTRUCTORS.map((operator) => prec.left(PREC.cmp, seq(
-		field('operator', operator),
-		'<',
-		commaSep1($.primary_expression),
-		optional(seq(
-		    '|', commaSep1($.primary_expression)
-		)),
+	constructor: $ => seq(
+	    $.identifier,
+	    '<',
+	    commaSep1($.primary_expression),
+	    optional(seq(
+		'|', optional(commaSep1(choice(
+		    $.primary_expression,
+		    $.optional_parameter,
+		    ))))),
 		'>'
-	    ))))
-	},
+	),
 	
 	
 	// Control flow
