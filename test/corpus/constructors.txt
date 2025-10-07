@@ -1,0 +1,14 @@
+============================
+Ideal constructor
+============================
+
+ideal<OF | a1,a2>;
+
+---
+
+(program
+  (expression_statement
+    (constructor
+      (identifier)
+      (identifier)
+      (identifier))))

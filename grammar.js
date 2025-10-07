@@ -45,7 +45,8 @@ const MAPS = [
 // TODO: finish adding constructors
 const CONSTRUCTORS = [
     'ideal', 'lideal', 'rideal', 'case', 'quo', 'sub', 'ext','ncl', 'elt', 'cop',
-    'Group', 'AbelianGroup', 'MatrixGroup', 'PolycyclicGroup', 'PermutationGroup', 'FPGroup',  
+    'Group', 'AbelianGroup', 'MatrixGroup', 'PolycyclicGroup', 'PermutationGroup', 'FPGroup',
+    'LinearCode', 'Network',
     'Semigroup', 'Monoid', 'car', // Cartesian product
     'func', 'proc', 'case' // case takes "default" in there!
 ]
@@ -461,6 +462,7 @@ module.exports = grammar({
 	    $.comparison_operator,
 	    $.attribute,
 	    $.map,
+	    $.constructor,
 	    $.seq_slice,
 	    $.true,
 	    $.false,
@@ -682,6 +684,21 @@ module.exports = grammar({
 		optional(seq(field('domain_element', $.identifier), ':->')),
 		field('image', $.primary_expression))
 	),
+
+	// Constructors
+	constructor: $ => {
+	    // @ts-ignore
+	    return choice(...CONSTRUCTORS.map((operator) => prec.left(PREC.cmp, seq(
+		field('operator', operator),
+		'<',
+		commaSep1($.primary_expression),
+		optional(seq(
+		    '|', commaSep1($.primary_expression)
+		)),
+		'>'
+	    ))))
+	},
+	
 	
 	// Control flow
 	_compound_statement: $ => choice(
