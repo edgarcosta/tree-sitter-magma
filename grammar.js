@@ -460,7 +460,6 @@ module.exports = grammar({
 
 	expression: $ => choice(
 	    $.primary_expression,
-	    $.where_expression,	// MAYBE: Should this be a primary expression?
 	    $.eval_expression
 	),
 
@@ -496,6 +495,7 @@ module.exports = grammar({
 	    $.dollar,
 	    $.double_dollar,		// MAYBE: should this really be here?
 	    $.parenthesized_expression, // should this really be here?
+	    $.where_expression,	// This should definitely be here
 	    $.literal_sequence,
 	    $.aggregate,
 	    $._set_operator,
@@ -654,7 +654,8 @@ module.exports = grammar({
 	anonymous_constructor: $ => seq(
 	    $.anonymous_identifier,
 	    '<',
-	    commaSep1($.identifier),
+	    choice(commaSep1($.identifier),
+		   seq('[', commaSep1($.identifier), ']')),
 	    '>'
 	),
 
@@ -720,8 +721,10 @@ module.exports = grammar({
 		'|', optional(commaSep1(choice(
 		    $.primary_expression,
 		    $.optional_parameter,
-		    ))))),
-		'>'
+		))),
+	    )),
+	    optional(seq(':', commaSep1($.optional_parameter))),
+	    '>'
 	),
 	
 	
