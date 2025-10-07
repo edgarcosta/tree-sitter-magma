@@ -11,4 +11,5 @@ ideal<OF | a1,a2>;
     (constructor
       (identifier)
       (identifier)
+      (identifier)
       (identifier))))

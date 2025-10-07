@@ -28,8 +28,7 @@ end function;
     parameters: (parameters)
     body: (block
       (return_statement
-        (expression_statement
-          (integer))))))
+        (integer)))))
 
 ================================================================================
 Function definition with arguments
@@ -58,10 +57,9 @@ end function;
           left: (identifier)
           right: (identifier)))
       (return_statement
-        (expression_statement
-          (binary_operator
-            left: (identifier)
-            right: (identifier)))))))
+        (binary_operator
+          left: (identifier)
+          right: (identifier))))))
 
 ================================================================================
 Function definition with := notation
@@ -90,23 +88,21 @@ end function;
           right: (integer))
         consequence: (block
           (return_statement
-            (expression_statement
-              (integer))))
+            (integer)))
         alternative: (else_clause
           consequence: (block
             (return_statement
-              (expression_statement
-                (binary_operator
-                  left: (double_dollar
-                    (argument_list
-                      argument: (binary_operator
-                        left: (identifier)
-                        right: (integer))))
-                  right: (double_dollar
-                    (argument_list
-                      argument: (binary_operator
-                        left: (identifier)
-                        right: (integer)))))))))))))
+              (binary_operator
+                left: (double_dollar
+                  (argument_list
+                    argument: (binary_operator
+                      left: (identifier)
+                      right: (integer))))
+                right: (double_dollar
+                  (argument_list
+                    argument: (binary_operator
+                      left: (identifier)
+                      right: (integer))))))))))))
 
 ================================================================================
 Procedure definition with no arguments

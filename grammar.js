@@ -125,6 +125,7 @@ module.exports = grammar({
 	    $.time_statement,
 	    $.vtime_statement,
 	    $.assert_statement,
+	    $.require_statement,
 	    $.declare_statement,
 	    $.local_statement,
 	    $._definition,
@@ -187,6 +188,13 @@ module.exports = grammar({
 	    $.expression,
 	),
 
+	require_statement: $ => seq(
+	    'require',
+	    $.expression,
+	    ':',
+	    commaSep1($.expression),
+	),
+
 	time_statement: $ => seq(
 	    'time',
 	    // _statement requires a semicolon, so using it here would require two!
@@ -230,7 +238,7 @@ module.exports = grammar({
 	    'type',
 	    $.type,
 	    optional(seq(
-		':', field('supertype', commaSep1($.identifier))))
+		':', commaSep1(field('supertype', $.identifier))))
 	),
 
 	verbosity_declaration: $ => seq(
@@ -573,7 +581,7 @@ module.exports = grammar({
 	    'intrinsic',
 	    field('name', $.identifier),
 	    field('parameters', $._intrinsic_parameters),
-	    optional(seq('->', field('return_type', $.type))),
+	    optional(seq('->', commaSep1(field('return_type', $.type)))),
 	    field('docstring',
 		  seq('{',
 		      /[^{}]*/,	// matches anything that's not a squirly brace
@@ -659,13 +667,25 @@ module.exports = grammar({
 	    '>'
 	),
 
-	// TODO: What about square brackets?
-	// should include anything described here:
-	// https://magma.maths.usyd.edu.au/magma/handbook/text/24
 	type: $ => choice(
+	    // Simple and any-type
 	    $.identifier,
 	    '.',
-	    seq($.identifier, '[', $.identifier, ']')
+	    // Base bracket types
+	    seq('[', ']'),			  // Sequence type
+	    seq('{', '}'),			  // Set type
+	    seq('{[', ']}'),		  // Set or sequence type
+	    seq('{@', '@}'),		  // Iset type
+	    seq('{*', '*}'),		  // Multiset type
+	    seq('<', '>'),		  // Tuple type
+	    // Composite types
+	    seq('[', $.type, ']'),	  // Sequences over <type>
+	    seq('{', $.type, '}'),	  // Sets over <type>
+	    seq('{[', $.type, ']}'),    // Sets or sequences over <type>
+	    seq('{@', $.type, '@}'),    // Indexed sets over <type>
+	    seq('{*', $.type, '*}'),    // Multisets over <type>
+	    // Extended types: Category[<type>, ...] (allow nested types)
+	    seq($.identifier, '[', commaSep1($.type), ']'),
 	),
 
 	attribute: $ => choice(

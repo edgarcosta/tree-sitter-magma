@@ -38,7 +38,7 @@ F<a> := NumberField(x^2+1);
 
 (program
   (assignment
-    left: (gen_expression
+    left: (constructor
       (identifier)
       (identifier))
     right: (call
@@ -77,7 +77,8 @@ _<x> := PolynomialRing(Integers());
 
 (program
   (assignment
-    left: (gen_expression
+    left: (anonymous_constructor
+      (anonymous_identifier)
       (identifier))
     right: (call
       function: (identifier)

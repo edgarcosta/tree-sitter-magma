@@ -7,12 +7,13 @@ x + y where x is 5;
 ---
 
     (program
-      (where_expression
-        (binary_operator
+      (expression_statement
+        (where_expression
+          (binary_operator
+            (identifier)
+            (identifier))
           (identifier)
-          (identifier))
-        (identifier)
-        (integer)))
+          (integer))))
 
 =======================================================
 Basic where expression with ":="
@@ -24,12 +25,13 @@ a * b where a := 3;
 ---
 
     (program
-      (where_expression
-        (binary_operator
+      (expression_statement
+        (where_expression
+          (binary_operator
+            (identifier)
+            (identifier))
           (identifier)
-          (identifier))
-        (identifier)
-        (integer)))
+          (integer))))
 
 =======================================================
 Where expression with function call
@@ -40,13 +42,14 @@ f(x) where x is 10;
 ---
 
     (program
-      (where_expression
-        (call
+      (expression_statement
+        (where_expression
+          (call
+            (identifier)
+            (argument_list
+              (identifier)))
           (identifier)
-          (argument_list
-            (identifier)))
-        (identifier)
-        (integer)))
+          (integer))))
 
 =======================================================
 Where expression with comparison
@@ -57,12 +60,13 @@ a eq b where a is 5;
 ---
 
     (program
-      (where_expression
-        (comparison_operator
+      (expression_statement
+        (where_expression
+          (comparison_operator
+            (identifier)
+            (identifier))
           (identifier)
-          (identifier))
-        (identifier)
-        (integer)))
+          (integer))))
 
 =======================================================
 Where expression with parenthesized expression
@@ -73,15 +77,16 @@ Where expression with parenthesized expression
 ---
 
     (program
-      (where_expression
-        (binary_operator
-          (parenthesized_expression
-            (binary_operator
-              (identifier)
-              (identifier)))
-          (identifier))
-        (identifier)
-        (integer)))
+      (expression_statement
+        (where_expression
+          (binary_operator
+            (parenthesized_expression
+              (binary_operator
+                (identifier)
+                (identifier)))
+            (identifier))
+          (identifier)
+          (integer))))
 
 =======================================================
 Where expression with boolean operator
@@ -92,12 +97,13 @@ a and b where a is true;
 ---
 
     (program
-      (where_expression
-        (boolean_operator
+      (expression_statement
+        (where_expression
+          (boolean_operator
+            (identifier)
+            (identifier))
           (identifier)
-          (identifier))
-        (identifier)
-        (true)))
+          (true))))
 
 
 =======================================================
@@ -109,11 +115,12 @@ not p where p is false;
 ---
 
     (program
-      (where_expression
-        (unary_operator
-          (identifier))
-        (identifier)
-        (false)))
+      (expression_statement
+        (where_expression
+          (unary_operator
+            (identifier))
+          (identifier)
+          (false))))
 
 =======================================================
 Where expression with arithmetic
@@ -124,12 +131,13 @@ n + 1 where n is 42;
 ---
 
     (program
-      (where_expression
-        (binary_operator
+      (expression_statement
+        (where_expression
+          (binary_operator
+            (identifier)
+            (integer))
           (identifier)
-          (integer))
-        (identifier)
-        (integer)))
+          (integer))))
 
 =======================================================
 Left associativity
@@ -140,18 +148,19 @@ a + b where b := 1 where a:=10 where a := 3;
 ---
 
     (program
-      (where_expression
+      (expression_statement
         (where_expression
           (where_expression
-            (binary_operator
+            (where_expression
+              (binary_operator
+                (identifier)
+                (identifier))
               (identifier)
-              (identifier))
+              (integer))
             (identifier)
             (integer))
           (identifier)
-          (integer))
-        (identifier)
-        (integer)))
+          (integer))))
 
 =======================================================
 Where expression with anonymous identifier
@@ -162,16 +171,17 @@ a + p where _, p := IsPrimePower(a) where a := 9;
 ---
 
 (program
-  (where_expression
-    value: (where_expression
-      value: (binary_operator
-        left: (identifier)
-        right: (identifier))
-      variables: (anonymous_identifier)
+  (expression_statement
+    (where_expression
+      value: (where_expression
+        value: (binary_operator
+          left: (identifier)
+          right: (identifier))
+        variables: (anonymous_identifier)
+        variables: (identifier)
+        definition: (call
+          function: (identifier)
+          arguments: (argument_list
+            argument: (identifier))))
       variables: (identifier)
-      definition: (call
-        function: (identifier)
-        arguments: (argument_list
-          argument: (identifier))))
-    variables: (identifier)
-    definition: (integer)))
+      definition: (integer))))
