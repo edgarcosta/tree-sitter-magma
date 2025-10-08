@@ -13,3 +13,26 @@ ideal<OF | a1,a2>;
       (identifier)
       (identifier)
       (identifier))))
+
+============================
+Recformat constructor with field definitions
+============================
+
+store_fmt := recformat<get : UserProgram, set: UserProgram, isset: UserProgram>;
+
+---
+
+(program
+  (assignment
+    left: (identifier)
+    right: (constructor
+      (identifier)
+      (field_definition
+        name: (identifier)
+        type: (identifier))
+      (field_definition
+        name: (identifier)
+        type: (identifier))
+      (field_definition
+        name: (identifier)
+        type: (identifier)))))

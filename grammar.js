@@ -67,6 +67,11 @@ module.exports = grammar({
     conflicts: $ => [
 	[$.expression_statement, $.assignment],
 	[$.function_definition, $.primary_expression, $.procedure_definition],
+	// Conflict between primary_expression and field_definition in constructors:
+	// Both can start with an identifier, but field_definition requires "name : type"
+	// syntax while primary_expression can be just an identifier or more complex expressions.
+	// This ambiguity occurs in constructor parameter lists like: <expr, name : type>
+	[$.primary_expression, $.field_definition],
     ],
     // A _statement_ is any valid sequence of symbols followed by a semicolon
     // eg. a variable assignment, a function/intrinsic definition
@@ -747,7 +752,10 @@ module.exports = grammar({
 	constructor: $ => seq(
 	    $.identifier,
 	    '<',
-	    commaSep1($.primary_expression),
+	    commaSep1(choice(
+		$.primary_expression,
+		$.field_definition
+	    )),
 	    optional(seq(
 		'|', optional(commaSep1(choice(
 		    $.primary_expression,
@@ -756,6 +764,12 @@ module.exports = grammar({
 	    )),
 	    optional(seq(':', commaSep1($.optional_parameter))),
 	    '>'
+	),
+
+	field_definition: $ => seq(
+	    field('name', $.identifier),
+	    ':',
+	    field('type', $.identifier)
 	),
 	
 	
