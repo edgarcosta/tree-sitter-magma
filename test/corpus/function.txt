@@ -199,3 +199,59 @@ end procedure;
             (assignment
               left: (identifier)
               right: (false))))))))
+
+============================
+Inline function expressions
+============================
+
+myfunc := func<| x + 1>;
+myproc := proc<| f(x)>;
+
+---
+
+(program
+  (assignment
+    left: (identifier)
+    right: (inline_function
+      body: (binary_operator
+        left: (identifier)
+        right: (integer))))
+  (assignment
+    left: (identifier)
+    right: (inline_procedure
+      body: (inline_procedure_body
+        (call
+          function: (identifier)
+          arguments: (argument_list
+            argument: (identifier)))))))
+
+============================
+Inline functions with parameters
+============================
+
+add := func<x, y | x + y>;
+print_and_return := proc<~result, value | result := value>;
+
+---
+
+(program
+  (assignment
+    left: (identifier)
+    right: (inline_function
+      parameters: (inline_parameters
+        (identifier)
+        (identifier))
+      body: (binary_operator
+        left: (identifier)
+        right: (identifier))))
+  (assignment
+    left: (identifier)
+    right: (inline_procedure
+      parameters: (inline_parameters
+        (ref_identifier
+          (identifier))
+        (identifier))
+      body: (inline_procedure_body
+        (assignment
+          left: (identifier)
+          right: (identifier))))))

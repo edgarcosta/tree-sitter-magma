@@ -506,6 +506,8 @@ module.exports = grammar({
 	    $.false,
 	    $.call,
 	    $.dollar,
+	    $.inline_function,
+	    $.inline_procedure,
 	    $.double_dollar,		// MAYBE: should this really be here?
 	    $.parenthesized_expression, // should this really be here?
 	    $.where_expression,	// This should definitely be here
@@ -543,14 +545,69 @@ module.exports = grammar({
 	    optional(field('body', $.block)),
 	    'end procedure',
 	),
+
+	// Inline function expressions: func<| expression> or func<parameters | expression>
+	inline_function: $ => choice(
+	    // No parameters: func<| expression>
+	    seq(
+		'func',
+		'<',
+		'|',
+		field('body', $.primary_expression),
+		'>'
+	    ),
+	    // With parameters: func<parameters | expression>
+	    seq(
+		'func',
+		'<',
+		field('parameters', $.inline_parameters),
+		'|',
+		field('body', $.primary_expression),
+		'>'
+	    )
+	),
+
+	// Inline procedure expressions: proc<| expression> or proc<parameters | expression>
+	inline_procedure: $ => choice(
+	    // No parameters: proc<| expression>
+	    seq(
+		'proc',
+		'<',
+		'|',
+		field('body', $.inline_procedure_body),
+		'>'
+	    ),
+	    // With parameters: proc<parameters | expression>
+	    seq(
+		'proc',
+		'<',
+		field('parameters', $.inline_parameters),
+		'|',
+		field('body', $.inline_procedure_body),
+		'>'
+	    )
+	),
+
+	// Inline procedure body can contain assignments or expressions
+	inline_procedure_body: $ => choice(
+	    $.assignment,
+	    $.primary_expression
+	),
     
-	parameters: $ => seq(
-	    '(',
-	    optional(commaSep1($.parameter)),
+	inline_parameters: $ => seq(
+	    commaSep1($.parameter),
 	    optional(seq(
 		':',
 		commaSep1($.optional_parameter))),
-	    ')'
+	),
+
+	parameters: $ => seq(
+		'(',
+		optional(commaSep1($.parameter)),
+		optional(seq(
+			':',
+			commaSep1($.optional_parameter))),
+		')'
 	),
 
 	// TODO: technically, this is not valid syntax for e.g. functions;
