@@ -42,17 +42,6 @@ const MAPS = [
     'hom', 'map', 'pmap', 'iso',
 ]
 
-// TODO: finish adding constructors
-const CONSTRUCTORS = [
-    'ideal', 'lideal', 'rideal', 'case', 'quo', 'sub', 'ext','ncl', 'elt', 'cop',
-    'Group', 'AbelianGroup', 'MatrixGroup', 'PolycyclicGroup', 'PermutationGroup', 'FPGroup',
-    'Graph',
-    'LinearCode', 'Network',
-    'Semigroup', 'Monoid', 'car', // Cartesian product
-    'func', 'proc', 'case', 'recformat', 'rec' // case takes "default" in there!
-]
-
-// TODO: add line continuation character: \ // Is this necessary?
 // TODO: move expression tests to new test file
 
 module.exports = grammar({
@@ -501,8 +490,7 @@ module.exports = grammar({
 	    $.comparison_operator,
 	    $.attribute,
 	    $.map,
-	    $.constructor,
-	    $.recformat_constructor,
+	    $._constructors,
 	    $.seq_slice,
 	    $.true,
 	    $.false,
@@ -694,8 +682,9 @@ module.exports = grammar({
 
 	optional_argument: $ => seq(
 	    field('argument', $.identifier),
-	    ':=',
-	    field('default_value', $.primary_expression)),
+	    optional(seq(':=',
+			 field('default_value', $.primary_expression)))
+	),
 
 	_assignment: $ => choice(
 	    $.assignment,
@@ -796,6 +785,12 @@ module.exports = grammar({
 
 	// Constructors
 
+	_constructors: $ => choice(
+	    $.constructor,
+	    $.recformat_constructor,
+	    $.cycle_or_commutator
+	),
+	
 	constructor: $ => seq(
 	    field('name', $.identifier),
 	    '<',
@@ -822,6 +817,12 @@ module.exports = grammar({
 	    '<',
 	    commaSep1($.field_definition),
 	    '>'
+	),
+
+	cycle_or_commutator: $ => seq(
+	    '(',
+	    commaSep2($.primary_expression),
+	    ')'
 	),
 	
 	
@@ -1036,6 +1037,10 @@ module.exports = grammar({
  */
 function commaSep1(rule) {
     return sep1(rule, ',');
+}
+
+function commaSep2(rule) {
+    return seq(rule, ',', sep1(rule, ','));
 }
 
 /**
