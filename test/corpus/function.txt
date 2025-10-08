@@ -219,18 +219,17 @@ myproc := proc<| f(x)>;
   (assignment
     left: (identifier)
     right: (inline_procedure
-      body: (inline_procedure_body
-        (call
-          function: (identifier)
-          arguments: (argument_list
-            argument: (identifier)))))))
+      body: (call
+        function: (identifier)
+        arguments: (argument_list
+              argument: (identifier))))))
 
 ============================
 Inline functions with parameters
 ============================
 
 add := func<x, y | x + y>;
-print_and_return := proc<~result, value | result := value>;
+print_and_return := proc<~result, value | Print(result, value)>;
 
 ---
 
@@ -251,7 +250,189 @@ print_and_return := proc<~result, value | result := value>;
         (ref_identifier
           (identifier))
         (identifier))
-      body: (inline_procedure_body
-        (assignment
-          left: (identifier)
-          right: (identifier))))))
+      body: (call
+        function: (identifier)
+        arguments: (argument_list
+          argument: (identifier)
+          argument: (identifier))))))
+
+============================
+Optional parameters in procedures
+============================
+
+procedure test1(entries:Dir); x := 1; end procedure;
+procedure test2(x, y:Default := 5); y := 2; end procedure;
+procedure test3(a, b, c, d:Opt2 := 10); z := 3; end procedure;
+
+---
+
+(program
+  (procedure_definition
+    name: (identifier)
+    parameters: (parameters
+      (identifier)
+      (optional_parameter
+        name: (identifier)))
+    body: (block
+      (return_statement
+        (MISSING "return"))
+      (assignment
+        left: (identifier)
+        right: (integer))))
+  (procedure_definition
+    name: (identifier)
+    parameters: (parameters
+      (identifier)
+      (identifier)
+      (optional_parameter
+        name: (identifier)
+        value: (integer)))
+    body: (block
+      (return_statement
+        (MISSING "return"))
+      (assignment
+        left: (identifier)
+        right: (integer))))
+  (procedure_definition
+    name: (identifier)
+    parameters: (parameters
+      (identifier)
+      (identifier)
+      (identifier)
+      (identifier)
+      (optional_parameter
+        name: (identifier)
+        value: (integer)))
+    body: (block
+      (return_statement
+        (MISSING "return"))
+      (assignment
+        left: (identifier)
+        right: (integer)))))
+
+============================
+Exit statements
+============================
+
+try
+    x := 1;
+    exit NO_RESPAWN;
+    y := 2;
+catch e
+    print "Error:", e;
+end try;
+
+---
+
+(program
+  (try_catch_statement
+    (block
+      (assignment
+        left: (identifier)
+        right: (integer))
+      (exit_statement
+        (identifier))
+      (assignment
+        left: (identifier)
+        right: (integer)))
+    error: (identifier)
+    (block
+      (print_statement
+        (string)
+        (identifier)))))
+
+============================
+More inline function examples
+============================
+
+add := func<x, y | x + y>;
+multiply := func<a, b | a * b>;
+increment := proc<~x | Append(~x, 1)>;
+swap := proc<~a, ~b | Print(a, b)>;
+factorial := func<n | n le 1 select 1 else n * $$(n-1)>;
+fibonacci := func<n | n le 1 select n else $$(n-1) + $$(n-2)>;
+
+---
+
+    (program
+      (assignment
+        (identifier)
+        (inline_function
+          (inline_parameters
+            (identifier)
+            (identifier))
+          (binary_operator
+            (identifier)
+            (identifier))))
+      (assignment
+        (identifier)
+        (inline_function
+          (inline_parameters
+            (identifier)
+            (identifier))
+          (binary_operator
+            (identifier)
+            (identifier))))
+      (assignment
+        (identifier)
+        (inline_procedure
+          (inline_parameters
+            (ref_identifier
+              (identifier)))
+          (call
+            (identifier)
+            (argument_list
+              (unary_operator
+                (identifier))
+              (integer)))))
+      (assignment
+        (identifier)
+        (inline_procedure
+          (inline_parameters
+            (ref_identifier
+              (identifier))
+            (ref_identifier
+              (identifier)))
+          (call
+            (identifier)
+            (argument_list
+              (identifier)
+              (identifier)))))
+      (assignment
+        (identifier)
+        (inline_function
+          (inline_parameters
+            (identifier))
+          (comparison_operator
+            (identifier)
+            (ternary_operator
+              (integer)
+              (integer)
+              (binary_operator
+                (identifier)
+                (double_dollar
+                  (argument_list
+                    (binary_operator
+                      (identifier)
+                      (integer)))))))))
+      (assignment
+        (identifier)
+        (inline_function
+          (inline_parameters
+            (identifier))
+          (comparison_operator
+            (identifier)
+            (ternary_operator
+              (integer)
+              (identifier)
+              (binary_operator
+                (double_dollar
+                  (argument_list
+                    (binary_operator
+                      (identifier)
+                      (integer))))
+                (double_dollar
+                  (argument_list
+                    (binary_operator
+                      (identifier)
+                      (integer))))))))))

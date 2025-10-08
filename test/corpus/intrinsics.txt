@@ -190,3 +190,137 @@ end intrinsic;
                       argument: (identifier)))))))))
       (return_statement
         (identifier)))))
+
+============================
+Intrinsic with complex parameter types
+============================
+
+intrinsic ComplexIntrinsic(~S::MonStgElt, T::SetEnum, U::SeqEnum[RngIntElt]) -> BoolElt, RngIntElt
+{
+    This intrinsic demonstrates complex parameter types.
+    S is a reference parameter with string type.
+    T is a set enumeration.
+    U is a sequence of integers.
+    Returns a boolean and an integer.
+}
+    // Implementation would go here
+    return true, 42;
+end intrinsic;
+
+---
+
+(program
+  (intrinsic_definition
+    name: (identifier)
+    parameters: (ref_typed_identifier
+      (identifier)
+      (type
+        (identifier)))
+    parameters: (typed_identifier
+      (identifier)
+      (type
+        (identifier)))
+    parameters: (typed_identifier
+      (identifier)
+      (type
+        (identifier)
+        (type
+          (identifier))))
+    return_type: (type
+      (identifier))
+    return_type: (type
+      (identifier))
+    (comment)
+    body: (block
+      (return_statement
+        (true)
+        (integer)))))
+
+============================
+Intrinsic with no parameters and no return type
+============================
+
+intrinsic SimpleIntrinsic()
+{
+    A simple intrinsic with no parameters and no return type.
+}
+    print "Hello from intrinsic!";
+end intrinsic;
+
+---
+
+(program
+  (intrinsic_definition
+    name: (identifier)
+    body: (block
+      (print_statement
+        (string)))))
+
+============================
+Intrinsic with multiple reference parameters
+============================
+
+intrinsic SwapIntrinsic(~A::RngIntElt, ~B::RngIntElt)
+{
+    Swaps two integer values using reference parameters.
+}
+    temp := A;
+    A := B;
+    B := temp;
+end intrinsic;
+
+---
+
+(program
+  (intrinsic_definition
+    name: (identifier)
+    parameters: (ref_typed_identifier
+      (identifier)
+      (type
+        (identifier)))
+    parameters: (ref_typed_identifier
+      (identifier)
+      (type
+        (identifier)))
+    body: (block
+      (assignment
+        left: (identifier)
+        right: (identifier))
+      (assignment
+        left: (identifier)
+        right: (identifier))
+      (assignment
+        left: (identifier)
+        right: (identifier)))))
+
+============================
+Intrinsic with array types
+============================
+
+intrinsic ArrayIntrinsic(M::Mtrx, V::SeqEnum[RngIntElt]) -> Mtrx
+{
+    An intrinsic that works with matrix and sequence types.
+}
+    return M;
+end intrinsic;
+
+---
+
+(program
+  (intrinsic_definition
+    name: (identifier)
+    parameters: (typed_identifier
+      (identifier)
+      (type
+        (identifier)))
+    parameters: (typed_identifier
+      (identifier)
+      (type
+        (identifier)
+        (type
+          (identifier))))
+    return_type: (type
+      (identifier))
+    body: (block
+      (return_statement
+        (identifier)))))

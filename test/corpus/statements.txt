@@ -192,3 +192,104 @@ Complex quoted identifiers
     right: (integer))
   (expression_statement
     (identifier)))
+
+============================
+Exit statements in different contexts
+============================
+
+try
+    x := 1;
+    exit ERROR_CODE;
+    y := 2;
+catch e
+    print "Caught:", e;
+end try;
+
+procedure test_exit()
+    x := 1;
+    exit SUCCESS;
+    y := 2;
+end procedure;
+
+exit compute_result();
+
+---
+
+(program
+  (try_catch_statement
+    (block
+      (assignment
+        left: (identifier)
+        right: (integer))
+      (exit_statement
+        (identifier))
+      (assignment
+        left: (identifier)
+        right: (integer)))
+    error: (identifier)
+    (block
+      (print_statement
+        (string)
+        (identifier))))
+  (procedure_definition
+    name: (identifier)
+    parameters: (parameters)
+    body: (block
+      (assignment
+        left: (identifier)
+        right: (integer))
+      (exit_statement
+        (identifier))
+      (assignment
+        left: (identifier)
+        right: (integer))))
+  (exit_statement
+    (call
+      function: (identifier)
+      arguments: (argument_list))))
+
+============================
+Complex try-catch with multiple exits
+============================
+
+try
+    if condition then
+        exit EARLY_EXIT;
+    end if;
+    process_data();
+    exit SUCCESS;
+catch e
+    if e eq "fatal" then
+        exit FATAL_ERROR;
+    end if;
+    print "Recovering from:", e;
+end try;
+
+---
+
+(program
+  (try_catch_statement
+    (block
+      (if_statement
+        condition: (identifier)
+        consequence: (block
+          (exit_statement
+            (identifier))))
+      (expression_statement
+        (call
+          function: (identifier)
+          arguments: (argument_list)))
+      (exit_statement
+        (identifier)))
+    error: (identifier)
+    (block
+      (if_statement
+        condition: (comparison_operator
+          left: (identifier)
+          right: (string))
+        consequence: (block
+          (exit_statement
+            (identifier))))
+      (print_statement
+        (string)
+        (identifier)))))

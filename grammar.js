@@ -72,6 +72,11 @@ module.exports = grammar({
 	// syntax while primary_expression can be just an identifier or more complex expressions.
 	// This ambiguity occurs in constructor parameter lists like: <expr, name : type>
 	[$.primary_expression, $.field_definition],
+	// Conflict between primary_expression and optional_parameter:
+	// Both can start with an identifier, but optional_parameter can have optional := value
+	// while primary_expression can be just an identifier or more complex expressions.
+	// This ambiguity occurs in inline function parameter lists like: <expr, name>
+	[$.primary_expression, $.optional_parameter],
     ],
     // A _statement_ is any valid sequence of symbols followed by a semicolon
     // eg. a variable assignment, a function/intrinsic definition
@@ -125,6 +130,7 @@ module.exports = grammar({
 	    $.return_statement,
 	    $.break_statement,
 	    $.continue_statement,
+	    $.exit_statement,
 	    $.print_statement,
 	    $.vprint_statement,
 	    $.time_statement,
@@ -270,6 +276,11 @@ module.exports = grammar({
 		    field('condition', $.expression),
 		    ',',
 		    commaSep1($.expression)))
+	),
+
+	exit_statement: $ => seq(
+	    'exit',
+	    optional($.primary_expression)
 	),
 
 	// MAYBE: consider moving 'not' to separate function
@@ -574,7 +585,7 @@ module.exports = grammar({
 		'proc',
 		'<',
 		'|',
-		field('body', $.inline_procedure_body),
+		field('body', $.primary_expression),
 		'>'
 	    ),
 	    // With parameters: proc<parameters | expression>
@@ -583,17 +594,11 @@ module.exports = grammar({
 		'<',
 		field('parameters', $.inline_parameters),
 		'|',
-		field('body', $.inline_procedure_body),
+		field('body', $.primary_expression),
 		'>'
 	    )
 	),
 
-	// Inline procedure body can contain assignments or expressions
-	inline_procedure_body: $ => choice(
-	    $.assignment,
-	    $.primary_expression
-	),
-    
 	inline_parameters: $ => seq(
 	    commaSep1($.parameter),
 	    optional(seq(
@@ -634,9 +639,11 @@ module.exports = grammar({
 	)),
 
 	optional_parameter: $ => seq(
-	    field('name', $.identifier),
-	    ':=',
-	    field('value', $.primary_expression)
+		field('name', $.identifier),
+			optional(seq(
+				':=',
+				field('value', $.primary_expression),
+			)),
 	),
 
 		intrinsic_definition: $ => seq(

@@ -12,6 +12,74 @@ ideal<OF | a1,a2>;
       (identifier)
       (identifier)
       (identifier)
+      (optional_parameter
+        name: (identifier)))))
+
+============================
+More recformat constructors
+============================
+
+point_fmt := recformat<x : RngIntElt, y : RngIntElt>;
+config_fmt := recformat<name : MonStgElt, value : Any, enabled : BoolElt>;
+matrix_fmt := recformat<data : Mtrx, rows : RngIntElt, cols : RngIntElt>;
+
+---
+
+(program
+  (assignment
+    left: (identifier)
+    right: (constructor
+      (identifier)
+      (field_definition
+        name: (identifier)
+        type: (identifier))
+      (field_definition
+        name: (identifier)
+        type: (identifier))))
+  (assignment
+    left: (identifier)
+    right: (constructor
+      (identifier)
+      (field_definition
+        name: (identifier)
+        type: (identifier))
+      (field_definition
+        name: (identifier)
+        type: (identifier))
+      (field_definition
+        name: (identifier)
+        type: (identifier))))
+  (assignment
+    left: (identifier)
+    right: (constructor
+      (identifier)
+      (field_definition
+        name: (identifier)
+        type: (identifier))
+      (field_definition
+        name: (identifier)
+        type: (identifier))
+      (field_definition
+        name: (identifier)
+        type: (identifier)))))
+
+============================
+Mixed constructor parameters
+============================
+
+mixed_constructor := MyType<arg1, name : Type, arg2>;
+
+---
+
+(program
+  (assignment
+    left: (identifier)
+    right: (constructor
+      (identifier)
+      (identifier)
+      (field_definition
+        name: (identifier)
+        type: (identifier))
       (identifier))))
 
 ============================
