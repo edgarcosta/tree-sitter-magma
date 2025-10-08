@@ -253,6 +253,7 @@ module.exports = grammar({
 	    $.block,
 	    'catch',
 	    field('error', $.identifier),
+	    optional(';'),
 	    $.block,
 	    'end try',
 	),
@@ -868,7 +869,10 @@ module.exports = grammar({
 	// Basic tokens:
 	
 	// DONE: fix regex such that "_" by itself is not a valid identifier
-	identifier: $ => /[_]*[a-zA-Z][a-zA-Z0-9_]*/,
+	identifier: $ => choice(
+	    /[_]*[a-zA-Z][a-zA-Z0-9_]*/,
+	    /'[^']*'/
+	),
 	anonymous_identifier: $ => '_',
 	block: $ => repeat1($._statement),
 

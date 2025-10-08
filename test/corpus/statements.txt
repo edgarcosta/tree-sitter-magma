@@ -20,9 +20,19 @@ Try-catch and print statements
 
 try print x; catch e print x; end try;
 
+try print x; catch e; print x; end try;
+
 ---
 
 (program
+  (try_catch_statement
+    (block
+      (print_statement
+        (identifier)))
+    error: (identifier)
+    (block
+      (print_statement
+        (identifier)))))
   (try_catch_statement
     (block
       (print_statement

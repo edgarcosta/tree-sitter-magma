@@ -63,3 +63,29 @@ F``("Signa" cat "ture");
         (binary_operator
           left: (string)
           right: (string))))))
+
+================================================================================
+Quoted identifier intrinsics (operators)
+================================================================================
+
+intrinsic '&+'(S::Setq) -> .
+{The sum of all elements of S}
+  return InternalAdd(S);
+end intrinsic;
+
+---
+
+(program
+  (intrinsic_definition
+    name: (identifier)
+    parameters: (typed_identifier
+      (identifier)
+      (type
+        (identifier)))
+    return_type: (type)
+    body: (block
+      (return_statement
+        (call
+          function: (identifier)
+          arguments: (argument_list
+            argument: (identifier)))))))
