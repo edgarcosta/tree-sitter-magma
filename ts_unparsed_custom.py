@@ -253,6 +253,8 @@ def main():
     files_with_errors = 0
 
     for file_path in files:
+        if file_path.endswith("spec"):
+            continue
         result = process_single_file(file_path, parser, have_supertype, args.mode)
         results.append(result)
         
