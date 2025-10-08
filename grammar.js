@@ -131,7 +131,6 @@ module.exports = grammar({
 	    $._definition,
 	    $._assignment,
 	    $._directive,
-	    $.try_catch_statement,
 	    $.error_statement,
 	),
 
@@ -577,20 +576,23 @@ module.exports = grammar({
 	    ':=',
 	    field('value', $.primary_expression)
 	),
-	
-	intrinsic_definition: $ => seq(
-	    'intrinsic',
-	    field('name', $.identifier),
-	    field('parameters', $._intrinsic_parameters),
-	    optional(seq('->', commaSep1(field('return_type', $.type)))),
-	    field('docstring',
-		  seq('{',
-		      /[^{}]*/,	// matches anything that's not a squirly brace
-		      '}')),
-	    optional(field('body', $.block)),
-	    'end intrinsic'
-	),
-	
+
+		intrinsic_definition: $ => seq(
+			'intrinsic',
+			field('name', $.identifier),
+			field('parameters', $._intrinsic_parameters),
+			optional(seq('->', commaSep1(field('return_type', $.type)))),
+			field('docstring',
+				seq('{',
+					/[^{}]*/,	// matches anything that's not a squirly brace
+					'}',
+					optional(';'),
+				)
+			),
+			optional(field('body', $.block)),
+			'end intrinsic'
+		),
+
 	_intrinsic_parameters: $ => seq(
 	    '(',
 	    optional(commaSep1($._intrinsic_parameter)),
@@ -602,8 +604,16 @@ module.exports = grammar({
 
 	_intrinsic_parameter: $ => choice(
 	    $.identifier,
-	    seq('~', $.identifier),
-	    $.typed_identifier
+	    $.ref_identifier,
+	    $.typed_identifier,
+	    $.ref_typed_identifier
+	),
+
+	ref_typed_identifier: $ => seq(
+	    '~',
+	    $.identifier,
+	    '::',
+	    $.type,
 	),
 
 
@@ -755,7 +765,8 @@ module.exports = grammar({
 	    $.for_statement,
 	    $.while_statement,
 	    $.case_statement,
-	    $.repeat_statement
+	    $.repeat_statement,
+	    $.try_catch_statement
 	),
 	
 	if_statement: $ => seq(
@@ -868,11 +879,8 @@ module.exports = grammar({
 	
 	// Basic tokens:
 	
-	// DONE: fix regex such that "_" by itself is not a valid identifier
-	identifier: $ => choice(
-	    /[_]*[a-zA-Z][a-zA-Z0-9_]*/,
-	    /'[^']*'/
-	),
+	// handles both regular identifiers witht the option of being quoted (e.g., foo, 'foo', or even 'foo.1 + 2')
+	identifier: $ => /(?:'[^']*'|[_]*[a-zA-Z][a-zA-Z0-9_]*)/,
 	anonymous_identifier: $ => '_',
 	block: $ => repeat1($._statement),
 

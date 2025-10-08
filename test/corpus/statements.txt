@@ -32,7 +32,7 @@ try print x; catch e; print x; end try;
     error: (identifier)
     (block
       (print_statement
-        (identifier)))))
+        (identifier))))
   (try_catch_statement
     (block
       (print_statement
@@ -40,8 +40,9 @@ try print x; catch e; print x; end try;
     error: (identifier)
     (block
       (print_statement
-        (identifier)))))
-
+        (identifier))))
+)
+          
 ================================================================================
 vprint statement
 ================================================================================
@@ -175,3 +176,19 @@ error if 1 gt 0, "Oops!";
       left: (integer)
       right: (integer))
     (string)))
+
+================================================================================
+Complex quoted identifiers
+================================================================================
+
+'foo.1 + 2' := 2;
+'foo.1 + 2';
+
+---
+
+(program
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (expression_statement
+    (identifier)))
