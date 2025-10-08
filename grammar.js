@@ -67,16 +67,6 @@ module.exports = grammar({
     conflicts: $ => [
 	[$.expression_statement, $.assignment],
 	[$.function_definition, $.primary_expression, $.procedure_definition],
-	// Conflict between primary_expression and field_definition in constructors:
-	// Both can start with an identifier, but field_definition requires "name : type"
-	// syntax while primary_expression can be just an identifier or more complex expressions.
-	// This ambiguity occurs in constructor parameter lists like: <expr, name : type>
-	[$.primary_expression, $.field_definition],
-	// Conflict between primary_expression and optional_parameter:
-	// Both can start with an identifier, but optional_parameter can have optional := value
-	// while primary_expression can be just an identifier or more complex expressions.
-	// This ambiguity occurs in inline function parameter lists like: <expr, name>
-	[$.primary_expression, $.optional_parameter],
     ],
     // A _statement_ is any valid sequence of symbols followed by a semicolon
     // eg. a variable assignment, a function/intrinsic definition
@@ -512,6 +502,7 @@ module.exports = grammar({
 	    $.attribute,
 	    $.map,
 	    $.constructor,
+	    $.recformat_constructor,
 	    $.seq_slice,
 	    $.true,
 	    $.false,
@@ -543,6 +534,7 @@ module.exports = grammar({
 		seq(field('name', $.identifier), ':=', 'function')
 	    ),
 	    field('parameters', $.parameters),
+	    optional(';'),
 	    field('body', $.block),
 	    'end function',
 	),
@@ -553,25 +545,26 @@ module.exports = grammar({
 		seq(field('name', $.identifier), ':=', 'procedure')
 	    ),
 	    field('parameters', $.parameters),
+	    optional(';'),
 	    optional(field('body', $.block)),
 	    'end procedure',
 	),
 
 	// Inline function expressions: func<| expression> or func<parameters | expression>
 	inline_function: $ => choice(
-	    // No parameters: func<| expression>
-	    seq(
-		'func',
-		'<',
-		'|',
-		field('body', $.primary_expression),
-		'>'
-	    ),
+	    // // No parameters: func<| expression>
+	    // seq(
+	    // 	'func',
+	    // 	'<',
+	    // 	'|',
+	    // 	field('body', $.primary_expression),
+	    // 	'>'
+	    // ),
 	    // With parameters: func<parameters | expression>
 	    seq(
 		'func',
 		'<',
-		field('parameters', $.inline_parameters),
+		optional(field('parameters', $._parameter_list)),
 		'|',
 		field('body', $.primary_expression),
 		'>'
@@ -580,39 +573,36 @@ module.exports = grammar({
 
 	// Inline procedure expressions: proc<| expression> or proc<parameters | expression>
 	inline_procedure: $ => choice(
-	    // No parameters: proc<| expression>
+	    // // No parameters: proc<| expression>
+	    // seq(
+	    // 	'proc',
+	    // 	'<',
+	    // 	'|',
+	    // 	field('body', $.primary_expression),
+	    // 	'>'
+	    // ),
+	    // // With parameters: proc<parameters | expression>
 	    seq(
 		'proc',
 		'<',
-		'|',
-		field('body', $.primary_expression),
-		'>'
-	    ),
-	    // With parameters: proc<parameters | expression>
-	    seq(
-		'proc',
-		'<',
-		field('parameters', $.inline_parameters),
+		optional(field('parameters', $._parameter_list)),
 		'|',
 		field('body', $.primary_expression),
 		'>'
 	    )
 	),
 
-	inline_parameters: $ => seq(
+	_parameter_list: $ => seq(
 	    commaSep1($.parameter),
 	    optional(seq(
 		':',
-		commaSep1($.optional_parameter))),
+		commaSep1(choice($.identifier, $.optional_parameter)))),
 	),
 
 	parameters: $ => seq(
-		'(',
-		optional(commaSep1($.parameter)),
-		optional(seq(
-			':',
-			commaSep1($.optional_parameter))),
-		')'
+	    '(',
+	    optional($._parameter_list),
+	    ')'
 	),
 
 	// TODO: technically, this is not valid syntax for e.g. functions;
@@ -640,27 +630,25 @@ module.exports = grammar({
 
 	optional_parameter: $ => seq(
 		field('name', $.identifier),
-			optional(seq(
-				':=',
-				field('value', $.primary_expression),
-			)),
+	    ':=',
+	    field('value', $.primary_expression),
 	),
 
-		intrinsic_definition: $ => seq(
-			'intrinsic',
-			field('name', $.identifier),
-			field('parameters', $._intrinsic_parameters),
-			optional(seq('->', commaSep1(field('return_type', $.type)))),
-			field('docstring',
-				seq('{',
-					/[^{}]*/,	// matches anything that's not a squirly brace
-					'}',
-					optional(';'),
-				)
-			),
-			optional(field('body', $.block)),
-			'end intrinsic'
-		),
+	intrinsic_definition: $ => seq(
+	    'intrinsic',
+	    field('name', $.identifier),
+	    field('parameters', $._intrinsic_parameters),
+	    optional(seq('->', commaSep1(field('return_type', $.type)))),
+	    field('docstring',
+		  seq('{',
+		      /[^{}]*/,	// matches anything that's not a squirly brace
+		      '}',
+		      optional(';'),
+		     )
+		 ),
+	    optional(field('body', $.block)),
+	    'end intrinsic'
+	),
 
 	_intrinsic_parameters: $ => seq(
 	    '(',
@@ -751,20 +739,13 @@ module.exports = grammar({
 	    // Simple and any-type
 	    $.identifier,
 	    '.',
-	    // Base bracket types
-	    seq('[', ']'),			  // Sequence type
-	    seq('{', '}'),			  // Set type
-	    seq('{[', ']}'),		  // Set or sequence type
-	    seq('{@', '@}'),		  // Iset type
-	    seq('{*', '*}'),		  // Multiset type
-	    seq('<', '>'),		  // Tuple type
-	    // Composite types
-	    seq('[', $.type, ']'),	  // Sequences over <type>
-	    seq('{', $.type, '}'),	  // Sets over <type>
-	    seq('{[', $.type, ']}'),    // Sets or sequences over <type>
-	    seq('{@', $.type, '@}'),    // Indexed sets over <type>
-	    seq('{*', $.type, '*}'),    // Multisets over <type>
 	    // Extended types: Category[<type>, ...] (allow nested types)
+	    seq('[', optional($.type), ']'),	 // Sequence type
+	    seq('{', optional($.type), '}'),		 // Set type
+	    seq('{[', optional($.type), ']}'),		 // Set or sequence type
+	    seq('{@', optional($.type), '@}'),		 // Iset type
+	    seq('{*', optional($.type), '*}'),		 // Multiset type
+	    seq('<', '>'),		                 // Tuple type
 	    seq($.identifier, '[', commaSep1($.type), ']'),
 	),
 
@@ -806,6 +787,7 @@ module.exports = grammar({
 	// In particular, right now it's technically legal to do things like
 	// map< A -> B | x, y -> z>;
 	// which probably isn't valid
+
 	_map_constructor: $ => commaSep1(
 	    seq(
 		optional(seq(field('domain_element', $.identifier), ':->')),
@@ -813,13 +795,11 @@ module.exports = grammar({
 	),
 
 	// Constructors
+
 	constructor: $ => seq(
-	    $.identifier,
+	    field('name', $.identifier),
 	    '<',
-	    commaSep1(choice(
-		$.primary_expression,
-		$.field_definition
-	    )),
+	    commaSep1(field('element', $.primary_expression)),
 	    optional(seq(
 		'|', optional(commaSep1(choice(
 		    $.primary_expression,
@@ -829,15 +809,24 @@ module.exports = grammar({
 	    optional(seq(':', commaSep1($.optional_parameter))),
 	    '>'
 	),
+	
 
 	field_definition: $ => seq(
 	    field('name', $.identifier),
 	    ':',
 	    field('type', $.identifier)
 	),
+
+	recformat_constructor: $ => seq(
+	    'recformat',
+	    '<',
+	    commaSep1($.field_definition),
+	    '>'
+	),
 	
 	
 	// Control flow
+
 	_compound_statement: $ => choice(
 	    $.if_statement,
 	    $.for_statement,

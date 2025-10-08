@@ -9,11 +9,11 @@ ideal<OF | a1,a2>;
 (program
   (expression_statement
     (constructor
+      name: (identifier)
+      element: (identifier)
       (identifier)
-      (identifier)
-      (identifier)
-      (optional_parameter
-        name: (identifier)))))
+      (identifier))))
+
 
 ============================
 More recformat constructors
@@ -28,8 +28,7 @@ matrix_fmt := recformat<data : Mtrx, rows : RngIntElt, cols : RngIntElt>;
 (program
   (assignment
     left: (identifier)
-    right: (constructor
-      (identifier)
+    right: (recformat_constructor
       (field_definition
         name: (identifier)
         type: (identifier))
@@ -38,8 +37,7 @@ matrix_fmt := recformat<data : Mtrx, rows : RngIntElt, cols : RngIntElt>;
         type: (identifier))))
   (assignment
     left: (identifier)
-    right: (constructor
-      (identifier)
+    right: (recformat_constructor
       (field_definition
         name: (identifier)
         type: (identifier))
@@ -51,8 +49,7 @@ matrix_fmt := recformat<data : Mtrx, rows : RngIntElt, cols : RngIntElt>;
         type: (identifier))))
   (assignment
     left: (identifier)
-    right: (constructor
-      (identifier)
+    right: (recformat_constructor
       (field_definition
         name: (identifier)
         type: (identifier))
@@ -93,8 +90,7 @@ store_fmt := recformat<get : UserProgram, set: UserProgram, isset: UserProgram>;
 (program
   (assignment
     left: (identifier)
-    right: (constructor
-      (identifier)
+    right: (recformat_constructor
       (field_definition
         name: (identifier)
         type: (identifier))
@@ -104,3 +100,4 @@ store_fmt := recformat<get : UserProgram, set: UserProgram, isset: UserProgram>;
       (field_definition
         name: (identifier)
         type: (identifier)))))
+
