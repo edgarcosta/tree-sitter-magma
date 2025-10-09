@@ -222,7 +222,7 @@ myproc := proc<| f(x)>;
       body: (call
         function: (identifier)
         arguments: (argument_list
-              argument: (identifier))))))
+          argument: (identifier))))))
 
 ============================
 Inline functions with parameters
@@ -237,19 +237,17 @@ print_and_return := proc<~result, value | Print(result, value)>;
   (assignment
     left: (identifier)
     right: (inline_function
-      parameters: (inline_parameters
-        (identifier)
-        (identifier))
+      parameters: (identifier)
+      parameters: (identifier)
       body: (binary_operator
         left: (identifier)
         right: (identifier))))
   (assignment
     left: (identifier)
     right: (inline_procedure
-      parameters: (inline_parameters
-        (ref_identifier
-          (identifier))
+      parameters: (ref_identifier
         (identifier))
+      parameters: (identifier)
       body: (call
         function: (identifier)
         arguments: (argument_list
@@ -271,11 +269,8 @@ procedure test3(a, b, c, d:Opt2 := 10); z := 3; end procedure;
     name: (identifier)
     parameters: (parameters
       (identifier)
-      (optional_parameter
-        name: (identifier)))
+      (identifier))
     body: (block
-      (return_statement
-        (MISSING "return"))
       (assignment
         left: (identifier)
         right: (integer))))
@@ -288,8 +283,6 @@ procedure test3(a, b, c, d:Opt2 := 10); z := 3; end procedure;
         name: (identifier)
         value: (integer)))
     body: (block
-      (return_statement
-        (MISSING "return"))
       (assignment
         left: (identifier)
         right: (integer))))
@@ -304,11 +297,10 @@ procedure test3(a, b, c, d:Opt2 := 10); z := 3; end procedure;
         name: (identifier)
         value: (integer)))
     body: (block
-      (return_statement
-        (MISSING "return"))
       (assignment
         left: (identifier)
         right: (integer)))))
+
 
 ============================
 Exit statements
@@ -353,86 +345,79 @@ factorial := func<n | n le 1 select 1 else n * $$(n-1)>;
 fibonacci := func<n | n le 1 select n else $$(n-1) + $$(n-2)>;
 
 ---
-
-    (program
-      (assignment
-        (identifier)
-        (inline_function
-          (inline_parameters
-            (identifier)
-            (identifier))
-          (binary_operator
-            (identifier)
-            (identifier))))
-      (assignment
-        (identifier)
-        (inline_function
-          (inline_parameters
-            (identifier)
-            (identifier))
-          (binary_operator
-            (identifier)
-            (identifier))))
-      (assignment
-        (identifier)
-        (inline_procedure
-          (inline_parameters
-            (ref_identifier
-              (identifier)))
-          (call
-            (identifier)
-            (argument_list
-              (unary_operator
-                (identifier))
-              (integer)))))
-      (assignment
-        (identifier)
-        (inline_procedure
-          (inline_parameters
-            (ref_identifier
-              (identifier))
-            (ref_identifier
-              (identifier)))
-          (call
-            (identifier)
-            (argument_list
-              (identifier)
-              (identifier)))))
-      (assignment
-        (identifier)
-        (inline_function
-          (inline_parameters
-            (identifier))
-          (comparison_operator
-            (identifier)
-            (ternary_operator
-              (integer)
-              (integer)
-              (binary_operator
-                (identifier)
-                (double_dollar
-                  (argument_list
-                    (binary_operator
-                      (identifier)
-                      (integer)))))))))
-      (assignment
-        (identifier)
-        (inline_function
-          (inline_parameters
-            (identifier))
-          (comparison_operator
-            (identifier)
-            (ternary_operator
-              (integer)
-              (identifier)
-              (binary_operator
-                (double_dollar
-                  (argument_list
-                    (binary_operator
-                      (identifier)
-                      (integer))))
-                (double_dollar
-                  (argument_list
-                    (binary_operator
-                      (identifier)
-                      (integer))))))))))
+(program
+  (assignment
+    left: (identifier)
+    right: (inline_function
+      parameters: (identifier)
+      parameters: (identifier)
+      body: (binary_operator
+        left: (identifier)
+        right: (identifier))))
+  (assignment
+    left: (identifier)
+    right: (inline_function
+      parameters: (identifier)
+      parameters: (identifier)
+      body: (binary_operator
+        left: (identifier)
+        right: (identifier))))
+  (assignment
+    left: (identifier)
+    right: (inline_procedure
+      parameters: (ref_identifier
+        (identifier))
+      body: (call
+        function: (identifier)
+        arguments: (argument_list
+          argument: (unary_operator
+            right: (identifier))
+          argument: (integer)))))
+  (assignment
+    left: (identifier)
+    right: (inline_procedure
+      parameters: (ref_identifier
+        (identifier))
+      parameters: (ref_identifier
+        (identifier))
+      body: (call
+        function: (identifier)
+        arguments: (argument_list
+          argument: (identifier)
+          argument: (identifier)))))
+  (assignment
+    left: (identifier)
+    right: (inline_function
+      parameters: (identifier)
+      body: (comparison_operator
+        left: (identifier)
+        right: (ternary_operator
+          conditional: (integer)
+          then: (integer)
+          else: (binary_operator
+            left: (identifier)
+            right: (double_dollar
+              (argument_list
+                argument: (binary_operator
+                  left: (identifier)
+                  right: (integer)))))))))
+  (assignment
+    left: (identifier)
+    right: (inline_function
+      parameters: (identifier)
+      body: (comparison_operator
+        left: (identifier)
+        right: (ternary_operator
+          conditional: (integer)
+          then: (identifier)
+          else: (binary_operator
+            left: (double_dollar
+              (argument_list
+                argument: (binary_operator
+                  left: (identifier)
+                  right: (integer))))
+            right: (double_dollar
+              (argument_list
+                argument: (binary_operator
+                  left: (identifier)
+                  right: (integer))))))))))
