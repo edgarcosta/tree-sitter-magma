@@ -68,12 +68,26 @@ Integers
       right: (integer))))
 
 ================================================================================
-Reals TODO: implement scanner for '1.2e4'
+Reals
 ================================================================================
 
 1.0;
-
+12345e-4;
+1.2345p10;
+12345e-4p8;
+1p2;
+1e+3;
 ---
 (program
+  (expression_statement
+    (real))
+  (expression_statement
+    (real))
+  (expression_statement
+    (real))
+  (expression_statement
+    (real))
+  (expression_statement
+    (real))
   (expression_statement
     (real)))

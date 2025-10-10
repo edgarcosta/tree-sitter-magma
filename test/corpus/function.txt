@@ -120,7 +120,8 @@ end procedure;
     parameters: (parameters)
     body: (block
       (print_statement
-        (string)))))
+        (expression_statement
+          (string))))))
 
 ================================================================================
 Procedure definition and modifying arguments
@@ -144,14 +145,17 @@ end procedure;
         (identifier)))
     body: (block
       (print_statement
-        (identifier))
+        (expression_statement
+          (identifier)))
       (print_statement
-        (identifier))
+        (expression_statement
+          (identifier)))
       (assignment
         left: (identifier)
         left: (identifier)
         right: (identifier)
         right: (identifier)))))
+
 
 ================================================================================
 Procedure definition with := notation
@@ -206,6 +210,7 @@ Inline function expressions
 
 myfunc := func<| x + 1>;
 myproc := proc<| f(x)>;
+func< :Dir | Dir>;
 
 ---
 
@@ -222,7 +227,11 @@ myproc := proc<| f(x)>;
       body: (call
         function: (identifier)
         arguments: (argument_list
-          argument: (identifier))))))
+          argument: (identifier)))))
+  (expression_statement
+    (inline_function
+      parameters: (identifier)
+      body: (identifier))))
 
 ============================
 Inline functions with parameters

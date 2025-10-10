@@ -55,15 +55,17 @@ end if;
           right: (integer))
         consequence: (block
           (print_statement
-            (unary_operator
-              right: (identifier))))
+            (expression_statement
+              (unary_operator
+                right: (identifier)))))
         alternative: (elif_clause
           condition: (comparison_operator
             left: (identifier)
             right: (integer))
           consequence: (block
             (print_statement
-              (integer))))
+              (expression_statement
+                (integer)))))
         alternative: (else_clause
           consequence: (block
             (assignment
@@ -146,6 +148,62 @@ end case;
       (expression_statement
         (identifier)
         (string)))))
+
+================================================================================
+Case constructor
+================================================================================
+
+myL:=func< A|  
+    case<Type(A) | SetCart : LSeries(A[1])*LSeries(A[2]),
+                   JacHyp  : LSeries(Curve(A) : LocalData:="Ogg"),
+                   CrvEll  : LSeries(A),
+                   default : false>>;
+---
+
+(program
+  (assignment
+    left: (identifier)
+    right: (inline_function
+      parameters: (identifier)
+      body: (case_constructor
+        (call
+          function: (identifier)
+          arguments: (argument_list
+            argument: (identifier)))
+        match: (identifier)
+        consequence: (binary_operator
+          left: (call
+            function: (identifier)
+            arguments: (argument_list
+              argument: (seq_slice
+                parent: (identifier)
+                (seqenum
+                  (integer)))))
+          right: (call
+            function: (identifier)
+            arguments: (argument_list
+              argument: (seq_slice
+                parent: (identifier)
+                (seqenum
+                  (integer))))))
+        match: (identifier)
+        consequence: (call
+          function: (identifier)
+          arguments: (argument_list
+            argument: (call
+              function: (identifier)
+              arguments: (argument_list
+                argument: (identifier)))
+            (optional_argument
+              argument: (identifier)
+              default_value: (string))))
+        match: (identifier)
+        consequence: (call
+          function: (identifier)
+          arguments: (argument_list
+            argument: (identifier)))
+        match: (identifier)
+        consequence: (false)))))
 
 ================================================================================
 Ternary operator
@@ -306,3 +364,48 @@ end for;
       (print_statement
         (identifier)
         (identifier)))))
+
+
+================================================================================
+For loop with multiple iterations
+================================================================================
+
+for i in [0..2], j in [0..2] do
+    printf "%o,%o : %o\n",i,j,HodgeNumber(X,i,j);
+end for;
+
+---
+
+(program
+  (for_statement
+    quantifier: (for_quantifier
+      (iterable_binding
+        element: (identifier)
+        parent: (aggregate
+          (seqenum
+            (range
+              start: (integer)
+              end: (integer)))))
+      (iterable_binding
+        element: (identifier)
+        parent: (aggregate
+          (seqenum
+            (range
+              start: (integer)
+              end: (integer))))))
+    body: (block
+      (print_statement
+        (expression_statement
+          (string)
+          (identifier)
+          (identifier)
+          (call
+            function: (identifier)
+            arguments: (argument_list
+              argument: (identifier)
+              argument: (identifier)
+              argument: (identifier))))))))
+
+
+
+
