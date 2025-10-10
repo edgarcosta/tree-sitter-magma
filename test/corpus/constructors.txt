@@ -16,51 +16,6 @@ ideal<OF | a1,a2>;
 
 
 ============================
-More recformat constructors
-============================
-
-point_fmt := recformat<x : RngIntElt, y : RngIntElt>;
-config_fmt := recformat<name : MonStgElt, value : Any, enabled : BoolElt>;
-matrix_fmt := recformat<data : Mtrx, rows : RngIntElt, cols : RngIntElt>;
-
----
-
-(program
-  (assignment
-    left: (identifier)
-    right: (recformat_constructor
-      (field_definition
-        name: (identifier)
-        type: (identifier))
-      (field_definition
-        name: (identifier)
-        type: (identifier))))
-  (assignment
-    left: (identifier)
-    right: (recformat_constructor
-      (field_definition
-        name: (identifier)
-        type: (identifier))
-      (field_definition
-        name: (identifier)
-        type: (identifier))
-      (field_definition
-        name: (identifier)
-        type: (identifier))))
-  (assignment
-    left: (identifier)
-    right: (recformat_constructor
-      (field_definition
-        name: (identifier)
-        type: (identifier))
-      (field_definition
-        name: (identifier)
-        type: (identifier))
-      (field_definition
-        name: (identifier)
-        type: (identifier)))))
-
-============================
 Mixed constructor parameters
 ============================
 
@@ -80,24 +35,36 @@ mixed_constructor := MyType<arg1, name : Type, arg2>;
       (identifier))))
 
 ============================
-Recformat constructor with field definitions
+Recformat constructor
 ============================
 
-store_fmt := recformat<get : UserProgram, set: UserProgram, isset: UserProgram>;
+recformat<get : UserProgram, set: UserProgram, isset: UserProgram>;
+recformat< n : Integers(), misc, seq : SeqEnum >;
 
 ---
 
 (program
-  (assignment
-    left: (identifier)
-    right: (recformat_constructor
+  (expression_statement
+    (recformat_constructor
       (field_definition
         name: (identifier)
         type: (identifier))
       (field_definition
         name: (identifier)
         type: (identifier))
+      (field_definition
+        name: (identifier)
+        type: (identifier))))
+  (expression_statement
+    (recformat_constructor
+      (field_definition
+        name: (identifier)
+        type: (call
+          function: (identifier)
+          arguments: (argument_list)))
+      (identifier)
       (field_definition
         name: (identifier)
         type: (identifier)))))
+
 

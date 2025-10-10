@@ -812,13 +812,13 @@ module.exports = grammar({
 	field_definition: $ => seq(
 	    field('name', $.identifier),
 	    ':',
-	    field('type', $.identifier)
+	    field('type', $.primary_expression)
 	),
 
 	recformat_constructor: $ => seq(
 	    'recformat',
 	    '<',
-	    commaSep1($.field_definition),
+	    commaSep1(choice($.field_definition, $.identifier)),
 	    '>'
 	),
 
