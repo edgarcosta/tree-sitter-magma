@@ -47,9 +47,10 @@ module.exports = grammar({
     name: 'magma',
 
     extras: $ => [
-	/\s/,           // whitespace
+	// /\s/,           // whitespace
+	// whitespace & line continuation (taken from https://github.com/tree-sitter/tree-sitter-c/blob/master/grammar.js)
+	/\s|\\\r?\n/,       
 	$.comment,      // comments
-	'\\',            // line continuation
     ],
     // word: $ => $.identifier,
     
@@ -170,7 +171,7 @@ module.exports = grammar({
 	// since they have slightly different semantics
 	// TODO: consider not using expression statement here?
 	print_statement: $ => seq(
-	    choice('print', 'printf', 'fprint'),
+	    choice('print', 'printf', 'fprintf'),
 	    choice($.expression_statement, $.print_level_statement)
 	),
 
@@ -285,6 +286,7 @@ module.exports = grammar({
 	    const table = [
 		['not', PREC.not],
 		['-', PREC.negate],
+		['+', PREC.negate],
 		['~', PREC.tilde],
 		['#', PREC.hash],
 		['assigned', PREC.assigned],
@@ -303,6 +305,7 @@ module.exports = grammar({
 		[prec.left, '*', PREC.times],
 		[prec.left, '/', PREC.times],
 		[prec.right, '^', PREC.power],
+		[prec.left, '~', PREC.tilde],
 		[prec.left, 'div', PREC.times],
 		[prec.left, 'mod', PREC.times],
 		[prec.left, '^^', PREC.hathat],
@@ -1033,10 +1036,25 @@ module.exports = grammar({
 	    commaSep1($.seqenum))
 	),
 
+	integer: _ => {
+	    const separator = '\\\n';
+	    const hex = /[0-9a-fA-F]/;
+	    const decimal = /[0-9]/;
+	    const hexDigits = seq(repeat1(hex), repeat(seq(separator, repeat1(hex))));
+	    const decimalDigits = seq(repeat1(decimal), repeat(seq(separator, repeat1(decimal))));
+	    return token(seq(
+		optional(choice(/0[xX]/, /0[bB]/)),
+		choice(decimalDigits,
+		       seq(/0[bB]/, decimalDigits),
+		       seq(/0[xX]/, hexDigits),
+		)
+	    ));
+	},
 	// AI generated, hopefully works as intended
 	string: $ => /"[^"\\]*(?:\\.[^"\\]*)*"/,
 
-	integer: _ => /\d+/,
+				     // TODO: make integers support hex, binary etc.
+	// integer: _ => 
 	// real: $ => /\d+\.\d*/,
 	// /\d+[\.\d+]?[eE][+-]?\d+/,
 	
