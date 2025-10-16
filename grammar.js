@@ -56,6 +56,7 @@ module.exports = grammar({
 	[$.expression_statement, $.assignment],
 	[$.function_definition, $.primary_expression, $.procedure_definition],
 	[$.map, $.identifier],
+	[$.inline_function, $.identifier] // func can be used as function call 
 	// [$._iterable_binding, $.primary_expression],
     ],
     // A _statement_ is any valid sequence of symbols followed by a semicolon
@@ -260,7 +261,7 @@ module.exports = grammar({
 	    'catch',
 	    field('error', $.identifier),
 	    optional(';'),
-	    $.block,
+	    optional($.block),
 	    'end try',
 	),
 
@@ -551,6 +552,7 @@ module.exports = grammar({
 	    optional(';'),
 	    field('body', $.block),
 	    'end function',
+	    optional($.parameters)
 	),
 	
 	procedure_definition: $ => seq(
@@ -562,6 +564,8 @@ module.exports = grammar({
 	    optional(';'),
 	    optional(field('body', $.block)),
 	    'end procedure',
+	    optional($.parameters)
+	    
 	),
 
 	inline_function: $ => choice(
@@ -724,7 +728,7 @@ module.exports = grammar({
 		$.anonymous_constructor
 	    )),
 
-	_right_hand_side: $ => commaSep1($.expression),
+	_right_hand_side: $ => choice(commaSep1($.expression), $._definition),
 
 	anonymous_constructor: $ => seq(
 	    $.anonymous_identifier,
@@ -907,7 +911,8 @@ module.exports = grammar({
 	    'if',
 	    field('condition', $.expression),
 	    'then',
-	    field('consequence', $.block),
+	    optional(';'),
+	    optional(field('consequence', $.block)),
 	    repeat(field('alternative', $.elif_clause)),
 	    optional(field('alternative', $.else_clause)),
 	    'end if'
@@ -915,14 +920,16 @@ module.exports = grammar({
 
 	elif_clause: $ => seq(
 	    'elif',
+	    optional(';'),
 	    field('condition', $.expression),
 	    'then',
-	    field('consequence', $.block),
+	    optional(field('consequence', $.block)),
 	),
 
 	else_clause: $ => seq(
 	    'else',
-	    field('consequence', $.block),
+	    optional(';'),
+	    optional(field('consequence', $.block)),
 	),
 
 	
@@ -930,6 +937,7 @@ module.exports = grammar({
 	    'for',
 	    field('quantifier', $.for_quantifier),
 	    'do',
+	    optional(';'),
 	    field('body', $.block),
 	    'end for'
 	),
@@ -941,8 +949,8 @@ module.exports = grammar({
 		optional(seq(
 		    'by', field('by', $.primary_expression)))
 			 )),
-	    seq(
-		commaSep1($.primary_expression))
+	    choice(commaSep1($.primary_expression),
+		   seq('random', commaSep1($.identifier), 'in', $.primary_expression))
 	),
 
 	// _iterable_binding: $ => seq(
@@ -989,18 +997,18 @@ module.exports = grammar({
 
 	when_clause: $ => seq(
 	    'when',
-	    field('match', $.primary_expression),
+	    field('match', commaSep1($.primary_expression)),
 	    ':',
 	    field('consequence', $.block)
 	),
 
 	// Misc:
 
-	dollar: $ => seq(
+	dollar: $ => token(seq(
 	    '$',
 	    optional('.'),
-	    token.immediate(/\d+/)
-	),
+	    optional(token.immediate(/\d+/))
+	)),
 	    
 	// MAYBE: rename this to parent_function or something?
 	double_dollar: $ => prec.left(
@@ -1011,7 +1019,7 @@ module.exports = grammar({
 	
 	// handles both regular identifiers witht the option of being quoted (e.g., foo, 'foo', or even 'foo.1 + 2')
 	identifier: $ => choice(/(?:'[^']*'|[_]*[a-zA-Z][a-zA-Z0-9_]*)/,
-				'hom', 'map', 'pmap', 'iso', 'rep'), 
+				'hom', 'map', 'pmap', 'iso', 'rep', 'func'), 
 	
 	anonymous_identifier: _ => '_',
 	block: $ => repeat1($._statement),
@@ -1086,12 +1094,13 @@ module.exports = grammar({
 	),
 
 	integer: _ => {
-	    const separator = '\\\n';
+	    const separator = /\\\s+/;
 	    const hex = /[0-9a-fA-F]/;
 	    const decimal = /[0-9]/;
 	    const hexDigits = seq(repeat1(hex), repeat(seq(separator, repeat1(hex))));
 	    const decimalDigits = seq(repeat1(decimal), repeat(seq(separator, repeat1(decimal))));
 	    return token(seq(
+		optional(/-\s*/),
 		optional(choice(/0[xX]/, /0[bB]/)),
 		choice(decimalDigits,
 		       seq(/0[bB]/, decimalDigits),
