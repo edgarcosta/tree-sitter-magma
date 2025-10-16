@@ -163,9 +163,9 @@ end intrinsic;
         right: (true))
       (for_statement
         quantifier: (for_quantifier
-          (iterable_binding
-            element: (identifier)
-            parent: (call
+          (binary_operator
+            left: (identifier)
+            right: (call
               function: (identifier)
               arguments: (argument_list
                 argument: (identifier)))))

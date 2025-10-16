@@ -379,16 +379,16 @@ end for;
 (program
   (for_statement
     quantifier: (for_quantifier
-      (iterable_binding
-        element: (identifier)
-        parent: (aggregate
+      (binary_operator
+        left: (identifier)
+        right: (aggregate
           (seqenum
             (range
               start: (integer)
               end: (integer)))))
-      (iterable_binding
-        element: (identifier)
-        parent: (aggregate
+      (binary_operator
+        left: (identifier)
+        right: (aggregate
           (seqenum
             (range
               start: (integer)
@@ -405,6 +405,7 @@ end for;
               argument: (identifier)
               argument: (identifier)
               argument: (identifier))))))))
+
 
 
 

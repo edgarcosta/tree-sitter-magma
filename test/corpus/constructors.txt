@@ -10,29 +10,10 @@ ideal<OF | a1,a2>;
   (expression_statement
     (constructor
       name: (identifier)
-      element: (identifier)
       (identifier)
-      (identifier))))
-
-
-============================
-Mixed constructor parameters
-============================
-
-mixed_constructor := MyType<arg1, name : Type, arg2>;
-
----
-
-(program
-  (assignment
-    left: (identifier)
-    right: (constructor
-      (identifier)
-      (identifier)
-      (field_definition
-        name: (identifier)
-        type: (identifier))
-      (identifier))))
+      (constructor_elements
+        (identifier)
+        (identifier)))))
 
 ============================
 Recformat constructor
@@ -67,4 +48,26 @@ recformat< n : Integers(), misc, seq : SeqEnum >;
         name: (identifier)
         type: (identifier)))))
 
+============================
+Stupid group quo constructor
+============================
 
+G<a,b,c,d,e> := quo< GrpPC : F | rels >;
+
+---
+
+(program
+  (assignment
+    left: (constructor
+      name: (identifier)
+      (identifier)
+      (identifier)
+      (identifier)
+      (identifier)
+      (identifier))
+    right: (constructor
+      name: (identifier)
+      (identifier)
+      (constructor_elements
+        free_group: (identifier)
+        (identifier)))))

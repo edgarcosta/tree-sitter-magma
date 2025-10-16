@@ -38,8 +38,6 @@ const PREC = {
 	call: 35                 // function application; keep as top-most
 };
 
-// const MAPS = [
-// ]
 
 // TODO: move expression tests to new test file
 
@@ -58,6 +56,7 @@ module.exports = grammar({
 	[$.expression_statement, $.assignment],
 	[$.function_definition, $.primary_expression, $.procedure_definition],
 	[$.map, $.identifier],
+	// [$._iterable_binding, $.primary_expression],
     ],
     // A _statement_ is any valid sequence of symbols followed by a semicolon
     // eg. a variable assignment, a function/intrinsic definition
@@ -110,7 +109,7 @@ module.exports = grammar({
 	    choice(
 		$._simple_statement,
 		$._compound_statement),
-	    ';',
+	    repeat1(';'),
 	),
 
 	_simple_statement: $ => choice(
@@ -186,7 +185,7 @@ module.exports = grammar({
 	print_level_statement: $ => seq(
 	    $.expression_statement,
 	    ':',
-	    choice('Default' , 'Maximal', 'Minimal', 'Magma')
+	    choice('Default' , 'Maximal', 'Minimal', 'Magma', 'Hex', 'Latex')
 	),
 	
 
@@ -335,7 +334,13 @@ module.exports = grammar({
 		field('right', $.expression),
 	    ))));
 	},
-
+	
+	group_relation : $ => prec.left(PREC.eq, seq(
+	    field('left', $.expression),
+	    '=',
+	    field('right', $.expression)
+	)),
+	
 	ternary_operator: $ => prec(PREC.ternary, seq(
 	    field('conditional', $.primary_expression),
 	    'select',
@@ -515,15 +520,16 @@ module.exports = grammar({
 	    $.true,
 	    $.false,
 	    $.call,
-	    $.dollar,
 	    $.inline_function,
 	    $.inline_procedure,
+	    $.dollar,
 	    $.double_dollar,		// MAYBE: should this really be here?
 	    $.parenthesized_expression, // should this really be here?
 	    $.where_expression,	// This should definitely be here
 	    $.literal_sequence,
 	    $.aggregate,
 	    $._set_operator,
+	    $.group_relation,
 	),
 	
 	true: _ => 'true',
@@ -604,7 +610,8 @@ module.exports = grammar({
 	parameter: $ => choice(
 	    $.identifier,
 	    $.typed_identifier,
-	    $.ref_identifier
+	    $.ref_identifier,
+	    '...'
 	),
 
 	ref_identifier: $ => seq(
@@ -784,8 +791,10 @@ module.exports = grammar({
 
 	_map_constructor: $ => commaSep1(
 	    seq(
-		optional(seq(field('domain_element', $.identifier), ':->')),
-		field('image', $.primary_expression))
+		optional(
+		    seq(field('domain_element', $.primary_expression),
+			choice(':->', '->'))),
+		field('image', $.primary_expression)),
 	),
 
 	// Constructors
@@ -800,16 +809,53 @@ module.exports = grammar({
 	constructor: $ => seq(
 	    field('name', $.identifier),
 	    '<',
-	    commaSep1(field('element', $.primary_expression)),
-	    optional(seq(
-		'|', optional(commaSep1(choice(
-		    $.primary_expression,
-		    $.optional_parameter,
-		))),
-	    )),
-	    optional(seq(':', commaSep1($.optional_parameter))),
+	    choice(
+		commaSep1($.primary_expression),
+		seq(optional(commaSep1($.primary_expression)),
+		    optional($.constructor_elements),
+		    optional($.constructor_options),
+		   )),
 	    '>'
 	),
+
+	_simple_assignment: $ => seq(
+	    $.identifier, ':=', $.primary_expression
+	),
+	// constructor_field: $ => seq(
+	//     choice(commaSep1($.primary_expression),
+	// 	   seq($.identifier, ':', $.primary_expression))
+	// ),
+
+	constructor_elements: $ => seq(
+	    optional(seq(':', field('free_group', $.primary_expression))),
+	    // this is to accommodate the construction
+	    // quo< GrpPC : F | R : parameters > : GrpFP, List(GrpFPRel) -> GrpPC, Map
+	    '|',
+	    optional(commaSep1(
+		choice($.primary_expression,
+		       $._simple_assignment)))
+	),
+	
+	constructor_options: $ => seq(
+	    ':',
+	    optional(commaSep1(
+		choice($.primary_expression,
+		       $._simple_assignment)))
+	),
+	
+	    // commaSep1(field('element', $.primary_expression)),
+	    // optional(seq(
+	    // 	// TODO: change this to aggregate
+	    // 	optional(seq(':', $.identifier)),
+	    // 	'|', optional(commaSep1(choice(
+	    // 	    $.primary_expression,
+	    // 	    $.optional_parameter,
+	    // 	))),
+	    // )),
+	    // optional(seq(':',
+	    // 		 commaSep1(choice($.optional_parameter, $.identifier)))),
+	    // '>'
+	// ),
 	
 
 	field_definition: $ => seq(
@@ -888,7 +934,6 @@ module.exports = grammar({
 	    'end for'
 	),
 
-	// TODO: clean up structure of tokens here
 	for_quantifier: $ => choice(
 	    commaSep1(seq($.identifier,
 		':=', field('from', $.primary_expression),
@@ -897,18 +942,14 @@ module.exports = grammar({
 		    'by', field('by', $.primary_expression)))
 			 )),
 	    seq(
-		optional('random'),
-		commaSep1($.iterable_binding))
+		commaSep1($.primary_expression))
 	),
 
-	iterable_binding: $ => seq(
-	    optional(seq(
-		field('index', $.identifier),
-		'->')),
-	    commaSep1(field('element', choice($.identifier, $.anonymous_identifier))),
-	    'in',
-	    field('parent', $.primary_expression)
-	),
+	// _iterable_binding: $ => seq(
+	//     commaSep1(choice($.two_tuple, $.identifier)),
+	//     'in',
+	//     field('parent', $.primary_expression)
+	// ),
 
 	// needs to take into account all the variations in
 	// https://magma.maths.usyd.edu.au/magma/handbook/text/13#86
@@ -957,6 +998,7 @@ module.exports = grammar({
 
 	dollar: $ => seq(
 	    '$',
+	    optional('.'),
 	    token.immediate(/\d+/)
 	),
 	    
@@ -991,11 +1033,18 @@ module.exports = grammar({
 	set: $ => aggregate_of($, '{', '}', true),
 	indexed_set: $ => aggregate_of($, '{@', '@}', true),
 	multiset: $ => aggregate_of($, '{*', '*}', true),
+
+	two_tuple: $ => prec.left(PREC.arrow, seq(
+	    $.primary_expression,
+	    '->',
+	    $.primary_expression
+	)),
 	
 	aggregate: $ => choice(
 	    $.seqenum,
 	    $.list,
 	    $.tuple,
+	    $.two_tuple,
 	    $.set,
 	    $.indexed_set,
 	    $.multiset,
@@ -1126,7 +1175,7 @@ function aggregate_of($, left, right, has_universe) {
 	    ),
 	    // specify parent(s) of element(s)
 	    optional(
-		seq(':', commaSep1($.iterable_binding),
+		seq(':', commaSep1($.primary_expression),
 		// conditions
 		optional(
 		    seq('|', field('condition', $.primary_expression)))

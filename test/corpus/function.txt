@@ -339,8 +339,9 @@ end try;
     error: (identifier)
     (block
       (print_statement
-        (string)
-        (identifier)))))
+        (expression_statement
+          (string)
+          (identifier))))))
 
 ============================
 More inline function examples

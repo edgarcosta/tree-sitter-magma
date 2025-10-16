@@ -85,6 +85,46 @@ Empty tuple
     (aggregate
       (tuple))))
 
+
+====================================
+Simple 2-tuple
+====================================
+
+(1 -> 2) eq <1,2>;
+
+---
+
+(program
+  (expression_statement
+    (comparison_operator
+      left: (parenthesized_expression
+        (aggregate
+          (two_tuple
+            (integer)
+            (integer))))
+      right: (aggregate
+        (tuple
+          (integer)
+          (integer))))))
+
+====================================
+Iterated 2-tuples
+====================================
+
+1 -> 2 -> 3;
+
+---
+
+(program
+  (expression_statement
+    (aggregate
+      (two_tuple
+        (aggregate
+          (two_tuple
+            (integer)
+            (integer)))
+        (integer)))))
+
 ==================
 Sets
 ==================
@@ -345,10 +385,12 @@ Subsequence with index and condition
         (binary_operator
           left: (identifier)
           right: (identifier))
-        (iterable_binding
-          index: (identifier)
-          element: (identifier)
-          parent: (aggregate
+        (binary_operator
+          left: (aggregate
+            (two_tuple
+              (identifier)
+              (identifier)))
+          right: (aggregate
             (seqenum
               (range
                 start: (integer)
@@ -375,17 +417,17 @@ exists(t){ <x, y> : x, y in [ t^3 : t in [-10..10] ] | x + y eq 218 };
           (tuple
             (identifier)
             (identifier)))
-        (iterable_binding
-          element: (identifier)
-          element: (identifier)
-          parent: (aggregate
+        (identifier)
+        (binary_operator
+          left: (identifier)
+          right: (aggregate
             (seqenum
               (binary_operator
                 left: (identifier)
                 right: (integer))
-              (iterable_binding
-                element: (identifier)
-                parent: (aggregate
+              (binary_operator
+                left: (identifier)
+                right: (aggregate
                   (seqenum
                     (range
                       start: (unary_operator
@@ -410,9 +452,9 @@ random{ x : x in F | IsPrimitive(x) };
     (random_element_of_set
       (set
         (identifier)
-        (iterable_binding
-          element: (identifier)
-          parent: (identifier))
+        (binary_operator
+          left: (identifier)
+          right: (identifier))
         condition: (call
           function: (identifier)
           arguments: (argument_list
@@ -433,9 +475,9 @@ rep {x^2 : x in [1..5] | IsEven(x) };
         (binary_operator
           left: (identifier)
           right: (integer))
-        (iterable_binding
-          element: (identifier)
-          parent: (aggregate
+        (binary_operator
+          left: (identifier)
+          right: (aggregate
             (seqenum
               (range
                 start: (integer)

@@ -40,7 +40,7 @@ F<a> := NumberField(x^2+1);
   (assignment
     left: (constructor
       name: (identifier)
-      element: (identifier))
+      (identifier))
     right: (call
       function: (identifier)
       arguments: (argument_list
@@ -49,7 +49,6 @@ F<a> := NumberField(x^2+1);
             left: (identifier)
             right: (integer))
           right: (integer))))))
-
 
 ================================================================================
 Assignment with anonymous identifier
