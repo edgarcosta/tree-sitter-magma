@@ -431,3 +431,23 @@ fibonacci := func<n | n le 1 select n else $$(n-1) + $$(n-2)>;
                 argument: (binary_operator
                   left: (identifier)
                   right: (integer))))))))))
+
+============================
+Call function upon definition
+============================
+
+a, b := function() return 1, "a"; end function();
+
+---
+(program
+  (expression_statement
+    (identifier)
+    (call
+      function: (function_definition
+        name: (identifier)
+        parameters: (parameters)
+        body: (block
+          (return_statement
+            (integer)
+            (string))))
+      arguments: (argument_list))))

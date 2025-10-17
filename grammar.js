@@ -54,9 +54,11 @@ module.exports = grammar({
     
     conflicts: $ => [
 	[$.expression_statement, $.assignment],
-	[$.function_definition, $.primary_expression, $.procedure_definition],
+	// [$.function_definition, $.primary_expression, $.procedure_definition],
 	[$.map, $.identifier],
-	[$.inline_function, $.identifier] // func can be used as function call 
+	// [$.inline_function, $.identifier] // func can be used as function call
+	// [$.inline_function, $.identifier] // func can be used as function call 
+
 	// [$._iterable_binding, $.primary_expression],
     ],
     // A _statement_ is any valid sequence of symbols followed by a semicolon
@@ -101,16 +103,26 @@ module.exports = grammar({
 	),
 	
 	// Comments
-	comment: $ => choice(
-	    seq('//', /.*/),
-	    seq('/*', /[^*]*\*+([^/*][^*]*\*+)*/, '/')
-	),
+	// taken from
+	// https://github.com/tree-sitter/tree-sitter-c/blob/master/grammar.js
+	comment: _ => token(choice(
+	    seq('//', /(\\+(.|\r?\n)|[^\\\n])*/),
+	    seq(
+		'/*',
+		/[^*]*\*+([^/*][^*]*\*+)*/,
+		'/',
+	    ),
+	)),
 
 	_statement: $ => seq(
 	    choice(
-		$._simple_statement,
-		$._compound_statement),
-	    repeat1(';'),
+		seq(choice(
+		    $._simple_statement,
+		    $._compound_statement),
+		    repeat1(';')),
+		$.intrinsic_definition,
+		// intrinsic definitions don't need ;
+	    )
 	),
 
 	_simple_statement: $ => choice(
@@ -121,20 +133,20 @@ module.exports = grammar({
 	    $.exit_statement,
 	    $.print_statement,
 	    $.vprint_statement,
-	    $.print_level_statement,
+	    $.read_statement,
 	    $.time_statement,
 	    $.vtime_statement,
 	    $.assert_statement,
 	    $.require_statement,
 	    $.declare_statement,
 	    $.local_statement,
-	    $._definition,
+	    // $._definition,
 	    $._assignment,
 	    $._directive,
 	    $.error_statement,
 	),
 
-	expression_statement: $ => commaSep1($.primary_expression),
+	expression_statement: $ => commaSep1(choice($.primary_expression, $.print_level_statement)),
 
 	return_statement: $ => seq(
 	    "return",
@@ -164,27 +176,33 @@ module.exports = grammar({
 	eval_expression: $ => prec.left(PREC.eval, seq(
 	    'eval',
 	    // can be anything that evaluates to a string!
-	    $.primary_expression)
-	),
+	    // Also, can be used with round brackets
+	    choice(seq('(', $.primary_expression, ')'),
+		   $.primary_expression),
+	)),
 
-	// MAYBE: make these into separate statements,
-	// since they have slightly different semantics
-	// TODO: consider not using expression statement here?
 	print_statement: $ => seq(
 	    choice('print', 'printf', 'fprintf'),
-	    choice($.expression_statement, $.print_level_statement)
+	    commaSep1(choice($.primary_expression, $.print_level_statement))
 	),
 
 	vprint_statement: $ => seq(
 	    choice('vprint', 'vprintf'),
 	    field('flag', $.identifier),
-	    optional(seq(',', field('n', $.integer))),
+	    optional(seq(',', field('n', $.primary_expression))),
 	    ':',
-	    commaSep1($.expression),
+	    commaSep1(choice($.primary_expression, $.print_level_statement))
+	),
+
+	read_statement: $ => seq(
+	    choice('read', 'readi'),
+	    field('identifier', $.identifier),
+	    ',',
+	    optional(field('prompt', $.primary_expression))
 	),
 
 	print_level_statement: $ => seq(
-	    $.expression_statement,
+	    $.primary_expression,
 	    ':',
 	    choice('Default' , 'Maximal', 'Minimal', 'Magma', 'Hex', 'Latex')
 	),
@@ -195,11 +213,21 @@ module.exports = grammar({
 	    $.expression,
 	),
 
-	require_statement: $ => seq(
+	require_statement: $ => choice(
+	    $._require,
+	    $._require_cond
+	),
+
+	_require: $ => seq(
 	    'require',
 	    $.expression,
 	    ':',
 	    commaSep1($.expression),
+	),
+	
+	_require_cond: $ => seq(
+	    choice('requirege', 'requirerange'),
+	    commaSep1($.primary_expression)
 	),
 
 	time_statement: $ => seq(
@@ -262,7 +290,8 @@ module.exports = grammar({
 	    field('error', $.identifier),
 	    optional(';'),
 	    optional($.block),
-	    'end try',
+	    'end',
+	    'try',
 	),
 
 	error_statement: $ => seq(
@@ -460,7 +489,7 @@ module.exports = grammar({
 	
 	forward: $ => seq(
 	    'forward',
-	    $.identifier
+	    commaSep1($.identifier)
 	),
 
 	delete: $ => seq(
@@ -480,6 +509,7 @@ module.exports = grammar({
 
 	import_directive: $ => seq(
 	    'import',
+	    optional('!'), 
 	    field('filename', $.string),
 	    ':',
 	    field('variable', commaSep1($.identifier))
@@ -487,10 +517,8 @@ module.exports = grammar({
 
 	// --- Expressions ---
 
-	expression: $ => choice(
-	    $.primary_expression,
-	    $.eval_expression
-	),
+	// TODO: clean this up
+	expression: $ => $.primary_expression,
 
 	parenthesized_expression: $ => prec(
 	    PREC.parenthesized_expression,
@@ -500,8 +528,6 @@ module.exports = grammar({
 		')'
 	    )),
 
-	// TODO: the expression (1,2) can mean permuation group cycle; implement this!
-	// NB: It can also mean commutator! cf Chapter 70 of the documentation pdf
 	primary_expression: $ => choice(
 	    $.identifier,
 	    $.anonymous_identifier,
@@ -521,8 +547,8 @@ module.exports = grammar({
 	    $.true,
 	    $.false,
 	    $.call,
-	    $.inline_function,
-	    $.inline_procedure,
+	    // $.inline_function,
+	    // $.inline_procedure,
 	    $.dollar,
 	    $.double_dollar,		// MAYBE: should this really be here?
 	    $.parenthesized_expression, // should this really be here?
@@ -531,64 +557,68 @@ module.exports = grammar({
 	    $.aggregate,
 	    $._set_operator,
 	    $.group_relation,
+	    $._definition,	// functions really are first class objects
+	    $.eval_expression,
 	),
+
 	
 	true: _ => 'true',
 	false: _ => 'false',
 	
 	_definition: $ => choice(
 	    $.function_definition,
-	    $.intrinsic_definition,
+	    // $.intrinsic_definition,
 	    $.procedure_definition,
 	),
 
 	// Function definition - semantic validation should ensure it has a return statement with expression
 	function_definition: $ => seq(
-	    choice(
-		seq('function', field('name', $.identifier)),
-		seq(field('name', $.identifier), ':=', 'function')
-	    ),
-	    field('parameters', $.parameters),
-	    optional(';'),
-	    field('body', $.block),
-	    'end function',
-	    optional($.parameters)
-	),
-	
-	procedure_definition: $ => seq(
-	    choice(
-		seq('procedure', field('name', $.identifier)),
-		seq(field('name', $.identifier), ':=', 'procedure')
-	    ),
+	    // choice(
+	    'function',
+	    optional(field('name', $.identifier)),
+		// seq(field('name', $.identifier), ':=', 'function')
+	    // ),
 	    field('parameters', $.parameters),
 	    optional(';'),
 	    optional(field('body', $.block)),
-	    'end procedure',
-	    optional($.parameters)
-	    
+	    'end',
+	    'function',
+	),
+	
+	procedure_definition: $ => seq(
+	    // choice(
+	    'procedure',
+	    optional(field('name', $.identifier)),
+		// seq(field('name', $.identifier), ':=', 'procedure')
+	    // ),
+	    field('parameters', $.parameters),
+	    optional(';'),
+	    optional(field('body', $.block)),
+	    'end',
+	    'procedure',
 	),
 
-	inline_function: $ => choice(
-	    seq(
-		'func',
-		'<',
-		optional(field('parameters', $._parameter_list)),
-		'|',
-		field('body', $.primary_expression),
-		'>'
-	    )
-	),
+	// inline_function: $ => choice(
+	//     seq(
+	// 	'func',
+	// 	'<',
+	// 	optional(field('parameters', $._parameter_list)),
+	// 	'|',
+	// 	field('body', $.primary_expression),
+	// 	'>'
+	//     )
+	// ),
 
-	inline_procedure: $ => choice(
-	    seq(
-		'proc',
-		'<',
-		optional(field('parameters', $._parameter_list)),
-		'|',
-		field('body', $.primary_expression),
-		'>'
-	    )
-	),
+	// inline_procedure: $ => choice(
+	//     seq(
+	// 	'proc',
+	// 	'<',
+	// 	optional(field('parameters', $._parameter_list)),
+	// 	'|',
+	// 	field('body', $.primary_expression),
+	// 	'>'
+	//     )
+	// ),
 
 	_parameter_list: $ => choice(
 	    seq(commaSep1($.parameter), optional($._optional_parameters)),
@@ -632,7 +662,7 @@ module.exports = grammar({
 	)),
 
 	optional_parameter: $ => seq(
-		field('name', $.identifier),
+	    field('name', $.identifier),
 	    ':=',
 	    field('value', $.primary_expression),
 	),
@@ -644,13 +674,15 @@ module.exports = grammar({
 	    optional(seq('->', commaSep1(field('return_type', $.type)))),
 	    field('docstring',
 		  seq('{',
-		      /[^{}]*/,	// matches anything that's not a squirly brace
+		     /(?:[^\\}]|\\.)*/,	// matches anything that's not a squirly brace
 		      '}',
 		      optional(';'),
 		     )
 		 ),
 	    optional(field('body', $.block)),
-	    'end intrinsic'
+	    'end',
+	    'intrinsic',
+	    optional(';')
 	),
 
 	_intrinsic_parameters: $ => seq(
@@ -658,16 +690,20 @@ module.exports = grammar({
 	    optional(commaSep1($._intrinsic_parameter)),
 	    optional(seq(
 		':',
-		commaSep1($.optional_parameter))),
+		commaSep1(choice($.optional_parameter, $.identifier)))),
+	    // optional parameters don't need default value
 	    ')'
 	),
 
 	_intrinsic_parameter: $ => choice(
 	    $.identifier,
+	    $.backtick_identifier,
 	    $.ref_identifier,
 	    $.typed_identifier,
 	    $.ref_typed_identifier
 	),
+
+	backtick_identifier: $ => seq('`', $.identifier),
 
 	ref_typed_identifier: $ => seq(
 	    '~',
@@ -677,6 +713,7 @@ module.exports = grammar({
 	),
 
 
+	// TODO: this makes cycles parse incorrectly!
 	call: $ => prec.right(PREC.call, seq(
 	    field('function',  $.primary_expression),
 	    field('arguments', $.argument_list),
@@ -728,7 +765,7 @@ module.exports = grammar({
 		$.anonymous_constructor
 	    )),
 
-	_right_hand_side: $ => choice(commaSep1($.expression), $._definition),
+	_right_hand_side: $ => commaSep1($.expression),
 
 	anonymous_constructor: $ => seq(
 	    $.anonymous_identifier,
@@ -741,6 +778,7 @@ module.exports = grammar({
 	type: $ => choice(
 	    // Simple and any-type
 	    $.identifier,
+	    $.string,
 	    '.',
 	    // Extended types: Category[<type>, ...] (allow nested types)
 	    seq('[', optional($.type), ']'),	 // Sequence type
@@ -831,9 +869,10 @@ module.exports = grammar({
 	// ),
 
 	constructor_elements: $ => seq(
-	    optional(seq(':', field('free_group', $.primary_expression))),
+	    optional($.constructor_options),
 	    // this is to accommodate the construction
 	    // quo< GrpPC : F | R : parameters > : GrpFP, List(GrpFPRel) -> GrpPC, Map
+	    // as well as optional arguments in func
 	    '|',
 	    optional(commaSep1(
 		choice($.primary_expression,
@@ -889,11 +928,22 @@ module.exports = grammar({
 	    '>'
 	),
 
-	cycle_or_commutator: $ => seq(
-	    '(',
-	    commaSep2($.primary_expression),
-	    ')'
+	// NB: these are usually parsed as function calls!!
+	cycle_or_commutator: $ => prec.left(
+	    choice(
+		$.literal_cycle,
+		repeat1(seq(
+		    '(',
+		    commaSep2($.primary_expression),
+		    ')')))
 	),
+
+	literal_cycle: $ => prec.right(seq(
+	    '\\(',
+	    commaSep1($.integer),
+	    ')',
+	    optional(repeat1(seq('(', commaSep1($.integer), ')')))
+	)),
 	
 	
 	// Control flow
@@ -915,7 +965,8 @@ module.exports = grammar({
 	    optional(field('consequence', $.block)),
 	    repeat(field('alternative', $.elif_clause)),
 	    optional(field('alternative', $.else_clause)),
-	    'end if'
+	    'end',
+	    'if'
 	),
 
 	elif_clause: $ => seq(
@@ -923,7 +974,9 @@ module.exports = grammar({
 	    optional(';'),
 	    field('condition', $.expression),
 	    'then',
+	    optional(';'),
 	    optional(field('consequence', $.block)),
+	    // optional(';')
 	),
 
 	else_clause: $ => seq(
@@ -939,7 +992,8 @@ module.exports = grammar({
 	    'do',
 	    optional(';'),
 	    field('body', $.block),
-	    'end for'
+	    'end',
+	    'for'
 	),
 
 	for_quantifier: $ => choice(
@@ -966,8 +1020,10 @@ module.exports = grammar({
 	    'while',
 	    field('condition', $.expression),
 	    'do',
+	    optional(';'),
 	    field('body', $.block),
-	    'end while',
+	    'end',
+	    'while',
 	),
 	
 	repeat_statement: $ => seq(
@@ -984,17 +1040,11 @@ module.exports = grammar({
 	    field('matchee', $.primary_expression),
 	    ':',
 	    repeat1($.when_clause),
-	    optional(seq('else:', field('else', $.block))),
-	    'end case',
+	    optional(seq('else', optional(':'), field('else', $.block))),
+	    'end',
+	    'case',
 	),
 	
-	// TODO: implement alternative syntax:
-	// > greeting := case< Random(1, 3) |
-	// >     1 : "Hello.",
-	// >     2 : "G'day.",
-	// >     default : "Pleased to meet you." >;
-	// > print greeting;
-
 	when_clause: $ => seq(
 	    'when',
 	    field('match', commaSep1($.primary_expression)),
@@ -1004,22 +1054,21 @@ module.exports = grammar({
 
 	// Misc:
 
-	dollar: $ => token(seq(
-	    '$',
-	    optional('.'),
-	    optional(token.immediate(/\d+/))
+	dollar: $ => prec.left(PREC.dollar, choice(
+		seq('$', optional(token.immediate(/\d+/))),
 	)),
 	    
 	// MAYBE: rename this to parent_function or something?
-	double_dollar: $ => prec.left(
-	    PREC.dollar, seq("$$", $.argument_list)),
+	double_dollar: $ => "$$",
 	
 	
 	// Basic tokens:
 	
-	// handles both regular identifiers witht the option of being quoted (e.g., foo, 'foo', or even 'foo.1 + 2')
-	identifier: $ => choice(/(?:'[^']*'|[_]*[a-zA-Z][a-zA-Z0-9_]*)/,
-				'hom', 'map', 'pmap', 'iso', 'rep', 'func'), 
+	// handles regular identifiers as well as quoted ones (e.g., foo, 'foo', or even 'foo.1 + 2')
+	// also need to manually add in keywords which are not reserved
+	// see https://magma.maths.usyd.edu.au/magma/handbook/text/85
+	identifier: $ => choice(/(?:'[^']*'|[_a-zA-Z]+[a-zA-Z0-9_]*)/,
+				'hom', 'map', 'pmap', 'iso', 'rep'), 
 	
 	anonymous_identifier: _ => '_',
 	block: $ => repeat1($._statement),
@@ -1109,7 +1158,8 @@ module.exports = grammar({
 	    ));
 	},
 	// AI generated, hopefully works as intended
-	string: $ => /"[^"\\]*(?:\\.[^"\\]*)*"/,
+	string: $ => /"[^"\\]*(?:\\(?:[\s\S])[^"\\]*)*"/,
+
 
 				     // TODO: make integers support hex, binary etc.
 	// integer: _ => 
@@ -1156,18 +1206,6 @@ function commaSep2(rule) {
 function sep1(rule, separator) {
     return seq(rule, repeat(seq(separator, rule)));
 }
-
-// // Possible choices of parameters for {function, procedure, intrinsic}
-// function parameter_choices($, def_type)  {
-//     switch (def_type) {
-//     case 'function':
-// 	return $.identifier;
-//     case 'procedure':
-// 	return choice($.identifier, $.ref_identifier);
-//     case 'intrinsic':
-// 	return choice($.identifier, $.ref_identifier, $.typed_identifier);
-//     }
-// }
 
 // TODO: add option to support trailing comma
 function aggregate_of($, left, right, has_universe) {

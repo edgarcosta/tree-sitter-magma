@@ -19,7 +19,7 @@ Intrinsic test with arguments
 ================================================================================
 
 intrinsic test(x, y) -> .
-{ docstring }
+{ docstring \{with brackets \} }
   return x + y;
 end intrinsic;
 
@@ -325,3 +325,19 @@ end intrinsic;
     body: (block
       (return_statement
         (identifier)))))
+
+================================================================================
+Basic intrinsic test without trailing semicolon 
+================================================================================
+
+intrinsic test() -> type
+{ docstring }
+end intrinsic
+
+---
+
+(program
+  (intrinsic_definition
+    name: (identifier)
+    return_type: (type
+      (identifier))))
