@@ -69,5 +69,7 @@ G<a,b,c,d,e> := quo< GrpPC : F | rels >;
       name: (identifier)
       (identifier)
       (constructor_elements
-        free_group: (identifier)
+        (constructor_options
+          (identifier))
         (identifier)))))
+

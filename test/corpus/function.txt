@@ -23,12 +23,13 @@ end function;
 ---
 
 (program
-  (function_definition
-    name: (identifier)
-    parameters: (parameters)
-    body: (block
-      (return_statement
-        (integer)))))
+  (expression_statement
+    (function_definition
+      name: (identifier)
+      parameters: (parameters)
+      body: (block
+        (return_statement
+          (integer))))))
 
 ================================================================================
 Function definition with arguments
@@ -42,24 +43,25 @@ end function;
 ---
 
 (program
-  (function_definition
-    name: (identifier)
-    parameters: (parameters
-      (identifier)
-      (identifier)
-      (optional_parameter
-        name: (identifier)
-        value: (integer)))
-    body: (block
-      (assignment
-        left: (identifier)
-        right: (binary_operator
+  (expression_statement
+    (function_definition
+      name: (identifier)
+      parameters: (parameters
+        (identifier)
+        (identifier)
+        (optional_parameter
+          name: (identifier)
+          value: (integer)))
+      body: (block
+        (assignment
           left: (identifier)
-          right: (identifier)))
-      (return_statement
-        (binary_operator
-          left: (identifier)
-          right: (identifier))))))
+          right: (binary_operator
+            left: (identifier)
+            right: (identifier)))
+        (return_statement
+          (binary_operator
+            left: (identifier)
+            right: (identifier)))))))
 
 ================================================================================
 Function definition with := notation
@@ -77,32 +79,35 @@ end function;
 
 ; copied from example H2E1
 (program
-  (function_definition
-    name: (identifier)
-    parameters: (parameters
-      (identifier))
-    body: (block
-      (if_statement
-        condition: (comparison_operator
-          left: (identifier)
-          right: (integer))
-        consequence: (block
-          (return_statement
-            (integer)))
-        alternative: (else_clause
+  (assignment
+    left: (identifier)
+    right: (function_definition
+      parameters: (parameters
+        (identifier))
+      body: (block
+        (if_statement
+          condition: (comparison_operator
+            left: (identifier)
+            right: (integer))
           consequence: (block
             (return_statement
-              (binary_operator
-                left: (double_dollar
-                  (argument_list
-                    argument: (binary_operator
-                      left: (identifier)
-                      right: (integer))))
-                right: (double_dollar
-                  (argument_list
-                    argument: (binary_operator
-                      left: (identifier)
-                      right: (integer))))))))))))
+              (integer)))
+          alternative: (else_clause
+            consequence: (block
+              (return_statement
+                (binary_operator
+                  left: (call
+                    function: (double_dollar)
+                    arguments: (argument_list
+                      argument: (binary_operator
+                        left: (identifier)
+                        right: (integer))))
+                  right: (call
+                    function: (double_dollar)
+                    arguments: (argument_list
+                      argument: (binary_operator
+                        left: (identifier)
+                        right: (integer)))))))))))))
 
 ================================================================================
 Procedure definition with no arguments
@@ -115,12 +120,12 @@ end procedure;
 ---
 
 (program
-  (procedure_definition
-    name: (identifier)
-    parameters: (parameters)
-    body: (block
-      (print_statement
-        (expression_statement
+  (expression_statement
+    (procedure_definition
+      name: (identifier)
+      parameters: (parameters)
+      body: (block
+        (print_statement
           (string))))))
 
 ================================================================================
@@ -136,25 +141,25 @@ end procedure;
 ---
 
 (program
-  (procedure_definition
-    name: (identifier)
-    parameters: (parameters
-      (ref_identifier
-        (identifier))
-      (ref_identifier
-        (identifier)))
-    body: (block
-      (print_statement
-        (expression_statement
+  (expression_statement
+    (procedure_definition
+      name: (identifier)
+      parameters: (parameters
+        (ref_identifier
+          (identifier))
+        (ref_identifier
           (identifier)))
-      (print_statement
-        (expression_statement
-          (identifier)))
-      (assignment
-        left: (identifier)
-        left: (identifier)
-        right: (identifier)
-        right: (identifier)))))
+      body: (block
+        (print_statement
+          (identifier))
+        (print_statement
+          (identifier))
+        (assignment
+          left: (identifier)
+          left: (identifier)
+          right: (identifier)
+          right: (identifier))))))
+
 
 
 ================================================================================
@@ -173,36 +178,37 @@ end procedure;
 
 ; adapted from example H2E5
 (program
-  (procedure_definition
-    name: (identifier)
-    parameters: (parameters
-      (identifier)
-      (identifier)
-      (identifier)
-      (ref_identifier
-        (identifier)))
-    body: (block
-      (if_statement
-        condition: (comparison_operator
-          left: (binary_operator
+  (assignment
+    left: (identifier)
+    right: (procedure_definition
+      parameters: (parameters
+        (identifier)
+        (identifier)
+        (identifier)
+        (ref_identifier
+          (identifier)))
+      body: (block
+        (if_statement
+          condition: (comparison_operator
             left: (binary_operator
-              left: (identifier)
-              right: (integer))
+              left: (binary_operator
+                left: (identifier)
+                right: (integer))
+              right: (binary_operator
+                left: (identifier)
+                right: (integer)))
             right: (binary_operator
               left: (identifier)
               right: (integer)))
-          right: (binary_operator
-            left: (identifier)
-            right: (integer)))
-        consequence: (block
-          (assignment
-            left: (identifier)
-            right: (true)))
-        alternative: (else_clause
           consequence: (block
             (assignment
               left: (identifier)
-              right: (false))))))))
+              right: (true)))
+          alternative: (else_clause
+            consequence: (block
+              (assignment
+                left: (identifier)
+                right: (false)))))))))
 
 ============================
 Inline function expressions
@@ -217,21 +223,28 @@ func< :Dir | Dir>;
 (program
   (assignment
     left: (identifier)
-    right: (inline_function
-      body: (binary_operator
-        left: (identifier)
-        right: (integer))))
+    right: (constructor
+      name: (identifier)
+      (constructor_elements
+        (binary_operator
+          left: (identifier)
+          right: (integer)))))
   (assignment
     left: (identifier)
-    right: (inline_procedure
-      body: (call
-        function: (identifier)
-        arguments: (argument_list
-          argument: (identifier)))))
+    right: (constructor
+      name: (identifier)
+      (constructor_elements
+        (call
+          function: (identifier)
+          arguments: (argument_list
+            argument: (identifier))))))
   (expression_statement
-    (inline_function
-      parameters: (identifier)
-      body: (identifier))))
+    (constructor
+      name: (identifier)
+      (constructor_elements
+        (constructor_options
+          (identifier))
+        (identifier)))))
 
 ============================
 Inline functions with parameters
@@ -245,23 +258,27 @@ print_and_return := proc<~result, value | Print(result, value)>;
 (program
   (assignment
     left: (identifier)
-    right: (inline_function
-      parameters: (identifier)
-      parameters: (identifier)
-      body: (binary_operator
-        left: (identifier)
-        right: (identifier))))
+    right: (constructor
+      name: (identifier)
+      (identifier)
+      (identifier)
+      (constructor_elements
+        (binary_operator
+          left: (identifier)
+          right: (identifier)))))
   (assignment
     left: (identifier)
-    right: (inline_procedure
-      parameters: (ref_identifier
-        (identifier))
-      parameters: (identifier)
-      body: (call
-        function: (identifier)
-        arguments: (argument_list
-          argument: (identifier)
-          argument: (identifier))))))
+    right: (constructor
+      name: (identifier)
+      (unary_operator
+        right: (identifier))
+      (identifier)
+      (constructor_elements
+        (call
+          function: (identifier)
+          arguments: (argument_list
+            argument: (identifier)
+            argument: (identifier)))))))
 
 ============================
 Optional parameters in procedures
@@ -274,42 +291,44 @@ procedure test3(a, b, c, d:Opt2 := 10); z := 3; end procedure;
 ---
 
 (program
-  (procedure_definition
-    name: (identifier)
-    parameters: (parameters
-      (identifier)
-      (identifier))
-    body: (block
-      (assignment
-        left: (identifier)
-        right: (integer))))
-  (procedure_definition
-    name: (identifier)
-    parameters: (parameters
-      (identifier)
-      (identifier)
-      (optional_parameter
-        name: (identifier)
-        value: (integer)))
-    body: (block
-      (assignment
-        left: (identifier)
-        right: (integer))))
-  (procedure_definition
-    name: (identifier)
-    parameters: (parameters
-      (identifier)
-      (identifier)
-      (identifier)
-      (identifier)
-      (optional_parameter
-        name: (identifier)
-        value: (integer)))
-    body: (block
-      (assignment
-        left: (identifier)
-        right: (integer)))))
-
+  (expression_statement
+    (procedure_definition
+      name: (identifier)
+      parameters: (parameters
+        (identifier)
+        (identifier))
+      body: (block
+        (assignment
+          left: (identifier)
+          right: (integer)))))
+  (expression_statement
+    (procedure_definition
+      name: (identifier)
+      parameters: (parameters
+        (identifier)
+        (identifier)
+        (optional_parameter
+          name: (identifier)
+          value: (integer)))
+      body: (block
+        (assignment
+          left: (identifier)
+          right: (integer)))))
+  (expression_statement
+    (procedure_definition
+      name: (identifier)
+      parameters: (parameters
+        (identifier)
+        (identifier)
+        (identifier)
+        (identifier)
+        (optional_parameter
+          name: (identifier)
+          value: (integer)))
+      body: (block
+        (assignment
+          left: (identifier)
+          right: (integer))))))
 
 ============================
 Exit statements
@@ -339,9 +358,8 @@ end try;
     error: (identifier)
     (block
       (print_statement
-        (expression_statement
-          (string)
-          (identifier))))))
+        (string)
+        (identifier)))))
 
 ============================
 More inline function examples
@@ -355,82 +373,98 @@ factorial := func<n | n le 1 select 1 else n * $$(n-1)>;
 fibonacci := func<n | n le 1 select n else $$(n-1) + $$(n-2)>;
 
 ---
+
 (program
   (assignment
     left: (identifier)
-    right: (inline_function
-      parameters: (identifier)
-      parameters: (identifier)
-      body: (binary_operator
-        left: (identifier)
-        right: (identifier))))
+    right: (constructor
+      name: (identifier)
+      (identifier)
+      (identifier)
+      (constructor_elements
+        (binary_operator
+          left: (identifier)
+          right: (identifier)))))
   (assignment
     left: (identifier)
-    right: (inline_function
-      parameters: (identifier)
-      parameters: (identifier)
-      body: (binary_operator
-        left: (identifier)
-        right: (identifier))))
+    right: (constructor
+      name: (identifier)
+      (identifier)
+      (identifier)
+      (constructor_elements
+        (binary_operator
+          left: (identifier)
+          right: (identifier)))))
   (assignment
     left: (identifier)
-    right: (inline_procedure
-      parameters: (ref_identifier
-        (identifier))
-      body: (call
-        function: (identifier)
-        arguments: (argument_list
-          argument: (unary_operator
-            right: (identifier))
-          argument: (integer)))))
+    right: (constructor
+      name: (identifier)
+      (unary_operator
+        right: (identifier))
+      (constructor_elements
+        (call
+          function: (identifier)
+          arguments: (argument_list
+            argument: (unary_operator
+              right: (identifier))
+            argument: (integer))))))
   (assignment
     left: (identifier)
-    right: (inline_procedure
-      parameters: (ref_identifier
-        (identifier))
-      parameters: (ref_identifier
-        (identifier))
-      body: (call
-        function: (identifier)
-        arguments: (argument_list
-          argument: (identifier)
-          argument: (identifier)))))
+    right: (constructor
+      name: (identifier)
+      (unary_operator
+        right: (identifier))
+      (unary_operator
+        right: (identifier))
+      (constructor_elements
+        (call
+          function: (identifier)
+          arguments: (argument_list
+            argument: (identifier)
+            argument: (identifier))))))
   (assignment
     left: (identifier)
-    right: (inline_function
-      parameters: (identifier)
-      body: (comparison_operator
-        left: (identifier)
-        right: (ternary_operator
-          conditional: (integer)
-          then: (integer)
-          else: (binary_operator
-            left: (identifier)
-            right: (double_dollar
-              (argument_list
-                argument: (binary_operator
-                  left: (identifier)
-                  right: (integer)))))))))
+    right: (constructor
+      name: (identifier)
+      (identifier)
+      (constructor_elements
+        (comparison_operator
+          left: (identifier)
+          right: (ternary_operator
+            conditional: (integer)
+            then: (integer)
+            else: (binary_operator
+              left: (identifier)
+              right: (call
+                function: (double_dollar)
+                arguments: (argument_list
+                  argument: (binary_operator
+                    left: (identifier)
+                    right: (integer))))))))))
   (assignment
     left: (identifier)
-    right: (inline_function
-      parameters: (identifier)
-      body: (comparison_operator
-        left: (identifier)
-        right: (ternary_operator
-          conditional: (integer)
-          then: (identifier)
-          else: (binary_operator
-            left: (double_dollar
-              (argument_list
-                argument: (binary_operator
-                  left: (identifier)
-                  right: (integer))))
-            right: (double_dollar
-              (argument_list
-                argument: (binary_operator
-                  left: (identifier)
-                  right: (integer))))))))))
+    right: (constructor
+      name: (identifier)
+      (identifier)
+      (constructor_elements
+        (comparison_operator
+          left: (identifier)
+          right: (ternary_operator
+            conditional: (integer)
+            then: (identifier)
+            else: (binary_operator
+              left: (call
+                function: (double_dollar)
+                arguments: (argument_list
+                  argument: (binary_operator
+                    left: (identifier)
+                    right: (integer))))
+              right: (call
+                function: (double_dollar)
+                arguments: (argument_list
+                  argument: (binary_operator
+                    left: (identifier)
+                    right: (integer)))))))))))
 
 ============================
 Call function upon definition
@@ -440,14 +474,15 @@ a, b := function() return 1, "a"; end function();
 
 ---
 (program
-  (expression_statement
-    (identifier)
-    (call
+  (assignment
+    left: (identifier)
+    left: (identifier)
+    right: (call
       function: (function_definition
-        name: (identifier)
         parameters: (parameters)
         body: (block
           (return_statement
             (integer)
             (string))))
       arguments: (argument_list))))
+

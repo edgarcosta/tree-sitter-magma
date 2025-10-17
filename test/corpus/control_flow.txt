@@ -55,17 +55,15 @@ end if;
           right: (integer))
         consequence: (block
           (print_statement
-            (expression_statement
-              (unary_operator
-                right: (identifier)))))
+            (unary_operator
+              right: (identifier))))
         alternative: (elif_clause
           condition: (comparison_operator
             left: (identifier)
             right: (integer))
           consequence: (block
             (print_statement
-              (expression_statement
-                (integer)))))
+              (integer))))
         alternative: (else_clause
           consequence: (block
             (assignment
@@ -85,7 +83,6 @@ case Sign(x):
    when -1:
       x, "is negative";
 end case;
-
 
 ---
 
@@ -112,8 +109,7 @@ end case;
           (identifier)
           (string))))
     (when_clause
-      match: (unary_operator
-        right: (integer))
+      match: (integer)
       consequence: (block
         (expression_statement
           (identifier)
@@ -163,47 +159,49 @@ myL:=func< A|
 (program
   (assignment
     left: (identifier)
-    right: (inline_function
-      parameters: (identifier)
-      body: (case_constructor
-        (call
-          function: (identifier)
-          arguments: (argument_list
-            argument: (identifier)))
-        match: (identifier)
-        consequence: (binary_operator
-          left: (call
+    right: (constructor
+      name: (identifier)
+      (identifier)
+      (constructor_elements
+        (case_constructor
+          (call
             function: (identifier)
             arguments: (argument_list
-              argument: (seq_slice
-                parent: (identifier)
-                (seqenum
-                  (integer)))))
-          right: (call
-            function: (identifier)
-            arguments: (argument_list
-              argument: (seq_slice
-                parent: (identifier)
-                (seqenum
-                  (integer))))))
-        match: (identifier)
-        consequence: (call
-          function: (identifier)
-          arguments: (argument_list
-            argument: (call
+              argument: (identifier)))
+          match: (identifier)
+          consequence: (binary_operator
+            left: (call
               function: (identifier)
               arguments: (argument_list
-                argument: (identifier)))
-            (optional_argument
-              argument: (identifier)
-              default_value: (string))))
-        match: (identifier)
-        consequence: (call
-          function: (identifier)
-          arguments: (argument_list
-            argument: (identifier)))
-        match: (identifier)
-        consequence: (false)))))
+                argument: (seq_slice
+                  parent: (identifier)
+                  (seqenum
+                    (integer)))))
+            right: (call
+              function: (identifier)
+              arguments: (argument_list
+                argument: (seq_slice
+                  parent: (identifier)
+                  (seqenum
+                    (integer))))))
+          match: (identifier)
+          consequence: (call
+            function: (identifier)
+            arguments: (argument_list
+              argument: (call
+                function: (identifier)
+                arguments: (argument_list
+                  argument: (identifier)))
+              (optional_argument
+                argument: (identifier)
+                default_value: (string))))
+          match: (identifier)
+          consequence: (call
+            function: (identifier)
+            arguments: (argument_list
+              argument: (identifier)))
+          match: (identifier)
+          consequence: (false))))))
 
 ================================================================================
 Ternary operator
@@ -222,8 +220,8 @@ s := (y gt 0) select 1 else -1;
           left: (identifier)
           right: (integer)))
       then: (integer)
-      else: (unary_operator
-        right: (integer)))))
+      else: (integer))))
+
 
 
 ================================================================================
@@ -248,8 +246,8 @@ Nested ternary operator
           right: (ternary_operator
             conditional: (integer)
             then: (integer)
-            else: (unary_operator
-              right: (integer))))))))
+            else: (integer)))))))
+
 
 ================================================================================
 Repeat statement
@@ -395,18 +393,12 @@ end for;
               end: (integer))))))
     body: (block
       (print_statement
-        (expression_statement
-          (string)
-          (identifier)
-          (identifier)
-          (call
-            function: (identifier)
-            arguments: (argument_list
-              argument: (identifier)
-              argument: (identifier)
-              argument: (identifier))))))))
-
-
-
-
-
+        (string)
+        (identifier)
+        (identifier)
+        (call
+          function: (identifier)
+          arguments: (argument_list
+            argument: (identifier)
+            argument: (identifier)
+            argument: (identifier)))))))

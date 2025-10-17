@@ -27,24 +27,19 @@ try print x; catch e; print x; end try;
   (try_catch_statement
     (block
       (print_statement
-        (expression_statement
-          (identifier))))
+        (identifier)))
     error: (identifier)
     (block
       (print_statement
-        (expression_statement
-          (identifier)))))
+        (identifier))))
   (try_catch_statement
     (block
       (print_statement
-        (expression_statement
-          (identifier))))
+        (identifier)))
     error: (identifier)
     (block
       (print_statement
-        (expression_statement
-          (identifier))))))
-
+        (identifier)))))
           
 ================================================================================
 vprint statement
@@ -232,21 +227,21 @@ exit compute_result();
     error: (identifier)
     (block
       (print_statement
-        (expression_statement
-          (string)
-          (identifier)))))
-  (procedure_definition
-    name: (identifier)
-    parameters: (parameters)
-    body: (block
-      (assignment
-        left: (identifier)
-        right: (integer))
-      (exit_statement
-        (identifier))
-      (assignment
-        left: (identifier)
-        right: (integer))))
+        (string)
+        (identifier))))
+  (expression_statement
+    (procedure_definition
+      name: (identifier)
+      parameters: (parameters)
+      body: (block
+        (assignment
+          left: (identifier)
+          right: (integer))
+        (exit_statement
+          (identifier))
+        (assignment
+          left: (identifier)
+          right: (integer)))))
   (exit_statement
     (call
       function: (identifier)
@@ -295,6 +290,6 @@ end try;
           (exit_statement
             (identifier))))
       (print_statement
-        (expression_statement
-          (string)
-          (identifier))))))
+        (string)
+        (identifier)))))
+

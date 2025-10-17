@@ -200,6 +200,25 @@ Multisets
         (integer)))))
 
 ==================
+Formal set
+==================
+
+{! x in PowerStructure(Map) !};
+
+---
+
+(program
+  (expression_statement
+    (aggregate
+      (formal_set
+        (binary_operator
+          left: (identifier)
+          right: (call
+            function: (identifier)
+            arguments: (argument_list
+              argument: (identifier))))))))
+
+==================
 Empty multiset
 ==================
 
@@ -430,8 +449,7 @@ exists(t){ <x, y> : x, y in [ t^3 : t in [-10..10] ] | x + y eq 218 };
                 right: (aggregate
                   (seqenum
                     (range
-                      start: (unary_operator
-                        right: (integer))
+                      start: (integer)
                       end: (integer))))))))
         condition: (comparison_operator
           left: (binary_operator

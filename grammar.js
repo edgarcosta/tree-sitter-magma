@@ -32,14 +32,15 @@ const PREC = {
 	hash: 29,                // TOK_HASH                            (nonassoc)
 	utilde: 30,              // TOK_UTILDE                          (nonassoc)
 	assigned: 31,            // TOK_ASSIGNED                        (right)
-	sq_bracket: 32,          // TOK_LEFTSQUARE                      (left)   // indexing
-	parenthesis: 33, 		 // TOK_LEFTROUND                   (left)
+    sq_bracket: 32,          // TOK_LEFTSQUARE                      (left)   // indexing
+    // FIXME: why are there two TOK_LEFTROUND?
+	parenthesis: 33,         // TOK_LEFTROUND                   (left)
 	backquote: 34,           // TOK_BACKQUOTE TOK_BACKQUOTE_BACKQUOTE (left)
 	call: 35                 // function application; keep as top-most
 };
 
 
-// TODO: move expression tests to new test file
+// TODO: move expression tests to separate test file
 
 module.exports = grammar({
     name: 'magma',
@@ -671,6 +672,8 @@ module.exports = grammar({
 	    'intrinsic',
 	    field('name', $.identifier),
 	    field('parameters', $._intrinsic_parameters),
+	    // TODO: find out what this means!
+	    optional('[~]'),
 	    optional(seq('->', commaSep1(field('return_type', $.type)))),
 	    field('docstring',
 		  seq('{',
@@ -1089,6 +1092,7 @@ module.exports = grammar({
 	tuple: $ => aggregate_of($, '<', '>', false),
 	set: $ => aggregate_of($, '{', '}', true),
 	indexed_set: $ => aggregate_of($, '{@', '@}', true),
+	formal_set: $ => aggregate_of($, '{!', '!}', false),
 	multiset: $ => aggregate_of($, '{*', '*}', true),
 
 	two_tuple: $ => prec.left(PREC.arrow, seq(
@@ -1105,6 +1109,7 @@ module.exports = grammar({
 	    $.set,
 	    $.indexed_set,
 	    $.multiset,
+	    $.formal_set
 	),
 
 

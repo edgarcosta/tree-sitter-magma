@@ -254,8 +254,7 @@ end intrinsic;
     name: (identifier)
     body: (block
       (print_statement
-        (expression_statement
-          (string))))))
+        (string)))))
 
 ============================
 Intrinsic with multiple reference parameters
