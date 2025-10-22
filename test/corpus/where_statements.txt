@@ -62,7 +62,7 @@ a eq b where a is 5;
     (program
       (expression_statement
         (where_expression
-          (comparison_operator
+          (binary_operator
             (identifier)
             (identifier))
           (identifier)

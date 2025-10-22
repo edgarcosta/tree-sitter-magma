@@ -96,7 +96,7 @@ Simple 2-tuple
 
 (program
   (expression_statement
-    (comparison_operator
+    (binary_operator
       left: (parenthesized_expression
         (aggregate
           (two_tuple
@@ -451,7 +451,7 @@ exists(t){ <x, y> : x, y in [ t^3 : t in [-10..10] ] | x + y eq 218 };
                     (range
                       start: (integer)
                       end: (integer))))))))
-        condition: (comparison_operator
+        condition: (binary_operator
           left: (binary_operator
             left: (identifier)
             right: (identifier))

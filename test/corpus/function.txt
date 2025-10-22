@@ -86,7 +86,7 @@ end function;
         (identifier))
       body: (block
         (if_statement
-          condition: (comparison_operator
+          condition: (binary_operator
             left: (identifier)
             right: (integer))
           consequence: (block
@@ -189,7 +189,7 @@ end procedure;
           (identifier)))
       body: (block
         (if_statement
-          condition: (comparison_operator
+          condition: (binary_operator
             left: (binary_operator
               left: (binary_operator
                 left: (identifier)
@@ -350,7 +350,7 @@ end try;
       (assignment
         left: (identifier)
         right: (integer))
-      (exit_statement
+      (exit_directive
         (identifier))
       (assignment
         left: (identifier)
@@ -428,7 +428,7 @@ fibonacci := func<n | n le 1 select n else $$(n-1) + $$(n-2)>;
       name: (identifier)
       (identifier)
       (constructor_elements
-        (comparison_operator
+        (binary_operator
           left: (identifier)
           right: (ternary_operator
             conditional: (integer)
@@ -447,7 +447,7 @@ fibonacci := func<n | n le 1 select n else $$(n-1) + $$(n-2)>;
       name: (identifier)
       (identifier)
       (constructor_elements
-        (comparison_operator
+        (binary_operator
           left: (identifier)
           right: (ternary_operator
             conditional: (integer)

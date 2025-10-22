@@ -98,7 +98,7 @@ assert2 1 + 2 eq 3;
 
 (program
   (assert_statement
-    (comparison_operator
+    (binary_operator
       left: (binary_operator
         left: (integer)
         right: (integer))
@@ -170,7 +170,7 @@ error if 1 gt 0, "Oops!";
 
 (program
   (error_statement
-    condition: (comparison_operator
+    condition: (binary_operator
       left: (integer)
       right: (integer))
     (string)))
@@ -219,7 +219,7 @@ exit compute_result();
       (assignment
         left: (identifier)
         right: (integer))
-      (exit_statement
+      (exit_directive
         (identifier))
       (assignment
         left: (identifier)
@@ -237,12 +237,12 @@ exit compute_result();
         (assignment
           left: (identifier)
           right: (integer))
-        (exit_statement
+        (exit_directive
           (identifier))
         (assignment
           left: (identifier)
           right: (integer)))))
-  (exit_statement
+  (exit_directive
     (call
       function: (identifier)
       arguments: (argument_list))))
@@ -272,22 +272,22 @@ end try;
       (if_statement
         condition: (identifier)
         consequence: (block
-          (exit_statement
+          (exit_directive
             (identifier))))
       (expression_statement
         (call
           function: (identifier)
           arguments: (argument_list)))
-      (exit_statement
+      (exit_directive
         (identifier)))
     error: (identifier)
     (block
       (if_statement
-        condition: (comparison_operator
+        condition: (binary_operator
           left: (identifier)
           right: (string))
         consequence: (block
-          (exit_statement
+          (exit_directive
             (identifier))))
       (print_statement
         (string)

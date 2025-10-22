@@ -45,12 +45,12 @@ end if;
 
 (program
   (if_statement
-    condition: (comparison_operator
+    condition: (binary_operator
       left: (identifier)
       right: (integer))
     consequence: (block
       (if_statement
-        condition: (comparison_operator
+        condition: (binary_operator
           left: (identifier)
           right: (integer))
         consequence: (block
@@ -58,7 +58,7 @@ end if;
             (unary_operator
               right: (identifier))))
         alternative: (elif_clause
-          condition: (comparison_operator
+          condition: (binary_operator
             left: (identifier)
             right: (integer))
           consequence: (block
@@ -216,7 +216,7 @@ s := (y gt 0) select 1 else -1;
     left: (identifier)
     right: (ternary_operator
       conditional: (parenthesized_expression
-        (comparison_operator
+        (binary_operator
           left: (identifier)
           right: (integer)))
       then: (integer)
@@ -236,12 +236,12 @@ Nested ternary operator
   (expression_statement
     (ternary_operator
       conditional: (parenthesized_expression
-        (comparison_operator
+        (binary_operator
           left: (identifier)
           right: (integer)))
       then: (integer)
       else: (parenthesized_expression
-        (comparison_operator
+        (binary_operator
           left: (identifier)
           right: (ternary_operator
             conditional: (integer)
@@ -283,7 +283,7 @@ until false;
             left: (identifier)
             right: (integer))))
       (if_statement
-        condition: (comparison_operator
+        condition: (binary_operator
           left: (identifier)
           right: (integer))
         consequence: (block

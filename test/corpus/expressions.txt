@@ -1,0 +1,15 @@
+===========================
+Eval expression
+===========================
+
+1 + (eval "return 1 + 2;");
+
+---
+
+(program
+  (expression_statement
+    (binary_operator
+      left: (integer)
+      right: (parenthesized_expression
+        (eval_expression
+          (string))))))
