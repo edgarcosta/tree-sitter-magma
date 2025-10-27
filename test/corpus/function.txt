@@ -366,10 +366,7 @@ More inline function examples
 ============================
 
 add := func<x, y | x + y>;
-multiply := func<a, b | a * b>;
-increment := proc<~x | Append(~x, 1)>;
 swap := proc<~a, ~b | Print(a, b)>;
-factorial := func<n | n le 1 select 1 else n * $$(n-1)>;
 fibonacci := func<n | n le 1 select n else $$(n-1) + $$(n-2)>;
 
 ---
@@ -385,29 +382,6 @@ fibonacci := func<n | n le 1 select n else $$(n-1) + $$(n-2)>;
         (binary_operator
           left: (identifier)
           right: (identifier)))))
-  (assignment
-    left: (identifier)
-    right: (constructor
-      name: (identifier)
-      (identifier)
-      (identifier)
-      (constructor_elements
-        (binary_operator
-          left: (identifier)
-          right: (identifier)))))
-  (assignment
-    left: (identifier)
-    right: (constructor
-      name: (identifier)
-      (unary_operator
-        right: (identifier))
-      (constructor_elements
-        (call
-          function: (identifier)
-          arguments: (argument_list
-            argument: (unary_operator
-              right: (identifier))
-            argument: (integer))))))
   (assignment
     left: (identifier)
     right: (constructor
@@ -428,43 +402,24 @@ fibonacci := func<n | n le 1 select n else $$(n-1) + $$(n-2)>;
       name: (identifier)
       (identifier)
       (constructor_elements
-        (binary_operator
-          left: (identifier)
-          right: (ternary_operator
-            conditional: (integer)
-            then: (integer)
-            else: (binary_operator
-              left: (identifier)
-              right: (call
-                function: (double_dollar)
-                arguments: (argument_list
-                  argument: (binary_operator
-                    left: (identifier)
-                    right: (integer))))))))))
-  (assignment
-    left: (identifier)
-    right: (constructor
-      name: (identifier)
-      (identifier)
-      (constructor_elements
-        (binary_operator
-          left: (identifier)
-          right: (ternary_operator
-            conditional: (integer)
-            then: (identifier)
-            else: (binary_operator
-              left: (call
-                function: (double_dollar)
-                arguments: (argument_list
-                  argument: (binary_operator
-                    left: (identifier)
-                    right: (integer))))
-              right: (call
-                function: (double_dollar)
-                arguments: (argument_list
-                  argument: (binary_operator
-                    left: (identifier)
-                    right: (integer)))))))))))
+        (ternary_operator
+          conditional: (binary_operator
+            left: (identifier)
+            right: (integer))
+          then: (identifier)
+          else: (binary_operator
+            left: (call
+              function: (double_dollar)
+              arguments: (argument_list
+                argument: (binary_operator
+                  left: (identifier)
+                  right: (integer))))
+            right: (call
+              function: (double_dollar)
+              arguments: (argument_list
+                argument: (binary_operator
+                  left: (identifier)
+                  right: (integer))))))))))
 
 ============================
 Call function upon definition

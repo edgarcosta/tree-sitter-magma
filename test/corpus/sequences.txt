@@ -100,8 +100,8 @@ Simple 2-tuple
       left: (parenthesized_expression
         (aggregate
           (two_tuple
-            (integer)
-            (integer))))
+            left: (integer)
+            right: (integer))))
       right: (aggregate
         (tuple
           (integer)
@@ -119,11 +119,11 @@ Iterated 2-tuples
   (expression_statement
     (aggregate
       (two_tuple
-        (aggregate
+        left: (aggregate
           (two_tuple
-            (integer)
-            (integer)))
-        (integer)))))
+            left: (integer)
+            right: (integer)))
+        right: (integer)))))
 
 ==================
 Sets
@@ -153,6 +153,27 @@ Empty set
   (expression_statement
     (aggregate
       (set))))
+
+==================
+Set progression
+==================
+
+{ FiniteField(13) | 1..10 by 2 };
+
+---
+
+(program
+  (expression_statement
+    (aggregate
+      (set
+        universe: (call
+          function: (identifier)
+          arguments: (argument_list
+            argument: (integer)))
+        (range
+          start: (integer)
+          end: (integer)
+          by: (integer))))))
 
 ==================
 Indexed sets
@@ -230,7 +251,6 @@ Empty multiset
   (expression_statement
     (aggregate
       (multiset))))
-
 
 ==================
 Sequences with expressions
@@ -329,7 +349,6 @@ Reduction of aggregates
           (integer)
           (integer))))))
 
-
 ==================
 Sequence with ..
 ==================
@@ -373,6 +392,7 @@ Subsequence
 [x^2 : x in [1..5]];
 
 --- 
+
 (program
   (expression_statement
     (aggregate
@@ -380,14 +400,14 @@ Subsequence
         (binary_operator
           left: (identifier)
           right: (integer))
-        (binary_operator
-          left: (identifier)
-          right: (aggregate
-            (seqenum
-              (range
-                start: (integer)
-                end: (integer)))))))))
-
+        (iter_vars
+          (iter_var
+            variable: (identifier)
+            (aggregate
+              (seqenum
+                (range
+                  start: (integer)
+                  end: (integer))))))))))
 
 ====================================
 Subsequence with index and condition
@@ -404,20 +424,20 @@ Subsequence with index and condition
         (binary_operator
           left: (identifier)
           right: (identifier))
-        (binary_operator
-          left: (aggregate
-            (two_tuple
-              (identifier)
-              (identifier)))
-          right: (aggregate
-            (seqenum
-              (range
-                start: (integer)
-                end: (integer)))))
+        (iter_vars
+          (iter_var
+            variable: (identifier)
+            index: (identifier)
+            (aggregate
+              (seqenum
+                (range
+                  start: (integer)
+                  end: (integer))))))
         condition: (call
           function: (identifier)
           arguments: (argument_list
             argument: (identifier)))))))
+
 
 ====================================
 Existential quantifier on set
@@ -436,21 +456,23 @@ exists(t){ <x, y> : x, y in [ t^3 : t in [-10..10] ] | x + y eq 218 };
           (tuple
             (identifier)
             (identifier)))
-        (identifier)
-        (binary_operator
-          left: (identifier)
-          right: (aggregate
-            (seqenum
-              (binary_operator
-                left: (identifier)
-                right: (integer))
-              (binary_operator
-                left: (identifier)
-                right: (aggregate
-                  (seqenum
-                    (range
-                      start: (integer)
-                      end: (integer))))))))
+        (iter_vars
+          (iter_var
+            variable: (identifier)
+            variable: (identifier)
+            (aggregate
+              (seqenum
+                (binary_operator
+                  left: (identifier)
+                  right: (integer))
+                (iter_vars
+                  (iter_var
+                    variable: (identifier)
+                    (aggregate
+                      (seqenum
+                        (range
+                          start: (integer)
+                          end: (integer))))))))))
         condition: (binary_operator
           left: (binary_operator
             left: (identifier)
@@ -470,13 +492,15 @@ random{ x : x in F | IsPrimitive(x) };
     (random_element_of_set
       (set
         (identifier)
-        (binary_operator
-          left: (identifier)
-          right: (identifier))
+        (iter_vars
+          (iter_var
+            variable: (identifier)
+            (identifier)))
         condition: (call
           function: (identifier)
           arguments: (argument_list
             argument: (identifier)))))))
+
 
 ====================================
 Representative of set
@@ -493,14 +517,37 @@ rep {x^2 : x in [1..5] | IsEven(x) };
         (binary_operator
           left: (identifier)
           right: (integer))
-        (binary_operator
-          left: (identifier)
-          right: (aggregate
-            (seqenum
-              (range
-                start: (integer)
-                end: (integer)))))
+        (iter_vars
+          (iter_var
+            variable: (identifier)
+            (aggregate
+              (seqenum
+                (range
+                  start: (integer)
+                  end: (integer))))))
         condition: (call
           function: (identifier)
           arguments: (argument_list
             argument: (identifier)))))))
+
+====================================
+Common iterator construct
+====================================
+
+[1..#S+1];
+
+---
+
+(program
+  (expression_statement
+    (aggregate
+      (seqenum
+        (range
+          start: (integer)
+          end: (binary_operator
+            left: (unary_operator
+              right: (identifier))
+            right: (integer)))))))
+
+
+

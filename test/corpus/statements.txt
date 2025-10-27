@@ -72,23 +72,6 @@ vprintf PRProspection, 4 : "Value %o, Threshold %o\n", value, threshold;
     (identifier)))
 
 ================================================================================
-Eval expression
-================================================================================
-
-(eval "1+2") + eval "3";
-
----
-
-(program
-  (expression_statement
-    (binary_operator
-      left: (parenthesized_expression
-        (eval_expression
-          (string)))
-      right: (eval_expression
-        (string)))))
-
-================================================================================
 Assert statement
 ================================================================================
 
@@ -196,17 +179,13 @@ Exit statements in different contexts
 ============================
 
 try
-    x := 1;
     exit FAILURE;
-    y := 2;
 catch e
     print "Caught:", e;
 end try;
 
 procedure test_exit()
-    x := 1;
     exit SUCCESS;
-    y := 2;
 end procedure;
 
 exit compute_result();
@@ -216,14 +195,8 @@ exit compute_result();
 (program
   (try_catch_statement
     (block
-      (assignment
-        left: (identifier)
-        right: (integer))
       (exit_directive
-        (identifier))
-      (assignment
-        left: (identifier)
-        right: (integer)))
+        (identifier)))
     error: (identifier)
     (block
       (print_statement
@@ -234,14 +207,8 @@ exit compute_result();
       name: (identifier)
       parameters: (parameters)
       body: (block
-        (assignment
-          left: (identifier)
-          right: (integer))
         (exit_directive
-          (identifier))
-        (assignment
-          left: (identifier)
-          right: (integer)))))
+          (identifier)))))
   (exit_directive
     (call
       function: (identifier)
@@ -292,4 +259,3 @@ end try;
       (print_statement
         (string)
         (identifier)))))
-

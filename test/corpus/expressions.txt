@@ -13,3 +13,38 @@ Eval expression
       right: (parenthesized_expression
         (eval_expression
           (string))))))
+
+================================================================================
+multiple eval expressions
+================================================================================
+
+(eval "1+2") + eval "3";
+
+---
+
+(program
+  (expression_statement
+    (binary_operator
+      left: (parenthesized_expression
+        (eval_expression
+          (string)))
+      right: (eval_expression
+        (string)))))
+
+================================================================================
+Semantically wrong eval expression
+================================================================================
+
+// This is syntactically correct, but semantically wrong!
+eval "1 + 2" + eval "3";
+
+---
+(program
+  (comment)
+  (expression_statement
+    (eval_expression
+      (binary_operator
+        left: (string)
+        right: (eval_expression
+          (string))))))
+

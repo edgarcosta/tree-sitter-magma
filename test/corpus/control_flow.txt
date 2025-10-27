@@ -228,26 +228,23 @@ s := (y gt 0) select 1 else -1;
 Nested ternary operator
 ================================================================================
 
-(y gt 0) select 1 else (y eq 0 select 0 else -1);
+y gt 0 select 1 else y eq 0 select 0 else -1;
 
 ---
 
 (program
   (expression_statement
     (ternary_operator
-      conditional: (parenthesized_expression
-        (binary_operator
-          left: (identifier)
-          right: (integer)))
+      conditional: (binary_operator
+        left: (identifier)
+        right: (integer))
       then: (integer)
-      else: (parenthesized_expression
-        (binary_operator
+      else: (ternary_operator
+        conditional: (binary_operator
           left: (identifier)
-          right: (ternary_operator
-            conditional: (integer)
-            then: (integer)
-            else: (integer)))))))
-
+          right: (integer))
+        then: (integer)
+        else: (integer)))))
 
 ================================================================================
 Repeat statement

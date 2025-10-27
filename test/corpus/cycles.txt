@@ -1,0 +1,103 @@
+=======================================================
+Group cycles
+=======================================================
+S := SymmetricGroup(5);
+(1,2)(3,4);
+(x where x is 1,2)(3,4);
+---
+
+(program
+  (assignment
+    left: (identifier)
+    right: (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (integer))))
+  (expression_statement
+    (cycle_or_commutator_product
+      (cycle_or_commutator
+        (integer)
+        (integer))
+      (cycle_or_commutator
+        (integer)
+        (integer))))
+  (expression_statement
+    (cycle_or_commutator_product
+      (cycle_or_commutator
+        (where_expression
+          value: (identifier)
+          variables: (identifier)
+          definition: (integer))
+        (integer))
+      (cycle_or_commutator
+        (integer)
+        (integer)))))
+
+=======================================================
+Function calls - easily confused with cycles
+=======================================================
+
+f(1,2);
+(f)(1,2);
+f((1,2));
+
+---
+
+(program
+  (expression_statement
+    (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (integer)
+        argument: (integer))))
+  (expression_statement
+    (call
+      function: (parenthesized_expression
+        (identifier))
+      arguments: (argument_list
+        argument: (integer)
+        argument: (integer))))
+  (expression_statement
+    (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (cycle_or_commutator_product
+          (cycle_or_commutator
+            (integer)
+            (integer)))))))
+
+=======================================================
+More complicated function calls
+=======================================================
+
+L := [function(x,y) return x + y; end function];
+(L[1])((1,2));
+
+---
+
+(program
+  (assignment
+    left: (identifier)
+    right: (aggregate
+      (seqenum
+        (function_definition
+          parameters: (parameters
+            (identifier)
+            (identifier))
+          body: (block
+            (return_statement
+              (binary_operator
+                left: (identifier)
+                right: (identifier))))))))
+  (expression_statement
+    (call
+      function: (parenthesized_expression
+        (seq_slice
+          parent: (identifier)
+          (seqenum
+            (integer))))
+      arguments: (argument_list
+        argument: (cycle_or_commutator_product
+          (cycle_or_commutator
+            (integer)
+            (integer)))))))

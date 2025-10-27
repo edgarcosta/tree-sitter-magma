@@ -76,6 +76,7 @@ module.exports = grammar({
 	$._simple_statement,
 	$._compound_statement,
 	$._left_hand_side,
+	$._callable
 	// $._right_hand_side,
     ],
 
@@ -158,7 +159,7 @@ module.exports = grammar({
 	// eval actually works like an expression:
 	// (eval "1 + 2") + eval "3"; // returns 6.
 	// Note that
-	// eval "1 + 2" + eval "3"; // Errors
+	// val "1 + 2" + eval "3"; // Errors
 	// but currently it parses just fine
 
 	eval_expression: $ => prec.left(PREC.eval, seq(
@@ -303,11 +304,12 @@ module.exports = grammar({
 		['assigned', PREC.assigned],
 	    ];
 	    // @ts-ignore
-	    return choice(...table.map(([operator, precedence]) => prec.right(precedence, seq(
+	    return choice(...table.map(([operator, precedence]) => prec.left(precedence, seq(
 		field('operator', operator),
-		field('right', $.expression),
+		field('right', $.primary_expression),
 	    ))));
 	},
+	
 	
 	binary_operator: $ => {
 	    const table = [
@@ -348,10 +350,10 @@ module.exports = grammar({
 
 	    // @ts-ignore
 	    return choice(...table.map(([fn, operator, precedence]) => fn(precedence, seq(
-		field('left', $.expression),
+		field('left', $.primary_expression),
 		// @ts-ignore
 		field('operator', operator),
-		field('right', $.expression),
+		field('right', $.primary_expression),
 	    ))));
 	},
 	
@@ -473,8 +475,8 @@ module.exports = grammar({
 
 	// --- Expressions ---
 
-	expression: $ => choice($.primary_expression,
-				$.eval_expression),
+	expression: $ => $.primary_expression,
+				
 				
 
 	parenthesized_expression: $ => prec(
@@ -510,7 +512,9 @@ module.exports = grammar({
 	    $.aggregate,
 	    $._set_operator,
 	    $.group_relation,
-	    $._definition,	
+	    $._definition,
+	    $.eval_expression,
+	    $.cycle_or_commutator_product,
 	),
 
 	
@@ -549,28 +553,6 @@ module.exports = grammar({
 	    'end',
 	    'procedure',
 	),
-
-	// inline_function: $ => choice(
-	//     seq(
-	// 	'func',
-	// 	'<',
-	// 	optional(field('parameters', $._parameter_list)),
-	// 	'|',
-	// 	field('body', $.primary_expression),
-	// 	'>'
-	//     )
-	// ),
-
-	// inline_procedure: $ => choice(
-	//     seq(
-	// 	'proc',
-	// 	'<',
-	// 	optional(field('parameters', $._parameter_list)),
-	// 	'|',
-	// 	field('body', $.primary_expression),
-	// 	'>'
-	//     )
-	// ),
 
 	_parameter_list: $ => choice(
 	    seq(commaSep1($.parameter), optional($._optional_parameters)),
@@ -661,11 +643,24 @@ module.exports = grammar({
 	    $.type,
 	),
 
+	_callable: $ => choice(
+	    $.identifier,
+	    $.call,
+	    $.attribute,
+	    $.seq_slice,
+	    $.dollar,
+	    $.double_dollar,
+	    $.where_expression,
+	    $._set_operator,
+	    $._definition,
+	    $.eval_expression,
+	    $.parenthesized_expression,
+	    $._constructors,
+	),
 
-	call: $ => prec.right(PREC.call, seq(
-	    field('function',  $.primary_expression),
+	call: $ => prec.left(PREC.call, seq(
+	    field('function',  $._callable),
 	    field('arguments', $.argument_list),
-	    
 	)),
 
 	argument_list: $ => seq(
@@ -786,7 +781,6 @@ module.exports = grammar({
 	_constructors: $ => choice(
 	    $.constructor,
 	    $.recformat_constructor,
-	    $.cycle_or_commutator,
 	    $.case_constructor,
 	),
 	
@@ -855,21 +849,23 @@ module.exports = grammar({
 	    '>'
 	),
 
-	// NB: these are usually parsed as function calls!!
-	cycle_or_commutator: $ => prec.left(
+	cycle_or_commutator_product: $ => prec.left(
 	    choice(
 		$.literal_cycle,
-		repeat1(seq(
-		    '(',
-		    commaSep2($.primary_expression),
-		    ')')))
+		repeat1($.cycle_or_commutator))
 	),
 
+	cycle_or_commutator: $ => seq(
+	    '(',
+	    commaSep2($.primary_expression),
+	    ')'
+	),
+    
 	literal_cycle: $ => prec.right(seq(
 	    '\\(',
-	    commaSep1($.integer),
+	    commaSep2($.integer),
 	    ')',
-	    optional(repeat1(seq('(', commaSep1($.integer), ')')))
+	    optional(repeat1(seq('(', commaSep2($.integer), ')')))
 	)),
 	
 	
@@ -934,15 +930,6 @@ module.exports = grammar({
 		   seq('random', commaSep1($.identifier), 'in', $.primary_expression))
 	),
 
-	// _iterable_binding: $ => seq(
-	//     commaSep1(choice($.two_tuple, $.identifier)),
-	//     'in',
-	//     field('parent', $.primary_expression)
-	// ),
-
-	// needs to take into account all the variations in
-	// https://magma.maths.usyd.edu.au/magma/handbook/text/13#86
-				     
 	while_statement: $ => seq(
 	    'while',
 	    field('condition', $.expression),
@@ -1018,10 +1005,20 @@ module.exports = grammar({
 	multiset: $ => aggregate_of($, '{*', '*}', true),
 
 	two_tuple: $ => prec.left(PREC.arrow, seq(
-	    $.primary_expression,
+	    field('left', $.primary_expression),
 	    '->',
-	    $.primary_expression
+	    field('right', $.primary_expression)
 	)),
+
+				     
+	iter_vars: $ => commaSep1($.iter_var),
+
+	iter_var: $ => seq(
+	    commaSep1(field('variable', $.identifier)),
+	    field('index', optional(seq('->', $.identifier))),
+	    'in',
+	    $.primary_expression
+	),
 	
 	aggregate: $ => choice(
 	    $.seqenum,
@@ -1062,7 +1059,6 @@ module.exports = grammar({
 	random_element_of_set: $ => seq('random', $.set),
 
 	representative_of_set: $ => prec.left(seq('rep', $.set)),
-	// representative_of_set: $ => seq("blablabla", $.identifier),
 
 	
 	seq_slice: $ => prec.left(PREC.sq_bracket, seq(
@@ -1144,7 +1140,7 @@ function aggregate_of($, left, right, has_universe) {
 	    // specify parent(s) of element(s)
 	    optional(
 		seq(':',
-		    commaSep1($.primary_expression),
+		    $.iter_vars,
 		    // conditions
 		    optional(
 			seq('|', field('condition', $.primary_expression)))
