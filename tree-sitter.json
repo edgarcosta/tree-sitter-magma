@@ -5,7 +5,8 @@
       "source-directory": ".",
       "grammar-path": "grammar.js",
       "scope": "source.magma",
-      "file-types": ["magma", "m"]
+      "file-types": ["magma", "m"],
+      "highlights": "queries/highlights.scm"
     }
   ],
   "metadata": {

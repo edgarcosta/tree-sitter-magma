@@ -506,9 +506,9 @@ module.exports = grammar({
 	    $.false,
 	    $.call,
 	    $.dollar,
-	    $.double_dollar,		// MAYBE: should this really be here?
-	    $.parenthesized_expression, // should this really be here?
-	    $.where_expression,	// This should definitely be here
+	    $.double_dollar,	
+	    $.parenthesized_expression,
+	    $.where_expression,
 	    $.aggregate,
 	    $._set_operator,
 	    $.group_relation,
@@ -604,17 +604,15 @@ module.exports = grammar({
 	    optional('[~]'),
 	    optional(seq('->', commaSep1(field('return_type', $.type)))),
 	    field('docstring',
-		  seq('{',
-		     /(?:[^\\}]|\\.)*/,	// matches anything that's not a squirly brace
-		      '}',
-		      optional(';'),
-		     )
+		  seq('{', $.doc_string, '}',
+		      optional(';'))
 		 ),
 	    optional(field('body', $.block)),
 	    'end',
 	    'intrinsic',
 	    optional(';')
 	),
+	doc_string: _ => /(?:[^\\}]|\\.)*/,	// matches anything that's not a closing squirly brace
 
 	_intrinsic_parameters: $ => seq(
 	    '(',
@@ -755,7 +753,7 @@ module.exports = grammar({
 	// Maps
 
 	map: $ => seq(
-	    choice('hom', 'map', 'pmap', 'iso'),
+	    field('type', choice('hom', 'map', 'pmap', 'iso')),
 	    '<',
 	    field('domain', $.primary_expression),
 	    '->',

@@ -11,7 +11,7 @@
     "computational-algebra",
     "syntax-highlighting"
   ],
-  "author": "Tree-sitter Magma Contributors",
+  "author": "Edgar Costa and Håvard Damm-Johnsen",
   "license": "MIT",
   "repository": {
     "type": "git",
