@@ -64,8 +64,10 @@
 ":=" @operator)
 
 (intrinsic_definition
+  "intrinsic" @keyword.function
+ docstring: (doc_string) @string.documentation
  ["intrinsic" "end"] @keyword.function
- docstring: (doc_string) @string.documentation)
+ )
 
 (function_definition
  ["function" "end"] @keyword.function)
@@ -76,14 +78,9 @@
 (return_statement
  "return" @keyword.return)
 
-(return_statement
- "return" @keyword.return)
-
 [(break_statement)
  (continue_statement)] @keyword.repeat
 
-(attribute_declaration
- "attributes" @attribute.declaration)
 
 
 
@@ -99,6 +96,16 @@
 
 (declare_statement
  "declare" @keyword.directive)
+
+(attribute_declaration
+ "attributes" @attribute.declaration)
+
+(type_declaration
+ "type" @attribute.declaration)
+
+(verbosity_declaration
+ "verbose" @attribute.declaration)
+
 
 [(print_statement)
  (vprint_statement)
