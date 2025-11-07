@@ -41,6 +41,7 @@ const PREC = {
 module.exports = grammar({
     name: 'magma',
 
+    word: $ => $.identifier,
     extras: $ => [
 	// whitespace & line continuation (taken from https://github.com/tree-sitter/tree-sitter-c/blob/master/grammar.js)
 	/\s|\\\r?\n/,       
@@ -50,7 +51,6 @@ module.exports = grammar({
     
     conflicts: $ => [
 	[$.expression_statement, $.assignment],
-	[$.map, $.identifier],
     ],
     // A _statement_ is any valid sequence of symbols followed by a semicolon
     // eg. a variable assignment, a function/intrinsic definition
@@ -65,19 +65,17 @@ module.exports = grammar({
     supertypes: $ => [
 	$._simple_statement,
 	$._compound_statement,
-	$.expression,
+	// $.expression,
 	$.primary_expression,
 	$.parameter,
     ],
 
     
     inline: $ => [
-	// $._map_keyword,
 	$._simple_statement,
 	$._compound_statement,
 	$._left_hand_side,
 	$._callable
-	// $._right_hand_side,
     ],
 
     externals: $ => [
@@ -85,19 +83,15 @@ module.exports = grammar({
     ],
     
     rules: {
-	program: $ => choice(
-	    repeat(choice(
-		// $.expression,
-		$._statement,
-	    )),
-	    seq()
-	),
+	program: $ => repeat($._statement),
 	
 	// Comments
 	// taken from
 	// https://github.com/tree-sitter/tree-sitter-c/blob/master/grammar.js
 	comment: _ => token(choice(
+	    // inline comment
 	    seq('//', /(\\+(.|\r?\n)|[^\\\n])*/),
+	    // block comment
 	    seq(
 		'/*',
 		/[^*]*\*+([^/*][^*]*\*+)*/,
@@ -135,14 +129,12 @@ module.exports = grammar({
 	    $.error_statement,
 	),
 
-	expression_statement: $ => commaSep1(choice(
-	    $.primary_expression, $.print_level_statement)),
+	expression_statement: $ => commaSep1(
+	    choice($.primary_expression, $.print_level_statement)),
 
 	return_statement: $ => seq(
 	    "return",
-	    // Procedures return nothing, and can only have empty return statements, as an early exit
-	    // Functions must have a return statement with an expression (semantic validation)
-	    optional(commaSep1($.expression))
+	    optional(commaSep1($.primary_expression))
 	),
 
 
@@ -156,16 +148,9 @@ module.exports = grammar({
 	    optional($.identifier)
 	),
 
-	// eval actually works like an expression:
-	// (eval "1 + 2") + eval "3"; // returns 6.
-	// Note that
-	// val "1 + 2" + eval "3"; // Errors
-	// but currently it parses just fine
-
 	eval_expression: $ => prec.left(PREC.eval, seq(
 	    'eval',
 	    // can be anything that evaluates to a string!
-	    // Also, can be used with round brackets
 	    $.primary_expression
 	)),
 
@@ -195,10 +180,9 @@ module.exports = grammar({
 	    choice('Default' , 'Maximal', 'Minimal', 'Magma', 'Hex', 'Latex')
 	),
 	
-
 	assert_statement: $ => seq(
 	    choice('assert', 'assert2', 'assert3'),
-	    $.expression,
+	    $.primary_expression,
 	),
 
 	require_statement: $ => choice(
@@ -208,9 +192,9 @@ module.exports = grammar({
 
 	_require: $ => seq(
 	    'require',
-	    $.expression,
+	    $.primary_expression,
 	    ':',
-	    commaSep1($.expression),
+	    commaSep1($.primary_expression),
 	),
 	
 	_require_cond: $ => seq(
@@ -226,7 +210,7 @@ module.exports = grammar({
 
 	vtime_statement: $ => seq(
 	    'vtime',
-	    $.expression,
+	    $.primary_expression,
 	    field('flag', $.identifier),
 	    optional(seq(',', field('n', $.integer))),
 	    ':',
@@ -234,19 +218,18 @@ module.exports = grammar({
 	),
 	
 	
-	declare_statement: $ => seq(
+	declare_statement: $ => prec.left(seq(
 	    'declare',
 	    choice(
 		$.attribute_declaration,
 		$.type_declaration,
 		$.verbosity_declaration,
-	    )
-	),
+	    ))),
 
-	// MAYBE: should these be directives? Doesn't affect parsing directly, unless we can access _directive token
+	// MAYBE: should these be directives? This is purely organizational, doesn't affect parsing directly.
 	local_statement: $ => seq(
 	    'local',
-	    commaSep1($.expression),
+	    commaSep1($.primary_expression),
 	),
 	
 	attribute_declaration: $ => seq(
@@ -285,11 +268,11 @@ module.exports = grammar({
 	error_statement: $ => seq(
 	    'error',
 	    choice(
-		commaSep1($.expression),
+		commaSep1($.primary_expression),
 		seq('if',
-		    field('condition', $.expression),
+		    field('condition', $.primary_expression),
 		    ',',
-		    commaSep1($.expression)))
+		    commaSep1($.primary_expression)))
 	),
 
 	// MAYBE: consider moving 'not' to separate function
@@ -310,7 +293,8 @@ module.exports = grammar({
 	    ))));
 	},
 	
-	
+	// We add whitespace to letter operators to aid error recovery;
+	// One should test whether this actually makes a difference.
 	binary_operator: $ => {
 	    const table = [
 		[prec.left, '+', PREC.plus],
@@ -358,17 +342,17 @@ module.exports = grammar({
 	},
 	
 	group_relation : $ => prec.left(PREC.eq, seq(
-	    field('left', $.expression),
+	    field('left', $.primary_expression),
 	    '=',
-	    field('right', $.expression)
+	    field('right', $.primary_expression)
 	)),
 	
-	ternary_operator: $ => prec(PREC.ternary, seq(
+	ternary_operator: $ => prec.right(PREC.ternary, seq(
 	    field('conditional', $.primary_expression),
 	    'select',
-	    field('then', $.expression),
+	    field('then', $.primary_expression),
 	    'else',
-	    field('else', $.expression))
+	    field('else', $.primary_expression))
 	),
 
 	reduct_operator: $ => {
@@ -376,17 +360,17 @@ module.exports = grammar({
 
 	    // @ts-ignore
 	    return choice(...table.map((sym) => prec.left(PREC.reduct, seq(
-		field('operator', '&'+ sym),
-		field('right', $.expression),
+		field('operator', '&' + sym),
+		field('right', $.primary_expression),
 	    ))));
 	},
 	
 	where_expression: $ => prec.left(PREC.where, seq(
-	    field('value', $.expression),
+	    field('value', $.primary_expression),
 	    'where',
 	    field('variables', commaSep1(choice($.identifier, $.anonymous_identifier))),
 	    field('operator', choice('is', ':=')),
-	    field('definition', $.expression),
+	    field('definition', $.primary_expression),
 	)),
 	
 	boolean_operator: $ => {
@@ -397,34 +381,13 @@ module.exports = grammar({
 	    ];
 	    // @ts-ignore
 	    return choice(...table.map(([operator, precedence]) => prec.left(precedence, seq(
-		field('left', $.expression),
+		field('left', $.primary_expression),
 		// @ts-ignore
 		field('operator', operator),
-		field('right', $.expression),
+		field('right', $.primary_expression),
 	    ))));
 	},
 	
-	
-	// // Delimiters
-	// leftangle: $ => '<',
-	// rightangle: $ => '>',
-	// leftbrace: $ => '{',
-	// rightbrace: $ => '}',
-	// leftsquare: $ => '[',
-	// rightsquare: $ => ']',
-	// leftround: $ => '(',
-	// rightround: $ => ')',
-
-	// // Special bracket combinations
-	// leftbrace_at: $ => '{@',
-	// at_rightbrace: $ => '@}',
-	// leftbrace_bang: $ => '{!',
-	// bang_rightbrace: $ => '!}',
-	// leftbrace_star: $ => '{*',
-	// star_rightbrace: $ => '*}',
-	// leftsquare_star: $ => '[*',
-	// star_rightsquare: $ => '*]',
-
 
 	// // Keywords - functions and procedures
 
@@ -440,10 +403,13 @@ module.exports = grammar({
 	    $.import_directive,
 	),
 	
-	// should only appear alone:
 	clear: $ => 'clear',
 	freeze: $ => 'freeze',
-	exit_directive: $ => seq(choice('quit', 'exit'), optional($.primary_expression)),
+
+	exit_directive: $ => seq(
+	    choice('quit', 'exit'),
+	    optional($.primary_expression)
+	),
 	
 	forward: $ => seq(
 	    'forward',
@@ -475,15 +441,13 @@ module.exports = grammar({
 
 	// --- Expressions ---
 
-	expression: $ => $.primary_expression,
-				
-				
+	// expression: $ => $.primary_expression,
 
 	parenthesized_expression: $ => prec(
 	    PREC.parenthesized_expression,
 	    seq(
 		'(',
-		$.expression,
+		$.primary_expression,
 		')'
 	    )),
 
@@ -499,7 +463,7 @@ module.exports = grammar({
 	    $.reduct_operator,
 	    $.boolean_operator,
 	    $.attribute,
-	    $.map,
+	    // $.map,
 	    $._constructors,
 	    $.seq_slice,
 	    $.true,
@@ -696,7 +660,7 @@ module.exports = grammar({
 		seq(
 		    field('left', $.primary_expression),
 		    symbol + ':=',
-		    field('right', $.expression)
+		    field('right', $.primary_expression)
 		)));
 	},
 
@@ -706,7 +670,7 @@ module.exports = grammar({
 		$.anonymous_constructor
 	    )),
 
-	_right_hand_side: $ => commaSep1($.expression),
+	_right_hand_side: $ => commaSep1($.primary_expression),
 
 	anonymous_constructor: $ => seq(
 	    $.anonymous_identifier,
@@ -747,31 +711,7 @@ module.exports = grammar({
 	    prec.left(PREC.backquote, seq(
 		$.primary_expression,
 		'``',
-		$.expression))
-	),
-
-	// Maps
-
-	map: $ => seq(
-	    field('type', choice('hom', 'map', 'pmap', 'iso')),
-	    '<',
-	    field('domain', $.primary_expression),
-	    '->',
-	    field('codomain', $.primary_expression),
-	    '|',
-	    field('map_constructor', $._map_constructor),
-	    optional(
-		seq(':', commaSep1($.optional_parameter))
-	    ),
-	    '>',
-	),
-
-	_map_constructor: $ => commaSep1(
-	    seq(
-		optional(
-		    seq(field('domain_element', $.primary_expression),
-			choice(':->', '->'))),
-		field('image', $.primary_expression)),
+		$.primary_expression))
 	),
 
 	// Constructors
@@ -810,7 +750,8 @@ module.exports = grammar({
 	    '|',
 	    optional(commaSep1(
 		choice($.primary_expression,
-		       $._simple_assignment)))
+		       $._simple_assignment,
+		       $.map_constructor)))
 	),
 	
 	constructor_options: $ => seq(
@@ -818,6 +759,12 @@ module.exports = grammar({
 	    optional(commaSep1(
 		choice($.primary_expression,
 		       $._simple_assignment)))
+	),
+
+	map_constructor: $ => seq(
+	    field('domain_element', $.primary_expression),
+	    ':->',
+	    field('image', $.primary_expression)
 	),
 	
 	field_definition: $ => seq(
@@ -880,12 +827,12 @@ module.exports = grammar({
 	
 	if_statement: $ => seq(
 	    'if',
-	    field('condition', $.expression),
+	    field('condition', $.primary_expression),
 	    'then',
 	    optional(';'),
 	    optional(field('consequence', $.block)),
-	    repeat(field('alternative', $.elif_clause)),
-	    optional(field('alternative', $.else_clause)),
+	    repeat(field('elif', $.elif_clause)),
+	    optional(field('default', $.else_clause)),
 	    'end',
 	    'if'
 	),
@@ -893,11 +840,10 @@ module.exports = grammar({
 	elif_clause: $ => seq(
 	    'elif',
 	    optional(';'),
-	    field('condition', $.expression),
+	    field('condition', $.primary_expression),
 	    'then',
 	    optional(';'),
 	    optional(field('consequence', $.block)),
-	    // optional(';')
 	),
 
 	else_clause: $ => seq(
@@ -930,7 +876,7 @@ module.exports = grammar({
 
 	while_statement: $ => seq(
 	    'while',
-	    field('condition', $.expression),
+	    field('condition', $.primary_expression),
 	    'do',
 	    optional(';'),
 	    field('body', $.block),
@@ -942,7 +888,7 @@ module.exports = grammar({
 	    'repeat',
 	    field('body', $.block),
 	    'until',
-	    field('condition', $.expression),
+	    field('condition', $.primary_expression),
 	),
 	
 
@@ -979,8 +925,7 @@ module.exports = grammar({
 	// handles regular identifiers as well as quoted ones (e.g., foo, 'foo', or even 'foo.1 + 2')
 	// also need to manually add in keywords which are not reserved
 	// see https://magma.maths.usyd.edu.au/magma/handbook/text/85
-	identifier: $ => choice(/(?:'[^']*'|[_a-zA-Z]+[a-zA-Z0-9_]*)/,
-				'hom', 'map', 'pmap', 'iso', 'rep'), 
+	identifier: $ => /(?:'[^']*'|[_a-zA-Z]+[a-zA-Z0-9_]*)/, 
 	
 	anonymous_identifier: _ => '_',
 	block: $ => repeat1($._statement),

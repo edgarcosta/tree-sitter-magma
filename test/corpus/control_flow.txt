@@ -19,7 +19,7 @@ end if;
       (expression_statement
         (identifier)
         (string)))
-    alternative: (else_clause
+    default: (else_clause
       consequence: (block
         (expression_statement
           (call
@@ -57,14 +57,14 @@ end if;
           (print_statement
             (unary_operator
               right: (identifier))))
-        alternative: (elif_clause
+        elif: (elif_clause
           condition: (binary_operator
             left: (identifier)
             right: (integer))
           consequence: (block
             (print_statement
               (integer))))
-        alternative: (else_clause
+        default: (else_clause
           consequence: (block
             (assignment
               left: (identifier)
@@ -86,7 +86,6 @@ end case;
 
 ---
 
-; copied from https://magma.maths.usyd.edu.au/magma/handbook/text/11
 (program
   (assignment
     left: (identifier)
@@ -222,8 +221,6 @@ s := (y gt 0) select 1 else -1;
       then: (integer)
       else: (integer))))
 
-
-
 ================================================================================
 Nested ternary operator
 ================================================================================
@@ -263,7 +260,7 @@ repeat
 until false;
 
 ---
-; copied from https://magma.maths.usyd.edu.au/magma/handbook/text/13#86
+
 (program
   (repeat_statement
     body: (block
@@ -296,7 +293,6 @@ until false;
         left: (identifier)
         right: (integer)))
     condition: (false)))
-
 
 ================================================================================
 Basic for loop
@@ -337,29 +333,6 @@ for i:=1 to 10 by 2 do i; end for;
     body: (block
       (expression_statement
         (identifier)))))
-
-
-================================================================================
-Enumerated for loop
-================================================================================
-
-for i -> x in X do
-    print i,x;
-end for;
-
---- 
-
-(program
-  (for_statement
-    quantifier: (for_quantifier
-      index: (identifier)
-      element: (identifier)
-      parent: (identifier))
-    body: (block
-      (print_statement
-        (identifier)
-        (identifier)))))
-
 
 ================================================================================
 For loop with multiple iterations

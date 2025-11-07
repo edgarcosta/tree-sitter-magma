@@ -15,7 +15,6 @@ end intrinsic;
       (identifier))
     docstring: (doc_string)))
 
-    
 ================================================================================
 Intrinsic test with arguments
 ================================================================================
@@ -39,7 +38,7 @@ end intrinsic;
         (binary_operator
           left: (identifier)
           right: (identifier))))))
-	    
+
 ================================================================================
 Attributes
 ================================================================================
@@ -185,7 +184,7 @@ end intrinsic;
               (assignment
                 left: (identifier)
                 right: (identifier)))
-            alternative: (else_clause
+            default: (else_clause
               consequence: (block
                 (assignment
                   left: (identifier)
@@ -336,7 +335,7 @@ end intrinsic;
         (identifier)))))
 
 ================================================================================
-Basic intrinsic test without trailing semicolon 
+Basic intrinsic test without trailing semicolon
 ================================================================================
 
 intrinsic test() -> type

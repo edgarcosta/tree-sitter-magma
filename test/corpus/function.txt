@@ -5,6 +5,7 @@ Function call
 EllipticCurve("11a1");
 
 ---
+
 (program
   (expression_statement
     (call
@@ -13,7 +14,7 @@ EllipticCurve("11a1");
         argument: (string)))))
 
 ================================================================================
-Basic definition function 
+Basic definition function
 ================================================================================
 
 function test()
@@ -77,7 +78,6 @@ end function;
 
 ---
 
-; copied from example H2E1
 (program
   (assignment
     left: (identifier)
@@ -92,7 +92,7 @@ end function;
           consequence: (block
             (return_statement
               (integer)))
-          alternative: (else_clause
+          default: (else_clause
             consequence: (block
               (return_statement
                 (binary_operator
@@ -160,8 +160,6 @@ end procedure;
           right: (identifier)
           right: (identifier))))))
 
-
-
 ================================================================================
 Procedure definition with := notation
 ================================================================================
@@ -176,7 +174,6 @@ end procedure;
 
 ---
 
-; adapted from example H2E5
 (program
   (assignment
     left: (identifier)
@@ -204,7 +201,7 @@ end procedure;
             (assignment
               left: (identifier)
               right: (true)))
-          alternative: (else_clause
+          default: (else_clause
             consequence: (block
               (assignment
                 left: (identifier)
@@ -428,6 +425,7 @@ Call function upon definition
 a, b := function() return 1, "a"; end function();
 
 ---
+
 (program
   (assignment
     left: (identifier)
@@ -440,4 +438,3 @@ a, b := function() return 1, "a"; end function();
             (integer)
             (string))))
       arguments: (argument_list))))
-

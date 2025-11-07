@@ -50,14 +50,6 @@
    ":" @punctuation.special)?
  )
 
-(map
- type: _ @variable.builtin
- "<"  @constructor
- "->" @operator
- [">" "|"] @constructor)
-
-
-
 ;; definitions
 
 (assignment
