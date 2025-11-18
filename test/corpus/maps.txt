@@ -10,10 +10,9 @@ map<A -> B | Graph>;
   (expression_statement
     (constructor
       name: (identifier)
-      (aggregate
-        (two_tuple
-          left: (identifier)
-          right: (identifier)))
+      (two_tuple
+        left: (identifier)
+        right: (identifier))
       (constructor_elements
         (identifier)))))
 
@@ -29,13 +28,12 @@ pmap<k -> Parent(f) | x :-> Evaluate(P!Eltseq(x),sigma)>;
   (expression_statement
     (constructor
       name: (identifier)
-      (aggregate
-        (two_tuple
-          left: (identifier)
-          right: (call
-            function: (identifier)
-            arguments: (argument_list
-              argument: (identifier)))))
+      (two_tuple
+        left: (identifier)
+        right: (call
+          function: (identifier)
+          arguments: (argument_list
+            argument: (identifier))))
       (constructor_elements
         (map_constructor
           domain_element: (identifier)
@@ -62,51 +60,48 @@ hom<Mod -> N | W![3, 2, 1, 0], W![3*(M!F.1 + 1), 2*(M!F.1 + 1), M!F.1 + 1, 0] >;
   (expression_statement
     (constructor
       name: (identifier)
-      (aggregate
-        (two_tuple
-          left: (identifier)
-          right: (identifier)))
+      (two_tuple
+        left: (identifier)
+        right: (identifier))
       (constructor_elements
         (binary_operator
           left: (identifier)
-          right: (aggregate
-            (seqenum
-              (integer)
-              (integer)
-              (integer)
-              (integer))))
+          right: (seqenum
+            (integer)
+            (integer)
+            (integer)
+            (integer)))
         (binary_operator
           left: (identifier)
-          right: (aggregate
-            (seqenum
-              (binary_operator
-                left: (integer)
-                right: (parenthesized_expression
-                  (binary_operator
-                    left: (binary_operator
-                      left: (identifier)
-                      right: (binary_operator
-                        left: (identifier)
-                        right: (integer)))
-                    right: (integer))))
-              (binary_operator
-                left: (integer)
-                right: (parenthesized_expression
-                  (binary_operator
-                    left: (binary_operator
-                      left: (identifier)
-                      right: (binary_operator
-                        left: (identifier)
-                        right: (integer)))
-                    right: (integer))))
-              (binary_operator
-                left: (binary_operator
-                  left: (identifier)
-                  right: (binary_operator
+          right: (seqenum
+            (binary_operator
+              left: (integer)
+              right: (parenthesized_expression
+                (binary_operator
+                  left: (binary_operator
                     left: (identifier)
-                    right: (integer)))
-                right: (integer))
-              (integer))))))))
+                    right: (binary_operator
+                      left: (identifier)
+                      right: (integer)))
+                  right: (integer))))
+            (binary_operator
+              left: (integer)
+              right: (parenthesized_expression
+                (binary_operator
+                  left: (binary_operator
+                    left: (identifier)
+                    right: (binary_operator
+                      left: (identifier)
+                      right: (integer)))
+                  right: (integer))))
+            (binary_operator
+              left: (binary_operator
+                left: (identifier)
+                right: (binary_operator
+                  left: (identifier)
+                  right: (integer)))
+              right: (integer))
+            (integer)))))))
 
 ================================================================================
 Hom with several entries
@@ -120,16 +115,15 @@ hom<Domain(f) -> Codomain(g) | g :-> 1, h :-> Sqrt(2)/2>;
   (expression_statement
     (constructor
       name: (identifier)
-      (aggregate
-        (two_tuple
-          left: (call
-            function: (identifier)
-            arguments: (argument_list
-              argument: (identifier)))
-          right: (call
-            function: (identifier)
-            arguments: (argument_list
-              argument: (identifier)))))
+      (two_tuple
+        left: (call
+          function: (identifier)
+          arguments: (argument_list
+            argument: (identifier)))
+        right: (call
+          function: (identifier)
+          arguments: (argument_list
+            argument: (identifier))))
       (constructor_elements
         (map_constructor
           domain_element: (identifier)
@@ -155,22 +149,18 @@ pmap< F -> Zm | <1, 1>, <z, 0>, <z^2, 4> >;
   (expression_statement
     (constructor
       name: (identifier)
-      (aggregate
-        (two_tuple
-          left: (identifier)
-          right: (identifier)))
+      (two_tuple
+        left: (identifier)
+        right: (identifier))
       (constructor_elements
-        (aggregate
-          (tuple
-            (integer)
-            (integer)))
-        (aggregate
-          (tuple
-            (identifier)
-            (integer)))
-        (aggregate
-          (tuple
-            (binary_operator
-              left: (identifier)
-              right: (integer))
-            (integer)))))))
+        (tuple
+          (integer)
+          (integer))
+        (tuple
+          (identifier)
+          (integer))
+        (tuple
+          (binary_operator
+            left: (identifier)
+            right: (integer))
+          (integer))))))

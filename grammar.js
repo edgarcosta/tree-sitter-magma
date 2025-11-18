@@ -68,6 +68,7 @@ module.exports = grammar({
 	// $.expression,
 	$.primary_expression,
 	$.parameter,
+	$.aggregate
     ],
 
     
@@ -493,27 +494,25 @@ module.exports = grammar({
 
 	// Function definition - semantic validation should ensure it has a return statement with expression
 	function_definition: $ => seq(
-	    // choice(
 	    'function',
-	    optional(field('name', $.identifier)),
-		// seq(field('name', $.identifier), ':=', 'function')
-	    // ),
-	    field('parameters', $.parameters),
-	    optional(';'),
-	    optional(field('body', $.block)),
+	    $._function_contents,
 	    'end',
 	    'function',
 	),
+
+	// introduce this partly for refactoring, partly to target with
+	// indentation rules
 	
-	procedure_definition: $ => seq(
-	    // choice(
-	    'procedure',
+	_function_contents: $ => seq(
 	    optional(field('name', $.identifier)),
-		// seq(field('name', $.identifier), ':=', 'procedure')
-	    // ),
 	    field('parameters', $.parameters),
 	    optional(';'),
-	    optional(field('body', $.block)),
+	    field('body', optional($.block)),
+	),
+	
+	procedure_definition: $ => seq(
+	    'procedure',
+	    $._function_contents,
 	    'end',
 	    'procedure',
 	),
@@ -566,17 +565,17 @@ module.exports = grammar({
 	    field('name', $.identifier),
 	    field('parameters', $._intrinsic_parameters),
 	    optional('[~]'),
-	    optional(seq('->', commaSep1(field('return_type', $.type)))),
-	    field('docstring',
-		  seq('{', $.doc_string, '}',
-		      optional(';'))
-		 ),
-	    optional(field('body', $.block)),
+	    field('return_type', optional(seq('->', commaSep1($.type)))),
+	    // this is to make it easier to indent properly
+	    field('docstring', $.doc_string),
+	    field('body', optional($.block)),
 	    'end',
 	    'intrinsic',
 	    optional(';')
 	),
-	doc_string: _ => /(?:[^\\}]|\\.)*/,	// matches anything that's not a closing squirly brace
+	doc_string: $ => token(seq('{',/(?:[^\\}]|\\.)*/, '}',
+	    optional(';'))),
+	    	// matches anything that's not a closing squirly brace
 
 	_intrinsic_parameters: $ => seq(
 	    '(',
@@ -928,6 +927,7 @@ module.exports = grammar({
 	identifier: $ => /(?:'[^']*'|[_a-zA-Z]+[a-zA-Z0-9_]*)/, 
 	
 	anonymous_identifier: _ => '_',
+
 	block: $ => repeat1($._statement),
 
 	// Aggregates

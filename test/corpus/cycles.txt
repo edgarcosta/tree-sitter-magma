@@ -78,17 +78,16 @@ L := [function(x,y) return x + y; end function];
 (program
   (assignment
     left: (identifier)
-    right: (aggregate
-      (seqenum
-        (function_definition
-          parameters: (parameters
-            (identifier)
-            (identifier))
-          body: (block
-            (return_statement
-              (binary_operator
-                left: (identifier)
-                right: (identifier))))))))
+    right: (seqenum
+      (function_definition
+        parameters: (parameters
+          (identifier)
+          (identifier))
+        body: (block
+          (return_statement
+            (binary_operator
+              left: (identifier)
+              right: (identifier)))))))
   (expression_statement
     (call
       function: (parenthesized_expression

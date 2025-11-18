@@ -1,6 +1,6 @@
 ;; Highlighting queries
 
-;; The highlight group names (e.g. @keyword.function )
+;; The highlight group names (e.g. @keyword.function)
 ;; are specific to neovim, but queries are quite general.
 
 (comment) @comment
@@ -132,16 +132,10 @@
  ["repeat" "end"] @keyword.repeat)
 
 (if_statement
- ["if" "end" "then"] @keyword.conditional)
+ ["if" "end" "then" "elif" "else"] @keyword.conditional)
 
 (case_statement
  ["case" "end" "else"] @keyword.conditional)
-
-(elif_clause
- "elif" "then" @keyword.conditional)
-
-(else_clause
- "else" @keyword.conditional)
 
 (ternary_operator
  ["select" "else"] @keyword.conditional.ternary)

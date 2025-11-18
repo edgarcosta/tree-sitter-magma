@@ -349,18 +349,16 @@ end for;
     quantifier: (for_quantifier
       (binary_operator
         left: (identifier)
-        right: (aggregate
-          (seqenum
-            (range
-              start: (integer)
-              end: (integer)))))
+        right: (seqenum
+          (range
+            start: (integer)
+            end: (integer))))
       (binary_operator
         left: (identifier)
-        right: (aggregate
-          (seqenum
-            (range
-              start: (integer)
-              end: (integer))))))
+        right: (seqenum
+          (range
+            start: (integer)
+            end: (integer)))))
     body: (block
       (print_statement
         (string)
