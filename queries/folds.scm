@@ -1,4 +1,22 @@
-; Placeholder folding queries - will be expanded in later tasks
-; Function bodies, control blocks, etc. will be added as grammar rules are implemented
+;; Code folding queries for Magma
 
-; TODO: Add folding patterns as grammar rules are implemented
+;; Definitions
+(function_definition) @fold
+(procedure_definition) @fold
+(intrinsic_definition) @fold
+
+;; Control flow
+(if_statement) @fold
+(for_statement) @fold
+(while_statement) @fold
+(repeat_statement) @fold
+(case_statement) @fold
+(try_catch_statement) @fold
+
+;; Constructors (multi-line)
+(constructor) @fold
+(recformat_constructor) @fold
+(case_constructor) @fold
+
+;; Block comments
+(comment) @fold
