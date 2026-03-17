@@ -27,6 +27,20 @@ Word operators with spaces: div
       right: (integer))))
 
 ================================================================================
+Word operators with space only on right: div
+================================================================================
+
+3div 5;
+
+---
+
+(program
+  (expression_statement
+    (binary_operator
+      left: (integer)
+      right: (integer))))
+
+================================================================================
 Word operators require spaces: mod
 ================================================================================
 
