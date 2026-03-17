@@ -157,16 +157,23 @@ declare attributes MyRat: Numer, Denom;
 Local variables declaration
 ================================================================================
 
-local A, outers, NS, CS;
+procedure test()
+    local A, outers, NS, CS;
+end procedure;
 
 ---
 
 (program
-  (local_statement
-    (identifier)
-    (identifier)
-    (identifier)
-    (identifier)))
+  (expression_statement
+    (procedure_definition
+      name: (identifier)
+      parameters: (parameters)
+      body: (block
+        (local_statement
+          (identifier)
+          (identifier)
+          (identifier)
+          (identifier))))))
 
 ================================================================================
 Error statement
