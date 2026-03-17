@@ -610,6 +610,7 @@ module.exports = grammar({
 
 	_callable: $ => choice(
 	    $.identifier,
+	    alias('rep', $.identifier),
 	    $.call,
 	    $.attribute,
 	    $.seq_slice,
