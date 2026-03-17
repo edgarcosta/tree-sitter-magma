@@ -739,7 +739,8 @@ module.exports = grammar({
 	),
 
 	_simple_assignment: $ => seq(
-	    $.identifier, ':=', $.primary_expression
+	    choice($.identifier, alias('rep', $.identifier)),
+	    ':=', $.primary_expression
 	),
 	// constructor_field: $ => seq(
 	//     choice(commaSep1($.primary_expression),
@@ -1030,7 +1031,7 @@ module.exports = grammar({
 	    ));
 	},
 	// Matches double-quoted strings with backslash escape sequences
-	string: $ => /"[^"\\]*(?:\\.[^"\\]*)*"/,
+	string: $ => /"[^"\\]*(?:\\(.|\r?\n)[^"\\]*)*"/,
 
     },
 
