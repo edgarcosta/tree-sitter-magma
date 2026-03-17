@@ -480,10 +480,6 @@ module.exports = grammar({
 	    $._definition,
 	    $.eval_expression,
 	    $.cycle_or_commutator_product,
-	    // Allow keyword 'rep' to be used as an identifier.
-	    // In Magma, 'rep' is not a reserved word and is commonly
-	    // used as a variable name.
-	    alias('rep', $.identifier),
 	),
 
 	
@@ -610,7 +606,6 @@ module.exports = grammar({
 
 	_callable: $ => choice(
 	    $.identifier,
-	    alias('rep', $.identifier),
 	    $.call,
 	    $.attribute,
 	    $.seq_slice,
@@ -739,8 +734,7 @@ module.exports = grammar({
 	),
 
 	_simple_assignment: $ => seq(
-	    choice($.identifier, alias('rep', $.identifier)),
-	    ':=', $.primary_expression
+	    $.identifier, ':=', $.primary_expression
 	),
 	// constructor_field: $ => seq(
 	//     choice(commaSep1($.primary_expression),
@@ -869,7 +863,7 @@ module.exports = grammar({
 	),
 
 	for_quantifier: $ => choice(
-	    commaSep1(seq(choice($.identifier, alias('rep', $.identifier)),
+	    commaSep1(seq($.identifier,
 		':=', field('from', $.primary_expression),
 		'to', field('to', $.primary_expression),
 		optional(seq(
@@ -1007,7 +1001,8 @@ module.exports = grammar({
 
 	random_element_of_set: $ => seq('random', $.set),
 
-	representative_of_set: $ => prec.left(seq('rep', $.set)),
+	// `rep S` is just a function call — `rep` is not reserved in Magma.
+	representative_of_set: $ => prec.left(seq($.identifier, $.set)),
 
 	
 	seq_slice: $ => prec.left(PREC.sq_bracket, seq(

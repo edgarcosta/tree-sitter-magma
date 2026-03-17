@@ -457,6 +457,7 @@ rep {x^2 : x in [1..5] | IsEven(x) };
 (program
   (expression_statement
     (representative_of_set
+      (identifier)
       (set
         (binary_operator
           left: (identifier)
