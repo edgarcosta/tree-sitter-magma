@@ -1,0 +1,135 @@
+================================================================================
+Dollar with numeric index
+================================================================================
+
+$1;
+
+---
+
+(program
+  (expression_statement
+    (dollar)))
+
+================================================================================
+Dollar with multi-digit index
+================================================================================
+
+$23;
+
+---
+
+(program
+  (expression_statement
+    (dollar)))
+
+================================================================================
+Assert with dollar reference
+================================================================================
+
+assert $1 eq 0;
+
+---
+
+(program
+  (assert_statement
+    (binary_operator
+      left: (dollar)
+      right: (integer))))
+
+================================================================================
+Requirege statement
+================================================================================
+
+requirege x, 0;
+
+---
+
+(program
+  (require_statement
+    (identifier)
+    (integer)))
+
+================================================================================
+Requirerange statement
+================================================================================
+
+requirerange x, 0, 10;
+
+---
+
+(program
+  (require_statement
+    (identifier)
+    (integer)
+    (integer)))
+
+================================================================================
+Readi statement
+================================================================================
+
+readi x, "Enter value: ";
+
+---
+
+(program
+  (read_statement
+    identifier: (identifier)
+    prompt: (string)))
+
+================================================================================
+Constructor with options
+================================================================================
+
+LieAlgebra< t | T : Rep:= "Dense" >;
+
+---
+
+(program
+  (expression_statement
+    (constructor
+      name: (identifier)
+      (identifier)
+      (constructor_elements
+        (identifier))
+      (constructor_options
+        (identifier)
+        (string)))))
+
+================================================================================
+Time with multiple assignment targets
+================================================================================
+
+time cv, m := ClosestVectors(D, w);
+
+---
+
+(program
+  (time_statement
+    (assignment
+      left: (identifier)
+      left: (identifier)
+      right: (call
+        function: (identifier)
+        arguments: (argument_list
+          argument: (identifier)
+          argument: (identifier))))))
+
+================================================================================
+Anonymous constructor assignment
+================================================================================
+
+_<x> := PolynomialRing(Rationals());
+
+---
+
+(program
+  (assignment
+    left: (anonymous_constructor
+      (anonymous_identifier)
+      (identifier))
+    right: (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (call
+          function: (identifier)
+          arguments: (argument_list))))))
