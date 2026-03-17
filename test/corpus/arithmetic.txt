@@ -69,6 +69,31 @@ Integers
       right: (integer))))
 
 ================================================================================
+Strings with escape sequences
+================================================================================
+
+x := "hello\nworld";
+y := "say \"hi\"";
+z := "path\\to\\file";
+w := "tab\there";
+
+---
+
+(program
+  (assignment
+    left: (identifier)
+    right: (string))
+  (assignment
+    left: (identifier)
+    right: (string))
+  (assignment
+    left: (identifier)
+    right: (string))
+  (assignment
+    left: (identifier)
+    right: (string)))
+
+================================================================================
 Reals
 ================================================================================
 

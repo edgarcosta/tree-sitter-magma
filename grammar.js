@@ -1021,8 +1021,8 @@ module.exports = grammar({
 		)
 	    ));
 	},
-	// AI generated, hopefully works as intended
-	string: $ => /"[^"\\]*(?:\\(?:[\s\S])[^"\\]*)*"/,
+	// Matches double-quoted strings with backslash escape sequences
+	string: $ => /"[^"\\]*(?:\\.[^"\\]*)*"/,
 
     },
 
