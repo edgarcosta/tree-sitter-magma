@@ -10,12 +10,14 @@ PACKAGE_DIR="${1:-/opt/magma/current/package}"
 SCRIPT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 TOTAL=0
 ERRORS=0
-ERROR_CONTEXTS=""
+ERROR_LOG=$(mktemp)
 
 if [ ! -d "$PACKAGE_DIR" ]; then
     echo "Error: Directory $PACKAGE_DIR does not exist" >&2
     exit 1
 fi
+
+trap "rm -f $ERROR_LOG" EXIT
 
 while IFS= read -r -d '' file; do
     TOTAL=$((TOTAL + 1))
@@ -23,11 +25,12 @@ while IFS= read -r -d '' file; do
     if echo "$output" | grep -q "ERROR"; then
         ERRORS=$((ERRORS + 1))
         echo "FAIL: $file"
-        # Extract ERROR context lines for later analysis
-        error_lines=$(echo "$output" | grep "ERROR" | head -5)
-        echo "$error_lines"
-        ERROR_CONTEXTS="${ERROR_CONTEXTS}${error_lines}"$'\n'
+        # Extract ERROR context lines and write to temp file
+        echo "$output" | grep "ERROR" | head -5 | tee -a "$ERROR_LOG"
         echo "---"
+    fi
+    if (( TOTAL % 200 == 0 )); then
+        echo "[progress] $TOTAL files processed, $ERRORS errors so far..." >&2
     fi
 done < <(find "$PACKAGE_DIR" -name "*.m" -type f -print0 | sort -z)
 
@@ -44,4 +47,4 @@ fi
 echo "========================================="
 echo ""
 echo "Most common ERROR contexts:"
-echo "$ERROR_CONTEXTS" | sed 's/^[[:space:]]*//' | grep -oP '\(ERROR[^)]*\)|\(MISSING[^)]*\)' | sort | uniq -c | sort -rn | head -20
+sed 's/^[[:space:]]*//' "$ERROR_LOG" | grep -oP '\(ERROR[^)]*\)|\(MISSING[^)]*\)' | sort | uniq -c | sort -rn | head -20
