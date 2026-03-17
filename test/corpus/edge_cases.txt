@@ -1,0 +1,305 @@
+================================================================================
+Augmented assignment: cat
+================================================================================
+
+x cat:= [1];
+
+---
+
+(program
+  (augmented_assignment
+    left: (identifier)
+    right: (seqenum
+      (integer))))
+
+================================================================================
+Augmented assignment: multiply
+================================================================================
+
+x *:= 2;
+
+---
+
+(program
+  (augmented_assignment
+    left: (identifier)
+    right: (integer)))
+
+================================================================================
+Augmented assignment: join
+================================================================================
+
+x join:= S;
+
+---
+
+(program
+  (augmented_assignment
+    left: (identifier)
+    right: (identifier)))
+
+================================================================================
+Augmented assignment: diff
+================================================================================
+
+x diff:= S;
+
+---
+
+(program
+  (augmented_assignment
+    left: (identifier)
+    right: (identifier)))
+
+================================================================================
+Augmented assignment: power
+================================================================================
+
+x ^:= 2;
+
+---
+
+(program
+  (augmented_assignment
+    left: (identifier)
+    right: (integer)))
+
+================================================================================
+Chained backtick attribute access
+================================================================================
+
+CM`gr`sg;
+
+---
+
+(program
+  (expression_statement
+    (attribute
+      (attribute
+        (identifier)
+        (identifier))
+      (identifier))))
+
+================================================================================
+Double-hat operator
+================================================================================
+
+x := 0^^5;
+
+---
+
+(program
+  (assignment
+    left: (identifier)
+    right: (binary_operator
+      left: (integer)
+      right: (integer))))
+
+================================================================================
+Double-at operator (preimage)
+================================================================================
+
+x := (Q!y)@@f;
+
+---
+
+(program
+  (assignment
+    left: (identifier)
+    right: (binary_operator
+      left: (parenthesized_expression
+        (binary_operator
+          left: (identifier)
+          right: (identifier)))
+      right: (identifier))))
+
+================================================================================
+Delete attribute
+================================================================================
+
+delete x`attr;
+
+---
+
+(program
+  (delete
+    (attribute
+      (identifier)
+      (identifier))))
+
+================================================================================
+Existential quantifier with variable binding
+================================================================================
+
+x := exists(t){ i : i in [1..10] | IsPrime(i) };
+
+---
+
+(program
+  (assignment
+    left: (identifier)
+    right: (quantified_set
+      (identifier)
+      (set
+        (identifier)
+        (iter_vars
+          (iter_var
+            variable: (identifier)
+            (seqenum
+              (range
+                start: (integer)
+                end: (integer)))))
+        condition: (call
+          function: (identifier)
+          arguments: (argument_list
+            argument: (identifier)))))))
+
+================================================================================
+Cardinality operator
+================================================================================
+
+x := #S;
+
+---
+
+(program
+  (assignment
+    left: (identifier)
+    right: (unary_operator
+      right: (identifier))))
+
+================================================================================
+Tilde operator
+================================================================================
+
+x := ~y;
+
+---
+
+(program
+  (assignment
+    left: (identifier)
+    right: (unary_operator
+      right: (identifier))))
+
+================================================================================
+Assigned operator
+================================================================================
+
+x := assigned y;
+
+---
+
+(program
+  (assignment
+    left: (identifier)
+    right: (unary_operator
+      right: (identifier))))
+
+================================================================================
+Double dollar recursive call
+================================================================================
+
+n := $$(S);
+
+---
+
+(program
+  (assignment
+    left: (identifier)
+    right: (call
+      function: (double_dollar)
+      arguments: (argument_list
+        argument: (identifier)))))
+
+================================================================================
+Import directive
+================================================================================
+
+import "foo.m" : Bar, Baz;
+
+---
+
+(program
+  (import_directive
+    filename: (string)
+    variable: (identifier)
+    variable: (identifier)))
+
+================================================================================
+Restore directive
+================================================================================
+
+restore "session.sav";
+
+---
+
+(program
+  (save_directive
+    (string)))
+
+================================================================================
+Multiset with expressions
+================================================================================
+
+cf := {* t : t in ChiefFactors(G) *};
+
+---
+
+(program
+  (assignment
+    left: (identifier)
+    right: (multiset
+      (identifier)
+      (iter_vars
+        (iter_var
+          variable: (identifier)
+          (call
+            function: (identifier)
+            arguments: (argument_list
+              argument: (identifier))))))))
+
+================================================================================
+Indexed set comprehension
+================================================================================
+
+leaders := {@ (Q!x)@@f : x in R @};
+
+---
+
+(program
+  (assignment
+    left: (identifier)
+    right: (indexed_set
+      (binary_operator
+        left: (parenthesized_expression
+          (binary_operator
+            left: (identifier)
+            right: (identifier)))
+        right: (identifier))
+      (iter_vars
+        (iter_var
+          variable: (identifier)
+          (identifier))))))
+
+================================================================================
+Complex constructor with pipe and options
+================================================================================
+
+G := quo< GrpPC : F | R : Order := n >;
+
+---
+
+(program
+  (assignment
+    left: (identifier)
+    right: (constructor
+      name: (identifier)
+      (identifier)
+      (constructor_elements
+        (constructor_options
+          (identifier))
+        (identifier))
+      (constructor_options
+        (identifier)
+        (identifier)))))
