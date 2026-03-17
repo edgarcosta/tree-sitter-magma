@@ -49,6 +49,28 @@ recformat< n : Integers(), misc, seq : SeqEnum >;
         type: (identifier)))))
 
 ============================
+Record constructor with rep as field name
+============================
+
+rec < CMF | gp:=G, rep:=f(M) >;
+
+---
+
+(program
+  (expression_statement
+    (constructor
+      name: (identifier)
+      (identifier)
+      (constructor_elements
+        (identifier)
+        (identifier)
+        (identifier)
+        (call
+          function: (identifier)
+          arguments: (argument_list
+            argument: (identifier)))))))
+
+============================
 Stupid group quo constructor
 ============================
 
