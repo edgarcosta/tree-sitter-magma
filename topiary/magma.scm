@@ -309,7 +309,7 @@
 
 ;; field_definition: "name : Type"
 (field_definition
-  ":" @append_space
+  ":" @prepend_space @append_space
 )
 
 ;; ============================================================
@@ -335,7 +335,7 @@
 )
 
 (where_expression
-  ":=" @append_space
+  ":=" @prepend_space @append_space
 )
 
 ;; ============================================================
