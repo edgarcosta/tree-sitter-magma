@@ -1,0 +1,191 @@
+================================================================================
+Simple where...is
+================================================================================
+
+x where x is 10;
+
+---
+
+(program
+  (expression_statement
+    (where_expression
+      value: (identifier)
+      variables: (identifier)
+      definition: (integer))))
+
+================================================================================
+Where with function calls
+================================================================================
+
+Order(G) + Degree(G) where G is Sym(3);
+
+---
+
+(program
+  (expression_statement
+    (where_expression
+      value: (binary_operator
+        left: (call
+          function: (identifier)
+          arguments: (argument_list
+            argument: (identifier)))
+        right: (call
+          function: (identifier)
+          arguments: (argument_list
+            argument: (identifier))))
+      variables: (identifier)
+      definition: (call
+        function: (identifier)
+        arguments: (argument_list
+          argument: (integer))))))
+
+================================================================================
+Chained where (left-associative)
+================================================================================
+
+x + y where x is 5 where y is 6;
+
+---
+
+(program
+  (expression_statement
+    (where_expression
+      value: (where_expression
+        value: (binary_operator
+          left: (identifier)
+          right: (identifier))
+        variables: (identifier)
+        definition: (integer))
+      variables: (identifier)
+      definition: (integer))))
+
+================================================================================
+Where with parenthesized override
+================================================================================
+
+(x + y where x is 5) where y is 6;
+
+---
+
+(program
+  (expression_statement
+    (where_expression
+      value: (parenthesized_expression
+        (where_expression
+          value: (binary_operator
+            left: (identifier)
+            right: (identifier))
+          variables: (identifier)
+          definition: (integer)))
+      variables: (identifier)
+      definition: (integer))))
+
+================================================================================
+Where on right-hand definition
+================================================================================
+
+x + y where x is (5 where y is 6);
+
+---
+
+(program
+  (expression_statement
+    (where_expression
+      value: (binary_operator
+        left: (identifier)
+        right: (identifier))
+      variables: (identifier)
+      definition: (parenthesized_expression
+        (where_expression
+          value: (integer)
+          variables: (identifier)
+          definition: (integer))))))
+
+================================================================================
+Where chain referencing earlier binding
+================================================================================
+
+x + y where x is y where y is 6;
+
+---
+
+(program
+  (expression_statement
+    (where_expression
+      value: (where_expression
+        value: (binary_operator
+          left: (identifier)
+          right: (identifier))
+        variables: (identifier)
+        definition: (identifier))
+      variables: (identifier)
+      definition: (integer))))
+
+================================================================================
+Where in set constructor predicate
+================================================================================
+
+{ a : i in [1 .. 10] | IsPrime(a) where a is 3*i + 1 };
+
+---
+
+(program
+  (expression_statement
+    (set
+      (identifier)
+      (iter_vars
+        (iter_var
+          variable: (identifier)
+          (seqenum
+            (range
+              start: (integer)
+              end: (integer)))))
+      condition: (where_expression
+        value: (call
+          function: (identifier)
+          arguments: (argument_list
+            argument: (identifier)))
+        variables: (identifier)
+        definition: (binary_operator
+          left: (binary_operator
+            left: (integer)
+            right: (identifier))
+          right: (integer))))))
+
+================================================================================
+Where in expression list
+================================================================================
+
+[a, a where a is 1];
+
+---
+
+(program
+  (expression_statement
+    (seqenum
+      (identifier)
+      (where_expression
+        value: (identifier)
+        variables: (identifier)
+        definition: (integer)))))
+
+================================================================================
+Where with parenthesized scope in sequence
+================================================================================
+
+[a, (a where a is 1)] where a is 2;
+
+---
+
+(program
+  (expression_statement
+    (where_expression
+      value: (seqenum
+        (identifier)
+        (parenthesized_expression
+          (where_expression
+            value: (identifier)
+            variables: (identifier)
+            definition: (integer))))
+      variables: (identifier)
+      definition: (integer))))
