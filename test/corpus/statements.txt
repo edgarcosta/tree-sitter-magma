@@ -72,6 +72,43 @@ vprintf PRProspection, 4 : "Value %o, Threshold %o\n", value, threshold;
     (identifier)))
 
 ================================================================================
+vtime statement
+================================================================================
+
+vtime SEA, 4: charpol := NaiveEulerFactor(C);
+
+---
+
+(program
+  (vtime_statement
+    flag: (identifier)
+    n: (integer)
+    (assignment
+      left: (identifier)
+      right: (call
+        function: (identifier)
+        arguments: (argument_list
+          argument: (identifier))))))
+
+================================================================================
+vtime statement without level
+================================================================================
+
+vtime ParamDP: x := f(y);
+
+---
+
+(program
+  (vtime_statement
+    flag: (identifier)
+    (assignment
+      left: (identifier)
+      right: (call
+        function: (identifier)
+        arguments: (argument_list
+          argument: (identifier))))))
+
+================================================================================
 Assert statement
 ================================================================================
 

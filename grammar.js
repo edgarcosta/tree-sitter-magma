@@ -211,7 +211,6 @@ module.exports = grammar({
 
 	vtime_statement: $ => seq(
 	    'vtime',
-	    $.primary_expression,
 	    field('flag', $.identifier),
 	    optional(seq(',', field('n', $.integer))),
 	    ':',
