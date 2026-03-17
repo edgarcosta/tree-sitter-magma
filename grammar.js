@@ -867,7 +867,7 @@ module.exports = grammar({
 	),
 
 	for_quantifier: $ => choice(
-	    commaSep1(seq($.identifier,
+	    commaSep1(seq(choice($.identifier, alias('rep', $.identifier)),
 		':=', field('from', $.primary_expression),
 		'to', field('to', $.primary_expression),
 		optional(seq(
