@@ -256,6 +256,7 @@ module.exports = grammar({
 
 	try_catch_statement: $ => seq(
 	    'try',
+	    optional(';'),
 	    $.block,
 	    'catch',
 	    field('error', $.identifier),
@@ -885,6 +886,7 @@ module.exports = grammar({
 	
 	repeat_statement: $ => seq(
 	    'repeat',
+	    optional(';'),
 	    field('body', $.block),
 	    'until',
 	    field('condition', $.primary_expression),
