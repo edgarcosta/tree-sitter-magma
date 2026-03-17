@@ -1,0 +1,116 @@
+================================================================================
+Trailing semicolon after repeat
+================================================================================
+
+repeat;
+    x := 1;
+until true;
+
+---
+
+(program
+  (repeat_statement
+    body: (block
+      (assignment
+        left: (identifier)
+        right: (integer)))
+    condition: (true)))
+
+================================================================================
+Trailing semicolon after do (for)
+================================================================================
+
+for i := 1 to 3 do;
+    x := i;
+end for;
+
+---
+
+(program
+  (for_statement
+    quantifier: (for_quantifier
+      (identifier)
+      from: (integer)
+      to: (integer))
+    body: (block
+      (assignment
+        left: (identifier)
+        right: (identifier)))))
+
+================================================================================
+Trailing semicolon after do (while)
+================================================================================
+
+while true do;
+    break;
+end while;
+
+---
+
+(program
+  (while_statement
+    condition: (true)
+    body: (block
+      (break_statement))))
+
+================================================================================
+Trailing semicolon after then
+================================================================================
+
+if true then;
+    x := 1;
+end if;
+
+---
+
+(program
+  (if_statement
+    condition: (true)
+    consequence: (block
+      (assignment
+        left: (identifier)
+        right: (integer)))))
+
+================================================================================
+Trailing semicolon after else
+================================================================================
+
+if true then;
+    x := 1;
+else;
+    x := 2;
+end if;
+
+---
+
+(program
+  (if_statement
+    condition: (true)
+    consequence: (block
+      (assignment
+        left: (identifier)
+        right: (integer)))
+    default: (else_clause
+      consequence: (block
+        (assignment
+          left: (identifier)
+          right: (integer))))))
+
+================================================================================
+Trailing semicolon after try
+================================================================================
+
+try;
+    x := 1;
+catch e;
+end try;
+
+---
+
+(program
+  (try_catch_statement
+    (block
+      (assignment
+        left: (identifier)
+        right: (integer)))
+    error: (identifier)))
