@@ -171,8 +171,8 @@ module.exports = grammar({
 	read_statement: $ => seq(
 	    choice('read', 'readi'),
 	    field('identifier', $.identifier),
-	    ',',
-	    optional(field('prompt', $.primary_expression))
+	    optional(seq(',',
+		optional(field('prompt', $.primary_expression))))
 	),
 
 	print_level_statement: $ => seq(
@@ -906,7 +906,8 @@ module.exports = grammar({
 	    'when',
 	    field('match', commaSep1($.primary_expression)),
 	    ':',
-	    field('consequence', $.block)
+	    optional(';'),
+	    field('consequence', optional($.block))
 	),
 
 	// Misc:
