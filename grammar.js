@@ -292,7 +292,11 @@ module.exports = grammar({
 		field('right', $.primary_expression),
 	    ))));
 	},
-	
+
+	// Word operators no longer include surrounding spaces.
+	// Tree-sitter's keyword extraction (via `word: $ => $.identifier`)
+	// ensures these won't match as substrings of identifiers.
+	// Spaces between tokens are handled by `extras`.
 	binary_operator: $ => {
 	    const table = [
 		[prec.left, '+', PREC.plus],

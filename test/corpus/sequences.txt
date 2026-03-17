@@ -490,3 +490,44 @@ Common iterator construct
           left: (unary_operator
             right: (identifier))
           right: (integer))))))
+
+================================================================================
+Multi-line cat expression
+================================================================================
+
+["a" cat IntegerToString(i) : i in [1..r]] cat
+["b" cat IntegerToString(i) : i in [1..r]];
+
+---
+
+(program
+  (expression_statement
+    (binary_operator
+      left: (seqenum
+        (binary_operator
+          left: (string)
+          right: (call
+            function: (identifier)
+            arguments: (argument_list
+              argument: (identifier))))
+        (iter_vars
+          (iter_var
+            variable: (identifier)
+            (seqenum
+              (range
+                start: (integer)
+                end: (identifier))))))
+      right: (seqenum
+        (binary_operator
+          left: (string)
+          right: (call
+            function: (identifier)
+            arguments: (argument_list
+              argument: (identifier))))
+        (iter_vars
+          (iter_var
+            variable: (identifier)
+            (seqenum
+              (range
+                start: (integer)
+                end: (identifier)))))))))
