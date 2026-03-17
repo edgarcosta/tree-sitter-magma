@@ -1,0 +1,37 @@
+================================================================================
+Line continuation in arithmetic
+================================================================================
+
+x := 1 +\
+2;
+
+---
+
+(program
+  (assignment
+    left: (identifier)
+    right: (binary_operator
+      left: (integer)
+      right: (integer))))
+
+================================================================================
+Line continuation in function calls
+================================================================================
+
+x := Order(G) +\
+    Degree(G);
+
+---
+
+(program
+  (assignment
+    left: (identifier)
+    right: (binary_operator
+      left: (call
+        function: (identifier)
+        arguments: (argument_list
+          argument: (identifier)))
+      right: (call
+        function: (identifier)
+        arguments: (argument_list
+          argument: (identifier))))))
