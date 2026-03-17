@@ -471,7 +471,7 @@ module.exports = grammar({
 	    $.false,
 	    $.call,
 	    $.dollar,
-	    $.double_dollar,	
+	    $.double_dollar,
 	    $.parenthesized_expression,
 	    $.where_expression,
 	    $.aggregate,
@@ -480,6 +480,10 @@ module.exports = grammar({
 	    $._definition,
 	    $.eval_expression,
 	    $.cycle_or_commutator_product,
+	    // Allow keyword 'rep' to be used as an identifier.
+	    // In Magma, 'rep' is not a reserved word and is commonly
+	    // used as a variable name.
+	    alias('rep', $.identifier),
 	),
 
 	
