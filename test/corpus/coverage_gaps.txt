@@ -92,12 +92,12 @@ time f(x);
 Print level statement
 ================================================================================
 
-printf x : Maximal;
+x : Maximal;
 
 ---
 
 (program
-  (print_statement
+  (expression_statement
     (print_level_statement
       (identifier))))
 
