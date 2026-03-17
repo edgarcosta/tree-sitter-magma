@@ -1,0 +1,83 @@
+================================================================================
+Empty when clause with semicolon no-op
+================================================================================
+
+case x :
+    when 1: ;
+    when 2: y := 1;
+end case;
+
+---
+
+(program
+  (case_statement
+    matchee: (identifier)
+    (when_clause
+      match: (integer))
+    (when_clause
+      match: (integer)
+      consequence: (block
+        (assignment
+          left: (identifier)
+          right: (integer))))))
+
+================================================================================
+Empty when clause with string match
+================================================================================
+
+case x :
+    when "Infty": ;
+    when "Finite":
+        y := 1;
+end case;
+
+---
+
+(program
+  (case_statement
+    matchee: (identifier)
+    (when_clause
+      match: (string))
+    (when_clause
+      match: (string)
+      consequence: (block
+        (assignment
+          left: (identifier)
+          right: (integer))))))
+
+================================================================================
+Read statement without prompt
+================================================================================
+
+read s;
+
+---
+
+(program
+  (read_statement
+    identifier: (identifier)))
+
+================================================================================
+Read statement with prompt
+================================================================================
+
+read x, "Enter x: ";
+
+---
+
+(program
+  (read_statement
+    identifier: (identifier)
+    prompt: (string)))
+
+================================================================================
+Readi statement without prompt
+================================================================================
+
+readi s;
+
+---
+
+(program
+  (read_statement
+    identifier: (identifier)))
