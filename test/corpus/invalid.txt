@@ -67,3 +67,128 @@ Word operators require spaces: cat
     (integer))
   (expression_statement
     (identifier)))
+
+================================================================================
+Mismatched end keyword: function/procedure
+================================================================================
+
+function test() end procedure;
+
+---
+
+(program
+  (ERROR
+    name: (identifier)
+    parameters: (parameters)
+    (identifier)))
+
+================================================================================
+Mismatched end keyword: if/while
+================================================================================
+
+if x then end while;
+
+---
+
+(program
+  (ERROR
+    (identifier)
+    (identifier)))
+
+================================================================================
+Missing right-hand side of assignment
+================================================================================
+
+x := ;
+
+---
+
+(program
+  (expression_statement
+    (identifier))
+  (ERROR))
+
+================================================================================
+Missing operand in binary expression
+================================================================================
+
+x + ;
+
+---
+
+(program
+  (expression_statement
+    (identifier))
+  (ERROR))
+
+================================================================================
+Extra token after assignment
+================================================================================
+
+x := 1 2;
+
+---
+
+(program
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (ERROR
+    (UNEXPECTED '2')))
+
+================================================================================
+Missing do in for loop
+================================================================================
+
+for i := 1 to 10 end for;
+
+---
+
+(program
+  (ERROR
+    (for_quantifier
+      (identifier)
+      from: (integer)
+      to: (integer))
+    (identifier)))
+
+================================================================================
+Unterminated string
+================================================================================
+
+"unterminated string;
+
+---
+
+(program
+  (ERROR
+    (UNEXPECTED '\0')))
+
+================================================================================
+Elif after else
+================================================================================
+
+if x then else elif y then end if;
+
+---
+
+(program
+  (if_statement
+    condition: (identifier)
+    default: (else_clause)
+    (ERROR
+      (identifier)
+      (identifier))))
+
+================================================================================
+Empty repeat-until body
+================================================================================
+
+repeat until;
+
+---
+
+(ERROR
+  (block
+    (expression_statement
+      (identifier))))
