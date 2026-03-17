@@ -27,6 +27,54 @@ const tree = parser.parse(sourceCode);
 console.log(tree.rootNode.toString());
 ```
 
+### Neovim (nvim-treesitter)
+
+Add the parser to your nvim-treesitter config:
+
+```lua
+local parser_config = require("nvim-treesitter.parsers").get_parser_configs()
+parser_config.magma = {
+    install_info = {
+        url = "https://github.com/edgarcosta/tree-sitter-magma",
+        files = {"src/parser.c", "src/scanner.c"},
+    },
+    filetype = "magma",
+}
+```
+
+Then register the `.m` filetype (in your `init.lua` or `ftdetect/magma.lua`):
+
+```lua
+vim.filetype.add({
+    extension = {
+        m = function(path, bufnr)
+            -- Check for Magma indicators: intrinsic, end function, freeze, etc.
+            local content = vim.api.nvim_buf_get_lines(bufnr, 0, 30, false)
+            for _, line in ipairs(content) do
+                if line:match("^freeze") or line:match("^intrinsic")
+                    or line:match("end function") or line:match("end procedure")
+                    or line:match("end intrinsic") then
+                    return "magma"
+                end
+            end
+            -- Fall back to default (MATLAB/Objective-C)
+            return nil
+        end,
+    },
+    pattern = {
+        ["*.magma"] = "magma",
+    },
+})
+```
+
+Install the parser:
+
+```vim
+:TSInstall magma
+```
+
+**Features:** syntax highlighting, code folding (`queries/folds.scm`), indentation (`queries/indents.scm`), textobjects (`queries/textobjects.scm`).
+
 ## Development
 
 ### Building
