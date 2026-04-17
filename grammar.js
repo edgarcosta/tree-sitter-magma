@@ -370,7 +370,7 @@ module.exports = grammar({
 	where_expression: $ => prec.left(PREC.where, seq(
 	    field('value', $.primary_expression),
 	    'where',
-	    field('variables', commaSep1(choice($.identifier, $.anonymous_identifier))),
+	    commaSep1(field('variables', choice($.identifier, $.anonymous_identifier))),
 	    field('operator', choice('is', ':=')),
 	    field('definition', $.primary_expression),
 	)),
@@ -648,9 +648,9 @@ module.exports = grammar({
 	),
 	
 	assignment: $ => seq(
-	    field('left', $._left_hand_side),
+	    $._left_hand_side,
 	    ':=',
-	    field('right', $._right_hand_side),
+	    $._right_hand_side,
 	),
 
 	augmented_assignment: $ => {
@@ -665,12 +665,12 @@ module.exports = grammar({
 	},
 
 	_left_hand_side: $ => commaSep1(
-	    choice(
-		$.primary_expression, 
+	    field('left', choice(
+		$.primary_expression,
 		$.anonymous_constructor
-	    )),
+	    ))),
 
-	_right_hand_side: $ => commaSep1($.primary_expression),
+	_right_hand_side: $ => commaSep1(field('right', $.primary_expression)),
 
 	anonymous_constructor: $ => seq(
 	    $.anonymous_identifier,
