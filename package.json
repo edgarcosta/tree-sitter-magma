@@ -15,18 +15,18 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tree-sitter/tree-sitter-magma.git"
+    "url": "https://github.com/edgarcosta/tree-sitter-magma.git"
   },
   "bugs": {
-    "url": "https://github.com/tree-sitter/tree-sitter-magma/issues"
+    "url": "https://github.com/edgarcosta/tree-sitter-magma/issues"
   },
-  "homepage": "https://github.com/tree-sitter/tree-sitter-magma#readme",
+  "homepage": "https://github.com/edgarcosta/tree-sitter-magma#readme",
   "dependencies": {
     "node-addon-api": "^7.0.0",
     "node-gyp-build": "^4.6.0"
   },
   "devDependencies": {
-    "tree-sitter-cli": "^0.20.8",
+    "tree-sitter-cli": "^0.25.0",
     "prebuildify": "^6.0.0"
   },
   "peerDependencies": {
