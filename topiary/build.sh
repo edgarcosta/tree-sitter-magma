@@ -34,7 +34,6 @@ format_file() {
     (cd "$SCRIPT_DIR" && topiary format --language magma \
         --configuration "$SCRIPT_DIR/languages.ncl" \
         --query "$SCRIPT_DIR/magma.scm" \
-        --skip-idempotence \
         < "$1")
 }
 

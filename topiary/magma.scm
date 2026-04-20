@@ -223,9 +223,10 @@
 ;; Binary operators: @append_space only (preserves source spacing before)
 ;; ============================================================
 
-(binary_operator
-  operator: "+" @append_space
-)
+;; (binary_operator
+;;   operator: "+" @prepend_space @append_space
+;; )
+["+" ":="] @prepend_space @append_space
 
 (binary_operator
   operator: "-" @append_space
@@ -259,7 +260,7 @@
 ;; ============================================================
 
 (assignment
-  ":=" @append_space
+  ":=" @prepend_space @append_space
 )
 
 ;; ============================================================
@@ -442,9 +443,9 @@
   operator: "-" @append_antispace
 )
 
-(unary_operator
-  operator: "+" @append_antispace
-)
+;; (unary_operator
+;;   operator: "+" @append_antispace
+;; )
 
 (unary_operator
   operator: "#" @append_antispace
