@@ -237,3 +237,19 @@ read u,;
   (read_statement
     identifier: (identifier))
   (ERROR))
+
+================================================================================
+Tilde is not a binary operator
+================================================================================
+
+x := a ~ b;
+
+---
+
+(program
+  (assignment
+    left: (identifier)
+    (ERROR
+      (identifier))
+    right: (unary_operator
+      right: (identifier))))
