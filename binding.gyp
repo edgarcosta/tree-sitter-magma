@@ -3,17 +3,19 @@
     {
       "target_name": "tree_sitter_magma_binding",
       "include_dirs": [
-        "<!(node -e \"console.log(require('node-addon-api').include)\")",
+        "<!@(node -p \"require('node-addon-api').include\")",
         "src"
       ],
       "dependencies": [
-        "<!(node -e \"console.log(require('node-addon-api').gyp)\")"
+        "<!(node -p \"require('node-addon-api').gyp\")"
+      ],
+      "defines": [
+        "NAPI_DISABLE_CPP_EXCEPTIONS",
       ],
       "sources": [
         "bindings/node/binding.cc",
         "src/parser.c",
         "src/scanner.c",
-        # NOTE: if your language has an external scanner, add it here.
       ],
       "conditions": [
         ["OS!='win'", {

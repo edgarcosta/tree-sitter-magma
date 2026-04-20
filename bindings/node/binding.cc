@@ -6,8 +6,7 @@ extern "C" TSLanguage *tree_sitter_magma();
 
 // "tree-sitter", "language" hashed with BLAKE2
 const napi_type_tag LANGUAGE_TYPE_TAG = {
-  0xaa, 0x8c, 0xf5, 0xa4, 0x40, 0x8c, 0xaa, 0x55,
-  0x4d, 0xb8, 0x38, 0x46, 0x87, 0x90, 0x3c, 0xb4
+  0x55aa8c40a4f58caaULL, 0xb43c90874638b84dULL
 };
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
