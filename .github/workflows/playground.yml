@@ -22,14 +22,16 @@ jobs:
         with:
           node-version: '20'
 
-      - run: npm ci
+      - run: npm install -g tree-sitter-cli@^0.25.0
+
+      - name: Generate parser
+        run: tree-sitter generate
 
       - name: Build WASM
-        run: npx tree-sitter build --wasm
+        run: tree-sitter build --wasm
 
       - name: Prepare playground directory
-        run: |
-          cp tree-sitter-magma.wasm docs/playground/
+        run: cp tree-sitter-magma.wasm docs/playground/
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
