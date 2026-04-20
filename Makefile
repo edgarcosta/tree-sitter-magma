@@ -144,7 +144,10 @@ parse-examples:
 # Checks that the Magma code in test/corpus/*.txt is syntactically valid
 # Only flags "bad syntax" errors (true parse failures), not runtime errors
 # like "not declared", "Illegal declaration (must be done in package only)", etc.
-# Skips: invalid.txt (intentionally bad syntax)
+# Skipped corpora:
+#   invalid.txt - intentionally bad syntax
+#   types.txt   - `declare type` is package-only and Magma rejects it outside
+#                 of a package context even before reaching the parser
 validate-corpus:
 	@python3 scripts/extract_corpus_code.py $(CORPUS_DIR) .corpus_tmp --skip invalid types
 	@pass=0; fail=0; skip=0; \
