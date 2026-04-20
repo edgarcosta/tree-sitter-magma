@@ -481,6 +481,9 @@ module.exports = grammar({
 	    $._definition,
 	    $.eval_expression,
 	    $.cycle_or_commutator_product,
+	    // `rep` is a keyword only in `representative_of_set`; allow it as
+	    // an identifier in every other position where an identifier is valid.
+	    alias('rep', $.identifier),
 	),
 
 	
@@ -607,6 +610,7 @@ module.exports = grammar({
 
 	_callable: $ => choice(
 	    $.identifier,
+	    alias('rep', $.identifier),
 	    $.call,
 	    $.attribute,
 	    $.seq_slice,
@@ -735,7 +739,8 @@ module.exports = grammar({
 	),
 
 	_simple_assignment: $ => seq(
-	    $.identifier, ':=', $.primary_expression
+	    choice($.identifier, alias('rep', $.identifier)),
+	    ':=', $.primary_expression
 	),
 	// constructor_field: $ => seq(
 	//     choice(commaSep1($.primary_expression),
@@ -864,7 +869,7 @@ module.exports = grammar({
 	),
 
 	for_quantifier: $ => choice(
-	    commaSep1(seq($.identifier,
+	    commaSep1(seq(choice($.identifier, alias('rep', $.identifier)),
 		':=', field('from', $.primary_expression),
 		'to', field('to', $.primary_expression),
 		optional(seq(
@@ -1004,8 +1009,10 @@ module.exports = grammar({
 
 	random_element_of_set: $ => seq('random', $.set),
 
-	// `rep S` is just a function call — `rep` is not reserved in Magma.
-	representative_of_set: $ => prec.left(seq($.identifier, $.set)),
+	// `rep` behaves like a keyword only immediately before a set literal.
+	// Aliasing to identifier lets it be used as a regular name elsewhere
+	// (e.g. as a variable, field, or callable).
+	representative_of_set: $ => prec.left(seq(alias('rep', $.identifier), $.set)),
 
 	
 	seq_slice: $ => prec.left(PREC.sq_bracket, seq(
