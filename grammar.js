@@ -480,9 +480,7 @@ module.exports = grammar({
 	    $._definition,
 	    $.eval_expression,
 	    $.cycle_or_commutator_product,
-	    // `rep` is a keyword only in `representative_of_set`; allow it as
-	    // an identifier in every other position where an identifier is valid.
-	    alias('rep', $.identifier),
+	    repIdentifier($),
 	),
 
 	
@@ -609,7 +607,7 @@ module.exports = grammar({
 
 	_callable: $ => choice(
 	    $.identifier,
-	    alias('rep', $.identifier),
+	    repIdentifier($),
 	    $.call,
 	    $.attribute,
 	    $.seq_slice,
@@ -738,7 +736,7 @@ module.exports = grammar({
 	),
 
 	_simple_assignment: $ => seq(
-	    choice($.identifier, alias('rep', $.identifier)),
+	    identifierOrRep($),
 	    ':=', $.primary_expression
 	),
 	// constructor_field: $ => seq(
@@ -868,7 +866,7 @@ module.exports = grammar({
 	),
 
 	for_quantifier: $ => choice(
-	    commaSep1(seq(choice($.identifier, alias('rep', $.identifier)),
+	    commaSep1(seq(identifierOrRep($),
 		':=', field('from', $.primary_expression),
 		'to', field('to', $.primary_expression),
 		optional(seq(
@@ -1008,10 +1006,7 @@ module.exports = grammar({
 
 	random_element_of_set: $ => seq('random', $.set),
 
-	// `rep` behaves like a keyword only immediately before a set literal.
-	// Aliasing to identifier lets it be used as a regular name elsewhere
-	// (e.g. as a variable, field, or callable).
-	representative_of_set: $ => prec.left(seq(alias('rep', $.identifier), $.set)),
+	representative_of_set: $ => seq(repIdentifier($), $.set),
 
 	
 	seq_slice: $ => prec.left(PREC.sq_bracket, seq(
@@ -1076,6 +1071,16 @@ function commaSep2(rule) {
  */
 function sep1(rule, separator) {
     return seq(rule, repeat(seq(separator, rule)));
+}
+
+// `rep` is a soft keyword: reserved only before a set literal (see
+// `representative_of_set`), usable as a regular identifier everywhere else.
+function repIdentifier($) {
+    return alias('rep', $.identifier);
+}
+
+function identifierOrRep($) {
+    return choice($.identifier, repIdentifier($));
 }
 
 function aggregate_of($, left, right, has_universe) {
