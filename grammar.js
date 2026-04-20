@@ -301,7 +301,6 @@ module.exports = grammar({
 		[prec.left, '*', PREC.times],
 		[prec.left, '/', PREC.times],
 		[prec.right, '^', PREC.power],
-		[prec.left, '~', PREC.tilde],
 		[prec.left, 'div', PREC.times],
 		[prec.left, 'mod', PREC.times],
 		[prec.left, '^^', PREC.hathat],
