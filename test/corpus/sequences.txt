@@ -475,6 +475,44 @@ rep {x^2 : x in [1..5] | IsEven(x) };
             argument: (identifier)))))))
 
 ====================================
+Function call with set argument is not representative_of_set
+====================================
+
+x := f({1,2,3});
+
+---
+
+(program
+  (assignment
+    left: (identifier)
+    right: (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (set
+          (integer)
+          (integer)
+          (integer))))))
+
+====================================
+rep is usable as a variable name
+====================================
+
+rep := 5;
+y := rep + 1;
+
+---
+
+(program
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (assignment
+    left: (identifier)
+    right: (binary_operator
+      left: (identifier)
+      right: (integer))))
+
+====================================
 Common iterator construct
 ====================================
 
