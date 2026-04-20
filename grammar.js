@@ -171,8 +171,7 @@ module.exports = grammar({
 	read_statement: $ => seq(
 	    choice('read', 'readi'),
 	    field('identifier', $.identifier),
-	    optional(seq(',',
-		optional(field('prompt', $.primary_expression))))
+	    optional(seq(',', field('prompt', $.primary_expression)))
 	),
 
 	print_level_statement: $ => seq(

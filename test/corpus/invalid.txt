@@ -224,3 +224,16 @@ repeat until;
   (block
     (expression_statement
       (identifier))))
+
+================================================================================
+Read statement with trailing comma and no prompt
+================================================================================
+
+read u,;
+
+---
+
+(program
+  (read_statement
+    identifier: (identifier))
+  (ERROR))
