@@ -13,7 +13,8 @@ end case;
   (case_statement
     matchee: (identifier)
     (when_clause
-      match: (integer))
+      match: (integer)
+      consequence: (block))
     (when_clause
       match: (integer)
       consequence: (block
@@ -37,7 +38,8 @@ end case;
   (case_statement
     matchee: (identifier)
     (when_clause
-      match: (string))
+      match: (string)
+      consequence: (block))
     (when_clause
       match: (string)
       consequence: (block
