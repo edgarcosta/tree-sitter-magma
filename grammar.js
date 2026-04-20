@@ -84,7 +84,7 @@ module.exports = grammar({
     ],
     
     rules: {
-	program: $ => repeat($._statement),
+	program: $ => repeat(choice($._statement, ';')),
 	
 	// Comments
 	// taken from
@@ -101,14 +101,8 @@ module.exports = grammar({
 	)),
 
 	_statement: $ => seq(
-	    choice(
-		seq(choice(
-		    $._simple_statement,
-		    $._compound_statement),
-		    repeat1(';')),
-		$.intrinsic_definition,
-		// intrinsic definitions don't need ;
-	    )
+	    choice($._simple_statement, $._compound_statement),
+	    ';'
 	),
 
 	_simple_statement: $ => choice(
@@ -255,11 +249,9 @@ module.exports = grammar({
 
 	try_catch_statement: $ => seq(
 	    'try',
-	    optional(';'),
 	    $.block,
 	    'catch',
 	    field('error', $.identifier),
-	    optional(';'),
 	    optional($.block),
 	    'end',
 	    'try',
@@ -507,7 +499,6 @@ module.exports = grammar({
 	_function_contents: $ => seq(
 	    optional(field('name', $.identifier)),
 	    field('parameters', $.parameters),
-	    optional(';'),
 	    field('body', optional($.block)),
 	),
 	
@@ -571,8 +562,7 @@ module.exports = grammar({
 	    field('docstring', $.doc_string),
 	    field('body', optional($.block)),
 	    'end',
-	    'intrinsic',
-	    optional(';')
+	    'intrinsic'
 	),
 	doc_string: $ => token(seq('{',/(?:[^\\}]|\\.)*/, '}',
 	    optional(';'))),
@@ -824,14 +814,14 @@ module.exports = grammar({
 	    $.while_statement,
 	    $.case_statement,
 	    $.repeat_statement,
-	    $.try_catch_statement
+	    $.try_catch_statement,
+	    $.intrinsic_definition,
 	),
 	
 	if_statement: $ => seq(
 	    'if',
 	    field('condition', $.primary_expression),
 	    'then',
-	    optional(';'),
 	    optional(field('consequence', $.block)),
 	    repeat(field('elif', $.elif_clause)),
 	    optional(field('default', $.else_clause)),
@@ -841,16 +831,13 @@ module.exports = grammar({
 
 	elif_clause: $ => seq(
 	    'elif',
-	    optional(';'),
 	    field('condition', $.primary_expression),
 	    'then',
-	    optional(';'),
 	    optional(field('consequence', $.block)),
 	),
 
 	else_clause: $ => seq(
 	    'else',
-	    optional(';'),
 	    optional(field('consequence', $.block)),
 	),
 
@@ -859,7 +846,6 @@ module.exports = grammar({
 	    'for',
 	    field('quantifier', $.for_quantifier),
 	    'do',
-	    optional(';'),
 	    field('body', $.block),
 	    'end',
 	    'for'
@@ -880,7 +866,6 @@ module.exports = grammar({
 	    'while',
 	    field('condition', $.primary_expression),
 	    'do',
-	    optional(';'),
 	    field('body', $.block),
 	    'end',
 	    'while',
@@ -888,7 +873,6 @@ module.exports = grammar({
 	
 	repeat_statement: $ => seq(
 	    'repeat',
-	    optional(';'),
 	    field('body', $.block),
 	    'until',
 	    field('condition', $.primary_expression),
@@ -910,7 +894,6 @@ module.exports = grammar({
 	    'when',
 	    field('match', commaSep1($.primary_expression)),
 	    ':',
-	    optional(';'),
 	    field('consequence', optional($.block))
 	),
 
@@ -933,7 +916,10 @@ module.exports = grammar({
 	
 	anonymous_identifier: _ => '_',
 
-	block: $ => repeat1($._statement),
+	// A block is a sequence of statements; stray `;` tokens act as empty
+	// statements, so `if x then ; body; end if` parses naturally without
+	// needing `optional(';')` glue on every block-opening keyword.
+	block: $ => repeat1(choice($._statement, ';')),
 
 	// Aggregates
 	

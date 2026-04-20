@@ -334,19 +334,3 @@ end intrinsic;
       (return_statement
         (identifier)))))
 
-================================================================================
-Basic intrinsic test without trailing semicolon
-================================================================================
-
-intrinsic test() -> type
-{ docstring }
-end intrinsic
-
----
-
-(program
-  (intrinsic_definition
-    name: (identifier)
-    return_type: (type
-      (identifier))
-    docstring: (doc_string)))

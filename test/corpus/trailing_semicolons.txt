@@ -113,4 +113,5 @@ end try;
       (assignment
         left: (identifier)
         right: (integer)))
-    error: (identifier)))
+    error: (identifier)
+    (block)))
