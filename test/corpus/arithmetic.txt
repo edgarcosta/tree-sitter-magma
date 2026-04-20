@@ -156,3 +156,108 @@ Reals
     (real))
   (expression_statement
     (real)))
+
+================================================================================
+Word binary operators: arithmetic and set
+================================================================================
+
+a := x mod y;
+b := x join y;
+c := x diff y;
+d := x sdiff y;
+e := x meet y;
+f := x cat y;
+
+---
+
+(program
+  (assignment
+    left: (identifier)
+    right: (binary_operator
+      left: (identifier)
+      right: (identifier)))
+  (assignment
+    left: (identifier)
+    right: (binary_operator
+      left: (identifier)
+      right: (identifier)))
+  (assignment
+    left: (identifier)
+    right: (binary_operator
+      left: (identifier)
+      right: (identifier)))
+  (assignment
+    left: (identifier)
+    right: (binary_operator
+      left: (identifier)
+      right: (identifier)))
+  (assignment
+    left: (identifier)
+    right: (binary_operator
+      left: (identifier)
+      right: (identifier)))
+  (assignment
+    left: (identifier)
+    right: (binary_operator
+      left: (identifier)
+      right: (identifier))))
+
+================================================================================
+Word binary operators: membership and adjacency
+================================================================================
+
+a := x notin y;
+b := G adj H;
+c := G notadj H;
+d := A subset B;
+e := A notsubset B;
+
+---
+
+(program
+  (assignment
+    left: (identifier)
+    right: (binary_operator
+      left: (identifier)
+      right: (identifier)))
+  (assignment
+    left: (identifier)
+    right: (binary_operator
+      left: (identifier)
+      right: (identifier)))
+  (assignment
+    left: (identifier)
+    right: (binary_operator
+      left: (identifier)
+      right: (identifier)))
+  (assignment
+    left: (identifier)
+    right: (binary_operator
+      left: (identifier)
+      right: (identifier)))
+  (assignment
+    left: (identifier)
+    right: (binary_operator
+      left: (identifier)
+      right: (identifier))))
+
+================================================================================
+Word binary operators: cmpeq and cmpne
+================================================================================
+
+a := x cmpeq y;
+b := x cmpne y;
+
+---
+
+(program
+  (assignment
+    left: (identifier)
+    right: (binary_operator
+      left: (identifier)
+      right: (identifier)))
+  (assignment
+    left: (identifier)
+    right: (binary_operator
+      left: (identifier)
+      right: (identifier))))
