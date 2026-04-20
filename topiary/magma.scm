@@ -1,13 +1,5 @@
 ;; Topiary formatting queries for Magma
 ;;
-;; NOTE: In this grammar, anonymous token byte ranges may include
-;; surrounding whitespace from the source text. Topiary uses source
-;; byte ranges for token content, so whitespace before operators gets
-;; embedded in the content. Therefore, we use @append_space on operator
-;; tokens (for trailing space) but avoid @prepend_space on anonymous
-;; tokens (which would add a duplicate leading space). Spacing BEFORE
-;; operators is preserved from the source.
-
 ;; ============================================================
 ;; Leaves: content that should not be reformatted
 ;; ============================================================
@@ -58,7 +50,7 @@
 (function_definition
   .
   "function" @append_space
-)
+) @prepend_hardline
 
 (procedure_definition
   .
@@ -74,10 +66,10 @@
 (function_definition
   parameters: (parameters) @append_hardline
   body: (block) @prepend_indent_start @append_indent_end
-)
+) 
 
 (function_definition
-  "end" @prepend_hardline @append_space
+  "end" @append_space
 )
 
 (procedure_definition
@@ -104,14 +96,14 @@
 
 (if_statement
   "if" @append_space
-  "then" @append_hardline
+  "then" @prepend_space @append_hardline
   consequence: (block) @prepend_indent_start @append_indent_end
   "end" @prepend_hardline @append_space
 )
 
 (elif_clause
   "elif" @prepend_hardline @append_space
-  "then" @append_hardline
+  "then" @prepend_space @append_hardline
   consequence: (block) @prepend_indent_start @append_indent_end
 )
 
@@ -126,7 +118,7 @@
 
 (for_statement
   "for" @append_space
-  "do" @append_hardline
+  "do" @prepend_space @append_hardline
   body: (block) @prepend_indent_start @append_indent_end
   "end" @prepend_hardline @append_space
 )
@@ -150,7 +142,7 @@
 
 (while_statement
   "while" @append_space
-  "do" @append_hardline
+  "do" @prepend_space @append_hardline
   body: (block) @prepend_indent_start @append_indent_end
   "end" @prepend_hardline @append_space
 )
@@ -219,56 +211,10 @@
   "end" @prepend_hardline @append_space
 )
 
-;; ============================================================
-;; Binary operators: @append_space only (preserves source spacing before)
-;; ============================================================
 
-;; (binary_operator
-;;   operator: "+" @prepend_space @append_space
-;; )
-["+" ":="] @prepend_space @append_space
 
-(binary_operator
-  operator: "-" @append_space
-)
+"," @prepend_antispace @append_space
 
-(binary_operator
-  operator: "*" @append_space
-)
-
-(binary_operator
-  operator: "/" @append_space
-)
-
-(binary_operator
-  operator: "^" @append_space
-)
-
-(binary_operator
-  operator: "^^" @append_space
-)
-
-(binary_operator
-  operator: "~" @append_space
-)
-
-;; Dot, bang, at operators: no extra spaces (member access, indexing)
-;; e.g. G.1, x!, x!!, f@x, f@@x — source spacing preserved
-
-;; ============================================================
-;; Assignment operator: @append_space only
-;; ============================================================
-
-(assignment
-  ":=" @prepend_space @append_space
-)
-
-;; ============================================================
-;; Commas: space after, no space before
-;; ============================================================
-
-"," @append_space
-"," @prepend_antispace
 
 ;; ============================================================
 ;; Parentheses: no space inside
@@ -310,8 +256,18 @@
 
 ;; field_definition: "name : Type"
 (field_definition
-  ":" @prepend_space @append_space
-)
+ ":" @prepend_space @append_space
+ )
+
+(seqenum
+ ":" @prepend_space @append_space
+ )
+
+(seqenum
+ "|" @prepend_space @append_space
+ )
+(iter_var
+ "in" @prepend_space @append_space)
 
 ;; ============================================================
 ;; Aggregates — no space inside brackets
@@ -334,11 +290,6 @@
 (where_expression
   "where" @append_space
 )
-
-(where_expression
-  ":=" @prepend_space @append_space
-)
-
 ;; ============================================================
 ;; Statement keywords: space after
 ;; ============================================================
@@ -400,7 +351,7 @@
 ;; ============================================================
 
 (typed_identifier
-  "::" @append_space
+ "::" @prepend_antispace @append_antispace
 )
 
 ;; ============================================================
@@ -420,7 +371,7 @@
 ;; ============================================================
 
 (intrinsic_definition
-  "->" @append_space
+  "->" @prepend_space @append_space
 )
 
 ;; ============================================================
@@ -440,20 +391,31 @@
 )
 
 (unary_operator
-  operator: "-" @append_antispace
+  operator: ["-" "+" "#" "~"] @append_antispace
 )
 
-;; (unary_operator
-;;   operator: "+" @append_antispace
-;; )
+;; ============================================================
+;; Binary operators
+;; ============================================================
 
-(unary_operator
-  operator: "#" @append_antispace
-)
+(binary_operator
+  operator: ["+" "-" "/" "*" "^" "^^" "@" "@@" "." "!" "!!" "mod" "in" "notin" "div" "join" "notin" "adj" "notadj" "subset" "notsubset" "gt" "lt" "ge" "le" "eq" "ne" "cmpeq" "cmpne"] @prepend_space @append_space
+  )
 
-(unary_operator
-  operator: "~" @append_antispace
-)
+(boolean_operator
+ operator: ["or" "xor" "and"] @prepend_space @append_space)
+
+;; ============================================================
+;; Assignment
+;; ============================================================
+
+(assignment
+ ":=" @prepend_space @append_space
+ )
+
+(augmented_assignment
+ ["join:="  "meet:="  "diff:="  "sdiff:="  "cat:="  "*:="  "+:="  "-:="  "/:="  "^:="  "div:="  "mod:="  "and:="  "or:="  "xor:="] @prepend_space @append_space
+ )
 
 ;; ============================================================
 ;; Comments
@@ -468,4 +430,4 @@
 
 (intrinsic_definition
   (doc_string) @prepend_hardline
-)
+) @append_hardline
