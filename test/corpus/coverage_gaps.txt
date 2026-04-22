@@ -4,7 +4,7 @@ Freeze directive
 
 freeze;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (freeze))
@@ -13,11 +13,15 @@ freeze;
 Delete directive
 ================================================================================
 
+x := 1;
 delete x;
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    (identifier)
+    (integer))
   (delete
     (identifier)))
 
@@ -27,7 +31,7 @@ Save directive
 
 save "foo.sav";
 
----
+--------------------------------------------------------------------------------
 
 (program
   (save_directive
@@ -43,7 +47,7 @@ for i := 1 to 10 do
     end if;
 end for;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (for_statement
@@ -65,7 +69,7 @@ Read statement
 
 read x, "Enter x: ";
 
----
+--------------------------------------------------------------------------------
 
 (program
   (read_statement
@@ -76,11 +80,23 @@ read x, "Enter x: ";
 Time statement
 ================================================================================
 
+f := func<x | x>;
+x := 1;
 time f(x);
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (identifier)
+    right: (constructor
+      name: (identifier)
+      (identifier)
+      (constructor_elements
+        (identifier))))
+  (assignment
+    left: (identifier)
+    right: (integer))
   (time_statement
     (expression_statement
       (call
@@ -92,11 +108,15 @@ time f(x);
 Print level statement
 ================================================================================
 
+x := 1;
 x : Maximal;
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    (identifier)
+    (integer))
   (expression_statement
     (print_level_statement
       (identifier))))
@@ -107,7 +127,7 @@ Dollar expression
 
 $;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (expression_statement
@@ -117,15 +137,30 @@ $;
 Group relation
 ================================================================================
 
-x = y;
+F<x, y> := FreeGroup(2);
+G := quo< F | x = y >;
 
----
+--------------------------------------------------------------------------------
 
 (program
-  (expression_statement
-    (group_relation
-      left: (identifier)
-      right: (identifier))))
+  (assignment
+    left: (constructor
+      name: (identifier)
+      (identifier)
+      (identifier))
+    right: (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (integer))))
+  (assignment
+    left: (identifier)
+    right: (constructor
+      name: (identifier)
+      (identifier)
+      (constructor_elements
+        (group_relation
+          left: (identifier)
+          right: (identifier))))))
 
 ================================================================================
 Backtick identifier in intrinsic
@@ -136,7 +171,7 @@ intrinsic Foo(`x) -> RngIntElt
   return x;
 end intrinsic;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (intrinsic_definition
@@ -156,7 +191,7 @@ Literal cycle
 
 x := \(1, 2, 3);
 
----
+--------------------------------------------------------------------------------
 
 (program
   (assignment
@@ -173,7 +208,7 @@ Literal sequence
 
 x := \[1, 2, 3];
 
----
+--------------------------------------------------------------------------------
 
 (program
   (assignment
@@ -189,7 +224,7 @@ Type declaration
 
 declare type MyType;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (declare_statement
@@ -203,7 +238,7 @@ Type declaration with supertype
 
 declare type MyType : ParentType;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (declare_statement

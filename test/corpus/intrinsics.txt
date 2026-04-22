@@ -6,7 +6,7 @@ intrinsic test() -> type
 { docstring }
 end intrinsic;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (intrinsic_definition
@@ -24,7 +24,7 @@ intrinsic test(x, y) -> .
   return x + y;
 end intrinsic;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (intrinsic_definition
@@ -43,13 +43,30 @@ end intrinsic;
 Attributes
 ================================================================================
 
-F`Signature; 
-F``"Signature"; 
-F``("Signa" cat "ture"); 
+AddAttribute(RngIntElt, "Signature");
+F := 1;
+F`Signature := 0;
+F`Signature;
+F``"Signature";
+F``("Signa" cat "ture");
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (expression_statement
+    (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (identifier)
+        argument: (string))))
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (assignment
+    left: (attribute
+      (identifier)
+      (identifier))
+    right: (integer))
   (expression_statement
     (attribute
       (identifier)
@@ -75,7 +92,7 @@ intrinsic '&+'(S::Setq) -> .
   return InternalAdd(S);
 end intrinsic;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (intrinsic_definition
@@ -102,7 +119,7 @@ intrinsic Prune(~S::MonStgElt)
   S := S[1..#S-1];
 end intrinsic;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (intrinsic_definition
@@ -144,7 +161,7 @@ intrinsic Minimum(S::SetMulti) -> .
   return min;
 end intrinsic;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (intrinsic_definition
@@ -196,9 +213,9 @@ end intrinsic;
       (return_statement
         (identifier)))))
 
-============================
+================================================================================
 Intrinsic with complex parameter types
-============================
+================================================================================
 
 intrinsic ComplexIntrinsic(~S::MonStgElt, T::SetEnum, U::SeqEnum[RngIntElt]) -> BoolElt, RngIntElt
 {
@@ -212,7 +229,7 @@ intrinsic ComplexIntrinsic(~S::MonStgElt, T::SetEnum, U::SeqEnum[RngIntElt]) -> 
     return true, 42;
 end intrinsic;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (intrinsic_definition
@@ -242,9 +259,9 @@ end intrinsic;
         (true)
         (integer)))))
 
-============================
+================================================================================
 Intrinsic with no parameters and no return type
-============================
+================================================================================
 
 intrinsic SimpleIntrinsic()
 {
@@ -253,7 +270,7 @@ intrinsic SimpleIntrinsic()
     print "Hello from intrinsic!";
 end intrinsic;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (intrinsic_definition
@@ -263,9 +280,9 @@ end intrinsic;
       (print_statement
         (string)))))
 
-============================
+================================================================================
 Intrinsic with multiple reference parameters
-============================
+================================================================================
 
 intrinsic SwapIntrinsic(~A::RngIntElt, ~B::RngIntElt)
 {
@@ -276,7 +293,7 @@ intrinsic SwapIntrinsic(~A::RngIntElt, ~B::RngIntElt)
     B := temp;
 end intrinsic;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (intrinsic_definition
@@ -301,9 +318,9 @@ end intrinsic;
         left: (identifier)
         right: (identifier)))))
 
-============================
+================================================================================
 Intrinsic with array types
-============================
+================================================================================
 
 intrinsic ArrayIntrinsic(M::Mtrx, V::SeqEnum[RngIntElt]) -> Mtrx
 {
@@ -312,7 +329,7 @@ intrinsic ArrayIntrinsic(M::Mtrx, V::SeqEnum[RngIntElt]) -> Mtrx
     return M;
 end intrinsic;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (intrinsic_definition
@@ -333,4 +350,3 @@ end intrinsic;
     body: (block
       (return_statement
         (identifier)))))
-

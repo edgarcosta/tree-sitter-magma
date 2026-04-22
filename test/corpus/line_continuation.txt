@@ -5,7 +5,7 @@ Line continuation in arithmetic
 x := 1 +\
 2;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (assignment
@@ -18,12 +18,19 @@ x := 1 +\
 Line continuation in function calls
 ================================================================================
 
+G := SymmetricGroup(3);
 x := Order(G) +\
     Degree(G);
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (identifier)
+    right: (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (integer))))
   (assignment
     left: (identifier)
     right: (binary_operator

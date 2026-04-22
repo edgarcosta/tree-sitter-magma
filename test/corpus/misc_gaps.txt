@@ -4,7 +4,7 @@ Dollar with numeric index
 
 $1;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (expression_statement
@@ -16,7 +16,7 @@ Dollar with multi-digit index
 
 $23;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (expression_statement
@@ -28,7 +28,7 @@ Assert with dollar reference
 
 assert $1 eq 0;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (assert_statement
@@ -37,31 +37,36 @@ assert $1 eq 0;
       right: (integer))))
 
 ================================================================================
-Requirege statement
-================================================================================
-
-requirege x, 0;
-
----
-
-(program
-  (require_statement
-    (identifier)
-    (integer)))
-
-================================================================================
 Requirerange statement
 ================================================================================
 
-requirerange x, 0, 10;
+// requirerange is only valid inside an intrinsic body
+intrinsic TestRequirerange(x :: RngIntElt) -> RngIntElt
+{Test that requirerange is accepted inside an intrinsic}
+    requirerange x, 0, 10;
+    return x;
+end intrinsic;
 
----
+--------------------------------------------------------------------------------
 
 (program
-  (require_statement
+  (comment)
+  (intrinsic_definition
     (identifier)
-    (integer)
-    (integer)))
+    (typed_identifier
+      (identifier)
+      (type
+        (identifier)))
+    (type
+      (identifier))
+    (doc_string)
+    (block
+      (require_statement
+        (identifier)
+        (integer)
+        (integer))
+      (return_statement
+        (identifier)))))
 
 ================================================================================
 Readi statement
@@ -69,7 +74,7 @@ Readi statement
 
 readi x, "Enter value: ";
 
----
+--------------------------------------------------------------------------------
 
 (program
   (read_statement
@@ -80,11 +85,25 @@ readi x, "Enter value: ";
 Constructor with options
 ================================================================================
 
+t := Rationals();
+T := MatrixRing(t, 2);
 LieAlgebra< t | T : Rep:= "Dense" >;
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (identifier)
+    right: (call
+      function: (identifier)
+      arguments: (argument_list)))
+  (assignment
+    left: (identifier)
+    right: (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (identifier)
+        argument: (integer))))
   (expression_statement
     (constructor
       name: (identifier)
@@ -100,11 +119,26 @@ LieAlgebra< t | T : Rep:= "Dense" >;
 Time with multiple assignment targets
 ================================================================================
 
+D := StandardLattice(2);
+w := D ! [1, 0];
 time cv, m := ClosestVectors(D, w);
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (identifier)
+    right: (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (integer))))
+  (assignment
+    left: (identifier)
+    right: (binary_operator
+      left: (identifier)
+      right: (seqenum
+        (integer)
+        (integer))))
   (time_statement
     (assignment
       left: (identifier)
@@ -121,7 +155,7 @@ Anonymous constructor assignment
 
 _<x> := PolynomialRing(Rationals());
 
----
+--------------------------------------------------------------------------------
 
 (program
   (assignment

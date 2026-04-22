@@ -2,11 +2,24 @@
 Basic expressions
 ================================================================================
 
+a := 1; b := 2; c := 3; d := 4;
 a + b * c - d;
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (assignment
+    left: (identifier)
+    right: (integer))
   (expression_statement
     (binary_operator
       left: (binary_operator
@@ -20,11 +33,27 @@ a + b * c - d;
 Parenthesized expression
 ================================================================================
 
+_2a := 1; b := 2; c := 3; d := 4; e := 5;
 _2a + (b * (c - d)) / e;
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (assignment
+    left: (identifier)
+    right: (integer))
   (expression_statement
     (binary_operator
       left: (identifier)
@@ -42,11 +71,18 @@ _2a + (b * (c - d)) / e;
 Unary minus
 ================================================================================
 
+a := 1; b := 2;
 a + -b;
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (assignment
+    left: (identifier)
+    right: (integer))
   (expression_statement
     (binary_operator
       left: (identifier)
@@ -59,7 +95,7 @@ Binary integer
 
 0b101 + 42;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (expression_statement
@@ -73,7 +109,7 @@ Hex integer
 
 0xff + 1;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (expression_statement
@@ -87,7 +123,7 @@ Large hex integer
 
 0xDEADBEEF;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (expression_statement
@@ -102,7 +138,7 @@ y := "say \"hi\"";
 z := "path\\to\\file";
 w := "tab\there";
 
----
+--------------------------------------------------------------------------------
 
 (program
   (assignment
@@ -125,7 +161,7 @@ Multi-line string with backslash continuation
 x := "hello \
 world";
 
----
+--------------------------------------------------------------------------------
 
 (program
   (assignment
@@ -142,7 +178,8 @@ Reals
 12345e-4p8;
 1p2;
 1e+3;
----
+--------------------------------------------------------------------------------
+
 (program
   (expression_statement
     (real))
@@ -161,16 +198,44 @@ Reals
 Word binary operators: arithmetic and set
 ================================================================================
 
-a := x mod y;
-b := x join y;
-c := x diff y;
-d := x sdiff y;
-e := x meet y;
-f := x cat y;
+i := 5; j := 2;
+s1 := {1, 2}; s2 := {2, 3};
+q1 := [1, 2]; q2 := [3];
+a := i mod j;
+b := s1 join s2;
+c := s1 diff s2;
+d := s1 sdiff s2;
+e := s1 meet s2;
+f := q1 cat q2;
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (assignment
+    left: (identifier)
+    right: (set
+      (integer)
+      (integer)))
+  (assignment
+    left: (identifier)
+    right: (set
+      (integer)
+      (integer)))
+  (assignment
+    left: (identifier)
+    right: (seqenum
+      (integer)
+      (integer)))
+  (assignment
+    left: (identifier)
+    right: (seqenum
+      (integer)))
   (assignment
     left: (identifier)
     right: (binary_operator
@@ -206,15 +271,60 @@ f := x cat y;
 Word binary operators: membership and adjacency
 ================================================================================
 
+x := 1; y := {1, 2, 3};
+G := CompleteGraph(4); u := VertexSet(G).1; v := VertexSet(G).2;
+A := {1, 2}; B := {1, 2, 3};
 a := x notin y;
-b := G adj H;
-c := G notadj H;
+b := u adj v;
+c := u notadj v;
 d := A subset B;
 e := A notsubset B;
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (assignment
+    left: (identifier)
+    right: (set
+      (integer)
+      (integer)
+      (integer)))
+  (assignment
+    left: (identifier)
+    right: (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (integer))))
+  (assignment
+    left: (identifier)
+    right: (binary_operator
+      left: (call
+        function: (identifier)
+        arguments: (argument_list
+          argument: (identifier)))
+      right: (integer)))
+  (assignment
+    left: (identifier)
+    right: (binary_operator
+      left: (call
+        function: (identifier)
+        arguments: (argument_list
+          argument: (identifier)))
+      right: (integer)))
+  (assignment
+    left: (identifier)
+    right: (set
+      (integer)
+      (integer)))
+  (assignment
+    left: (identifier)
+    right: (set
+      (integer)
+      (integer)
+      (integer)))
   (assignment
     left: (identifier)
     right: (binary_operator
@@ -245,12 +355,19 @@ e := A notsubset B;
 Word binary operators: cmpeq and cmpne
 ================================================================================
 
+x := 1; y := 2;
 a := x cmpeq y;
 b := x cmpne y;
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (assignment
+    left: (identifier)
+    right: (integer))
   (assignment
     left: (identifier)
     right: (binary_operator

@@ -4,7 +4,7 @@ Function call
 
 EllipticCurve("11a1");
 
----
+--------------------------------------------------------------------------------
 
 (program
   (expression_statement
@@ -21,7 +21,7 @@ function test()
     return 0;
 end function;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (expression_statement
@@ -41,7 +41,7 @@ function test(x,y : z := 3)
     return x + z;
 end function;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (expression_statement
@@ -76,7 +76,7 @@ fibonacci := function(n)
    end if;
 end function;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (assignment
@@ -117,7 +117,7 @@ procedure main()
     print "Hello, World!";
 end procedure;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (expression_statement
@@ -138,7 +138,7 @@ procedure foobar(~foo, ~bar)
     foo, bar := bar, foo;
 end procedure;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (expression_statement
@@ -172,7 +172,7 @@ CheckPythagoras := procedure(x, y, z, ~h)
     end if;
 end procedure;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (assignment
@@ -207,17 +207,29 @@ end procedure;
                 left: (identifier)
                 right: (false)))))))))
 
-============================
+================================================================================
 Inline function expressions
-============================
+================================================================================
 
+x := 1;
+f := func<a | a>;
 myfunc := func<| x + 1>;
 myproc := proc<| f(x)>;
 func< :Dir | Dir>;
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (assignment
+    left: (identifier)
+    right: (constructor
+      name: (identifier)
+      (identifier)
+      (constructor_elements
+        (identifier))))
   (assignment
     left: (identifier)
     right: (constructor
@@ -243,14 +255,14 @@ func< :Dir | Dir>;
           (identifier))
         (identifier)))))
 
-============================
+================================================================================
 Inline functions with parameters
-============================
+================================================================================
 
 add := func<x, y | x + y>;
 print_and_return := proc<~result, value | Print(result, value)>;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (assignment
@@ -277,15 +289,15 @@ print_and_return := proc<~result, value | Print(result, value)>;
             argument: (identifier)
             argument: (identifier)))))))
 
-============================
+================================================================================
 Optional parameters in procedures
-============================
+================================================================================
 
 procedure test1(entries:Dir); x := 1; end procedure;
 procedure test2(x, y:Default := 5); y := 2; end procedure;
 procedure test3(a, b, c, d:Opt2 := 10); z := 3; end procedure;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (expression_statement
@@ -327,10 +339,11 @@ procedure test3(a, b, c, d:Opt2 := 10); z := 3; end procedure;
           left: (identifier)
           right: (integer))))))
 
-============================
+================================================================================
 Exit statements
-============================
+================================================================================
 
+NO_RESPAWN := 0;
 try
     x := 1;
     exit NO_RESPAWN;
@@ -339,9 +352,12 @@ catch e
     print "Error:", e;
 end try;
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (identifier)
+    right: (integer))
   (try_catch_statement
     (block
       (assignment
@@ -358,15 +374,15 @@ end try;
         (string)
         (identifier)))))
 
-============================
+================================================================================
 More inline function examples
-============================
+================================================================================
 
 add := func<x, y | x + y>;
 swap := proc<~a, ~b | Print(a, b)>;
 fibonacci := func<n | n le 1 select n else $$(n-1) + $$(n-2)>;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (assignment
@@ -418,13 +434,13 @@ fibonacci := func<n | n le 1 select n else $$(n-1) + $$(n-2)>;
                   left: (identifier)
                   right: (integer))))))))))
 
-============================
+================================================================================
 Call function upon definition
-============================
+================================================================================
 
 a, b := function() return 1, "a"; end function();
 
----
+--------------------------------------------------------------------------------
 
 (program
   (assignment

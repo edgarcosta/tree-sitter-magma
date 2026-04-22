@@ -2,14 +2,18 @@
 Empty when clause with semicolon no-op
 ================================================================================
 
+x := 1;
 case x :
     when 1: ;
     when 2: y := 1;
 end case;
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (identifier)
+    right: (integer))
   (case_statement
     matchee: (identifier)
     (when_clause
@@ -26,15 +30,19 @@ end case;
 Empty when clause with string match
 ================================================================================
 
+x := "Infty";
 case x :
     when "Infty": ;
     when "Finite":
         y := 1;
 end case;
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (identifier)
+    right: (string))
   (case_statement
     matchee: (identifier)
     (when_clause
@@ -53,7 +61,7 @@ Read statement without prompt
 
 read s;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (read_statement
@@ -65,7 +73,7 @@ Read statement with prompt
 
 read x, "Enter x: ";
 
----
+--------------------------------------------------------------------------------
 
 (program
   (read_statement
@@ -78,7 +86,7 @@ Readi statement without prompt
 
 readi s;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (read_statement

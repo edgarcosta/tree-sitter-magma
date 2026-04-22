@@ -2,11 +2,18 @@
 Multiple inline expressions
 ================================================================================
 
+x := 1; y := 2;
 x, y, 2 + 4;
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (assignment
+    left: (identifier)
+    right: (integer))
   (expression_statement
     (identifier)
     (identifier)
@@ -18,12 +25,16 @@ x, y, 2 + 4;
 Try-catch and print statements
 ================================================================================
 
+x := 1;
 try print x; catch e print x; end try;
 try print x; catch e; print x; end try;
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (identifier)
+    right: (integer))
   (try_catch_statement
     (block
       (print_statement
@@ -40,30 +51,43 @@ try print x; catch e; print x; end try;
     (block
       (print_statement
         (identifier)))))
-          
+
 ================================================================================
 vprint statement
 ================================================================================
 
 vprint User1: "Computing order...";
 
----
+--------------------------------------------------------------------------------
 
 (program
   (vprint_statement
     flag: (identifier)
     (string)))
 
-
 ================================================================================
 vprintf statement
 ================================================================================
 
+SetVerbose("PRProspection", 4);
+value := 1; threshold := 2;
 vprintf PRProspection, 4 : "Value %o, Threshold %o\n", value, threshold;
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (expression_statement
+    (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (string)
+        argument: (integer))))
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (assignment
+    left: (identifier)
+    right: (integer))
   (vprint_statement
     flag: (identifier)
     n: (integer)
@@ -75,11 +99,30 @@ vprintf PRProspection, 4 : "Value %o, Threshold %o\n", value, threshold;
 vtime statement
 ================================================================================
 
+SetVerbose("SEA", 4);
+NaiveEulerFactor := func<x | x>;
+C := 1;
 vtime SEA, 4: charpol := NaiveEulerFactor(C);
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (expression_statement
+    (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (string)
+        argument: (integer))))
+  (assignment
+    left: (identifier)
+    right: (constructor
+      name: (identifier)
+      (identifier)
+      (constructor_elements
+        (identifier))))
+  (assignment
+    left: (identifier)
+    right: (integer))
   (vtime_statement
     flag: (identifier)
     n: (integer)
@@ -94,11 +137,30 @@ vtime SEA, 4: charpol := NaiveEulerFactor(C);
 vtime statement without level
 ================================================================================
 
+SetVerbose("ParamDP", 1);
+f := func<a | a>;
+y := 1;
 vtime ParamDP: x := f(y);
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (expression_statement
+    (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (string)
+        argument: (integer))))
+  (assignment
+    left: (identifier)
+    right: (constructor
+      name: (identifier)
+      (identifier)
+      (constructor_elements
+        (identifier))))
+  (assignment
+    left: (identifier)
+    right: (integer))
   (vtime_statement
     flag: (identifier)
     (assignment
@@ -114,7 +176,7 @@ Assert statement
 
 assert2 1 + 2 eq 3;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (assert_statement
@@ -130,28 +192,13 @@ Declare verbose statement
 
 declare verbose MyAlgorithm, 3;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (declare_statement
     (verbosity_declaration
       function: (identifier)
       level: (integer))))
-
-================================================================================
-Declare attributes statement
-================================================================================
-
-declare attributes MyRat: Numer, Denom;
-
---- 
-
-(program
-  (declare_statement
-    (attribute_declaration
-      category: (identifier)
-      attribute: (identifier)
-      attribute: (identifier))))
 
 ================================================================================
 Local variables declaration
@@ -161,7 +208,7 @@ procedure test()
     local A, outers, NS, CS;
 end procedure;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (expression_statement
@@ -181,7 +228,7 @@ Error statement
 
 error "Runtime error in 'MyFunc'";
 
----
+--------------------------------------------------------------------------------
 
 (program
   (error_statement
@@ -193,7 +240,7 @@ Error statement with if
 
 error if 1 gt 0, "Oops!";
 
----
+--------------------------------------------------------------------------------
 
 (program
   (error_statement
@@ -209,7 +256,7 @@ Complex quoted identifiers
 'foo.1 + 2' := 2;
 'foo.1 + 2';
 
----
+--------------------------------------------------------------------------------
 
 (program
   (assignment
@@ -218,10 +265,12 @@ Complex quoted identifiers
   (expression_statement
     (identifier)))
 
-============================
+================================================================================
 Exit statements in different contexts
-============================
+================================================================================
 
+FAILURE := 0; SUCCESS := 1;
+compute_result := func<| 0>;
 try
     exit FAILURE;
 catch e
@@ -234,9 +283,21 @@ end procedure;
 
 exit compute_result();
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (assignment
+    left: (identifier)
+    right: (constructor
+      name: (identifier)
+      (constructor_elements
+        (integer))))
   (try_catch_statement
     (block
       (exit_directive
@@ -258,10 +319,13 @@ exit compute_result();
       function: (identifier)
       arguments: (argument_list))))
 
-============================
+================================================================================
 Complex try-catch with multiple exits
-============================
+================================================================================
 
+condition := false;
+process_data := procedure() end procedure;
+EARLY_EXIT := 1; SUCCESS := 0; FATAL_ERROR := 2;
 try
     if condition then
         exit EARLY_EXIT;
@@ -275,9 +339,25 @@ catch e
     print "Recovering from:", e;
 end try;
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (identifier)
+    right: (false))
+  (assignment
+    left: (identifier)
+    right: (procedure_definition
+      parameters: (parameters)))
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (assignment
+    left: (identifier)
+    right: (integer))
   (try_catch_statement
     (block
       (if_statement
