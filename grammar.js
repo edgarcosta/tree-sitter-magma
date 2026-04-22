@@ -285,10 +285,6 @@ module.exports = grammar({
 	    ))));
 	},
 
-	// Word operators no longer include surrounding spaces.
-	// Tree-sitter's keyword extraction (via `word: $ => $.identifier`)
-	// ensures these won't match as substrings of identifiers.
-	// Spaces between tokens are handled by `extras`.
 	binary_operator: $ => {
 	    const table = [
 		[prec.left, '+', PREC.plus],
@@ -481,7 +477,7 @@ module.exports = grammar({
 	
 	_definition: $ => choice(
 	    $.function_definition,
-	    // $.intrinsic_definition,
+	    $.intrinsic_definition,
 	    $.procedure_definition,
 	),
 
@@ -812,7 +808,6 @@ module.exports = grammar({
 	    $.case_statement,
 	    $.repeat_statement,
 	    $.try_catch_statement,
-	    $.intrinsic_definition,
 	),
 	
 	if_statement: $ => seq(
@@ -1058,6 +1053,12 @@ function sep1(rule, separator) {
 
 // `rep` is a soft keyword: reserved only before a set literal (see
 // `representative_of_set`), usable as a regular identifier everywhere else.
+// The literal `'rep'` aliased to `$.identifier` causes tree-sitter's
+// keyword-extraction machinery to treat `rep` as a keyword when parsing a
+// `representative_of_set`, and as an identifier otherwise. The four call
+// sites below (primary_expression, _callable, _simple_assignment,
+// for_quantifier) are the positions where `rep` can appear as an ordinary
+// name; it is possible there is a cleaner way to achieve the same effect.
 function repIdentifier($) {
     return alias('rep', $.identifier);
 }
