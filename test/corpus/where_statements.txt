@@ -1,174 +1,205 @@
-=======================================================
+================================================================================
 Basic where expression with "is"
-=======================================================
+================================================================================
 
+y := 1;
 x + y where x is 5;
 
----
+--------------------------------------------------------------------------------
 
-    (program
-      (expression_statement
-        (where_expression
-          (binary_operator
-            (identifier)
-            (identifier))
-          (identifier)
-          (integer))))
+(program
+  (assignment
+    (identifier)
+    (integer))
+  (expression_statement
+    (where_expression
+      (binary_operator
+        (identifier)
+        (identifier))
+      (identifier)
+      (integer))))
 
-=======================================================
+================================================================================
 Basic where expression with ":="
-=======================================================
+================================================================================
 
-
+b := 1;
 a * b where a := 3;
 
----
+--------------------------------------------------------------------------------
 
-    (program
-      (expression_statement
-        (where_expression
-          (binary_operator
-            (identifier)
-            (identifier))
-          (identifier)
-          (integer))))
+(program
+  (assignment
+    (identifier)
+    (integer))
+  (expression_statement
+    (where_expression
+      (binary_operator
+        (identifier)
+        (identifier))
+      (identifier)
+      (integer))))
 
-=======================================================
+================================================================================
 Where expression with function call
-=======================================================
+================================================================================
 
+f := func<z | z + 1>;
 f(x) where x is 10;
 
----
+--------------------------------------------------------------------------------
 
-    (program
-      (expression_statement
-        (where_expression
-          (call
-            (identifier)
-            (argument_list
-              (identifier)))
+(program
+  (assignment
+    (identifier)
+    (constructor
+      (identifier)
+      (identifier)
+      (constructor_elements
+        (binary_operator
           (identifier)
-          (integer))))
+          (integer)))))
+  (expression_statement
+    (where_expression
+      (call
+        (identifier)
+        (argument_list
+          (identifier)))
+      (identifier)
+      (integer))))
 
-=======================================================
+================================================================================
 Where expression with comparison
-=======================================================
+================================================================================
 
+b := 5;
 a eq b where a is 5;
 
----
+--------------------------------------------------------------------------------
 
-    (program
-      (expression_statement
-        (where_expression
-          (binary_operator
-            (identifier)
-            (identifier))
-          (identifier)
-          (integer))))
+(program
+  (assignment
+    (identifier)
+    (integer))
+  (expression_statement
+    (where_expression
+      (binary_operator
+        (identifier)
+        (identifier))
+      (identifier)
+      (integer))))
 
-=======================================================
+================================================================================
 Where expression with parenthesized expression
-=======================================================
+================================================================================
 
+y := 2; z := 3;
 (x + y) * z where x is 1;
 
----
+--------------------------------------------------------------------------------
 
-    (program
-      (expression_statement
-        (where_expression
+(program
+  (assignment
+    (identifier)
+    (integer))
+  (assignment
+    (identifier)
+    (integer))
+  (expression_statement
+    (where_expression
+      (binary_operator
+        (parenthesized_expression
           (binary_operator
-            (parenthesized_expression
-              (binary_operator
-                (identifier)
-                (identifier)))
-            (identifier))
-          (identifier)
-          (integer))))
+            (identifier)
+            (identifier)))
+        (identifier))
+      (identifier)
+      (integer))))
 
-=======================================================
+================================================================================
 Where expression with boolean operator
-=======================================================
+================================================================================
 
+b := true;
 a and b where a is true;
 
----
+--------------------------------------------------------------------------------
 
-    (program
-      (expression_statement
-        (where_expression
-          (boolean_operator
-            (identifier)
-            (identifier))
-          (identifier)
-          (true))))
+(program
+  (assignment
+    (identifier)
+    (true))
+  (expression_statement
+    (where_expression
+      (boolean_operator
+        (identifier)
+        (identifier))
+      (identifier)
+      (true))))
 
-
-=======================================================
+================================================================================
 Where expression with unary operator
-=======================================================
+================================================================================
 
 not p where p is false;
 
----
+--------------------------------------------------------------------------------
 
-    (program
-      (expression_statement
-        (where_expression
-          (unary_operator
-            (identifier))
-          (identifier)
-          (false))))
+(program
+  (expression_statement
+    (where_expression
+      (unary_operator
+        (identifier))
+      (identifier)
+      (false))))
 
-=======================================================
+================================================================================
 Where expression with arithmetic
-=======================================================
+================================================================================
 
 n + 1 where n is 42;
 
----
+--------------------------------------------------------------------------------
 
-    (program
-      (expression_statement
-        (where_expression
-          (binary_operator
-            (identifier)
-            (integer))
-          (identifier)
-          (integer))))
+(program
+  (expression_statement
+    (where_expression
+      (binary_operator
+        (identifier)
+        (integer))
+      (identifier)
+      (integer))))
 
-=======================================================
+================================================================================
 Left associativity
-=======================================================
+================================================================================
 
 a + b where b := 1 where a:=10 where a := 3;
 
----
+--------------------------------------------------------------------------------
 
-    (program
-      (expression_statement
+(program
+  (expression_statement
+    (where_expression
+      (where_expression
         (where_expression
-          (where_expression
-            (where_expression
-              (binary_operator
-                (identifier)
-                (identifier))
-              (identifier)
-              (integer))
+          (binary_operator
             (identifier)
-            (integer))
+            (identifier))
           (identifier)
-          (integer))))
+          (integer))
+        (identifier)
+        (integer))
+      (identifier)
+      (integer))))
 
-=======================================================
+================================================================================
 Where expression with anonymous identifier
-=======================================================
+================================================================================
 
 a + p where _, p := IsPrimePower(a) where a := 9;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (expression_statement

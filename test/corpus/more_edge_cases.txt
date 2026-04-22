@@ -2,11 +2,17 @@
 Coercion with bang operator
 ================================================================================
 
+Z := Integers();
 x := Z!42;
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (identifier)
+    right: (call
+      function: (identifier)
+      arguments: (argument_list)))
   (assignment
     left: (identifier)
     right: (binary_operator
@@ -19,7 +25,7 @@ Multi-variable sequence comprehension
 
 [ <x,y> : x in [1..3], y in [1..3] | x ne y ];
 
----
+--------------------------------------------------------------------------------
 
 (program
   (expression_statement
@@ -48,14 +54,18 @@ Multi-variable sequence comprehension
 Case with multiple match values
 ================================================================================
 
+x := 2;
 case x :
     when 1, 2: y := true;
     when 3: y := false;
 end case;
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (identifier)
+    right: (integer))
   (case_statement
     matchee: (identifier)
     (when_clause
@@ -80,7 +90,7 @@ for i := 1 to 10 do
     break i;
 end for;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (for_statement
@@ -98,7 +108,7 @@ Negative integer literal
 
 x := -42;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (assignment
@@ -111,7 +121,7 @@ Reduct and
 
 &and[true, true, false];
 
----
+--------------------------------------------------------------------------------
 
 (program
   (expression_statement
@@ -127,7 +137,7 @@ Reduct or
 
 &or[true, false];
 
----
+--------------------------------------------------------------------------------
 
 (program
   (expression_statement
@@ -144,7 +154,7 @@ for random x in {1..10} do
     break;
 end for;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (for_statement
@@ -167,7 +177,7 @@ catch e
     print e;
 end try;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (try_catch_statement
@@ -191,7 +201,7 @@ function outer()
     return inner();
 end function;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (expression_statement
@@ -217,7 +227,7 @@ Deep parenthesized nesting
 
 x := ((((1 + 2) * 3) - 4) / 5);
 
----
+--------------------------------------------------------------------------------
 
 (program
   (assignment
@@ -244,7 +254,7 @@ function test()
     return 1, 2, 3;
 end function;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (expression_statement

@@ -2,11 +2,33 @@
 Basic map
 ================================================================================
 
+A := Integers();
+B := Integers();
+Graph := {<1,1>, <2,2>};
 map<A -> B | Graph>;
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (identifier)
+    right: (call
+      function: (identifier)
+      arguments: (argument_list)))
+  (assignment
+    left: (identifier)
+    right: (call
+      function: (identifier)
+      arguments: (argument_list)))
+  (assignment
+    left: (identifier)
+    right: (set
+      (tuple
+        (integer)
+        (integer))
+      (tuple
+        (integer)
+        (integer))))
   (expression_statement
     (constructor
       name: (identifier)
@@ -20,11 +42,35 @@ map<A -> B | Graph>;
 Partial map with complicated mapping rule
 ================================================================================
 
+k := Integers();
+f := func<y | y>;
+P := Integers();
+sigma := 1;
 pmap<k -> Parent(f) | x :-> Evaluate(P!Eltseq(x),sigma)>;
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (identifier)
+    right: (call
+      function: (identifier)
+      arguments: (argument_list)))
+  (assignment
+    left: (identifier)
+    right: (constructor
+      name: (identifier)
+      (identifier)
+      (constructor_elements
+        (identifier))))
+  (assignment
+    left: (identifier)
+    right: (call
+      function: (identifier)
+      arguments: (argument_list)))
+  (assignment
+    left: (identifier)
+    right: (integer))
   (expression_statement
     (constructor
       name: (identifier)
@@ -52,11 +98,42 @@ pmap<k -> Parent(f) | x :-> Evaluate(P!Eltseq(x),sigma)>;
 Hom with several entries
 ================================================================================
 
+Mod := RSpace(Integers(), 4);
+N := Mod;
+W := Mod;
+M := Integers();
+F := FreeGroup(1);
 hom<Mod -> N | W![3, 2, 1, 0], W![3*(M!F.1 + 1), 2*(M!F.1 + 1), M!F.1 + 1, 0] >;
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (identifier)
+    right: (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (call
+          function: (identifier)
+          arguments: (argument_list))
+        argument: (integer))))
+  (assignment
+    left: (identifier)
+    right: (identifier))
+  (assignment
+    left: (identifier)
+    right: (identifier))
+  (assignment
+    left: (identifier)
+    right: (call
+      function: (identifier)
+      arguments: (argument_list)))
+  (assignment
+    left: (identifier)
+    right: (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (integer))))
   (expression_statement
     (constructor
       name: (identifier)
@@ -104,14 +181,34 @@ hom<Mod -> N | W![3, 2, 1, 0], W![3*(M!F.1 + 1), 2*(M!F.1 + 1), M!F.1 + 1, 0] >;
             (integer)))))))
 
 ================================================================================
-Hom with several entries
+Hom with several entries (named domain and codomain)
 ================================================================================
 
+f := hom<Integers() -> Integers() | x :-> x>;
+g := f;
 hom<Domain(f) -> Codomain(g) | g :-> 1, h :-> Sqrt(2)/2>;
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (identifier)
+    right: (constructor
+      name: (identifier)
+      (two_tuple
+        left: (call
+          function: (identifier)
+          arguments: (argument_list))
+        right: (call
+          function: (identifier)
+          arguments: (argument_list)))
+      (constructor_elements
+        (map_constructor
+          domain_element: (identifier)
+          image: (identifier)))))
+  (assignment
+    left: (identifier)
+    right: (identifier))
   (expression_statement
     (constructor
       name: (identifier)
@@ -141,11 +238,27 @@ hom<Domain(f) -> Codomain(g) | g :-> 1, h :-> Sqrt(2)/2>;
 pmap with tuples
 ================================================================================
 
+F := Integers();
+Zm := Integers();
+z := 1;
 pmap< F -> Zm | <1, 1>, <z, 0>, <z^2, 4> >;
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (identifier)
+    right: (call
+      function: (identifier)
+      arguments: (argument_list)))
+  (assignment
+    left: (identifier)
+    right: (call
+      function: (identifier)
+      arguments: (argument_list)))
+  (assignment
+    left: (identifier)
+    right: (integer))
   (expression_statement
     (constructor
       name: (identifier)

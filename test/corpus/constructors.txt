@@ -1,12 +1,33 @@
-============================
+================================================================================
 Ideal constructor
-============================
+================================================================================
 
+OF := RingOfIntegers(QuadraticField(-5));
+a1 := OF!2; a2 := OF!3;
 ideal<OF | a1,a2>;
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (identifier)
+    right: (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (call
+          function: (identifier)
+          arguments: (argument_list
+            argument: (integer))))))
+  (assignment
+    left: (identifier)
+    right: (binary_operator
+      left: (identifier)
+      right: (integer)))
+  (assignment
+    left: (identifier)
+    right: (binary_operator
+      left: (identifier)
+      right: (integer)))
   (expression_statement
     (constructor
       name: (identifier)
@@ -15,14 +36,14 @@ ideal<OF | a1,a2>;
         (identifier)
         (identifier)))))
 
-============================
+================================================================================
 Recformat constructor
-============================
+================================================================================
 
 recformat<get : UserProgram, set: UserProgram, isset: UserProgram>;
 recformat< n : Integers(), misc, seq : SeqEnum >;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (expression_statement
@@ -48,15 +69,40 @@ recformat< n : Integers(), misc, seq : SeqEnum >;
         name: (identifier)
         type: (identifier)))))
 
-============================
+================================================================================
 Record constructor with rep as field name
-============================
+================================================================================
 
+CMF := recformat<gp, rep>;
+G := SymmetricGroup(3);
+M := 1;
+f := func<x | x>;
 rec < CMF | gp:=G, rep:=f(M) >;
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (identifier)
+    right: (recformat_constructor
+      (identifier)
+      (identifier)))
+  (assignment
+    left: (identifier)
+    right: (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (integer))))
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (assignment
+    left: (identifier)
+    right: (constructor
+      name: (identifier)
+      (identifier)
+      (constructor_elements
+        (identifier))))
   (expression_statement
     (constructor
       name: (identifier)
@@ -72,15 +118,32 @@ rec < CMF | gp:=G, rep:=f(M) >;
             arguments: (argument_list
               argument: (identifier))))))))
 
-============================
+================================================================================
 Stupid group quo constructor
-============================
+================================================================================
 
+F := FreeGroup(5);
+rels := [F.1, F.2];
 G<a,b,c,d,e> := quo< GrpPC : F | rels >;
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (identifier)
+    right: (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (integer))))
+  (assignment
+    left: (identifier)
+    right: (seqenum
+      (binary_operator
+        left: (identifier)
+        right: (integer))
+      (binary_operator
+        left: (identifier)
+        right: (integer))))
   (assignment
     left: (constructor
       name: (identifier)
@@ -96,4 +159,3 @@ G<a,b,c,d,e> := quo< GrpPC : F | rels >;
         (constructor_options
           (identifier))
         (identifier)))))
-

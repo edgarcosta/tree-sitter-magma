@@ -4,7 +4,7 @@ Basic assignment
 
 x := 1;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (assignment
@@ -17,7 +17,7 @@ Multiple assignment
 
 a,b,c := 1,2,3;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (assignment
@@ -32,11 +32,22 @@ a,b,c := 1,2,3;
 Assignment with generator
 ================================================================================
 
+_<x> := PolynomialRing(Integers());
 F<a> := NumberField(x^2+1);
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (anonymous_constructor
+      (anonymous_identifier)
+      (identifier))
+    right: (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (call
+          function: (identifier)
+          arguments: (argument_list)))))
   (assignment
     left: (constructor
       name: (identifier)
@@ -56,7 +67,7 @@ Assignment with anonymous identifier
 
 p, _ := IsPrimePower(9);
 
----
+--------------------------------------------------------------------------------
 
 (program
   (assignment
@@ -73,7 +84,7 @@ Assignment with anonymous generator
 
 _<x> := PolynomialRing(Integers());
 
----
+--------------------------------------------------------------------------------
 
 (program
   (assignment
@@ -88,14 +99,18 @@ _<x> := PolynomialRing(Integers());
           arguments: (argument_list))))))
 
 ================================================================================
-Augmented assignment 
+Augmented assignment
 ================================================================================
 
+x := 0;
 x +:= 1;
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (identifier)
+    right: (integer))
   (augmented_assignment
     left: (identifier)
     right: (integer)))

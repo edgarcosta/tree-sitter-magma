@@ -1,10 +1,10 @@
-=======================================================
+================================================================================
 Group cycles
-=======================================================
+================================================================================
 S := SymmetricGroup(5);
 (1,2)(3,4);
 (x where x is 1,2)(3,4);
----
+--------------------------------------------------------------------------------
 
 (program
   (assignment
@@ -33,17 +33,35 @@ S := SymmetricGroup(5);
         (integer)
         (integer)))))
 
-=======================================================
+================================================================================
 Function calls - easily confused with cycles
-=======================================================
+================================================================================
 
+S := SymmetricGroup(3);
+f := func<a, b | a + b>;
 f(1,2);
 (f)(1,2);
-f((1,2));
+f(S!(1,2));
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (identifier)
+    right: (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (integer))))
+  (assignment
+    left: (identifier)
+    right: (constructor
+      name: (identifier)
+      (identifier)
+      (identifier)
+      (constructor_elements
+        (binary_operator
+          left: (identifier)
+          right: (identifier)))))
   (expression_statement
     (call
       function: (identifier)
@@ -61,19 +79,21 @@ f((1,2));
     (call
       function: (identifier)
       arguments: (argument_list
-        argument: (cycle_or_commutator_product
-          (cycle_or_commutator
-            (integer)
-            (integer)))))))
+        argument: (binary_operator
+          left: (identifier)
+          right: (cycle_or_commutator_product
+            (cycle_or_commutator
+              (integer)
+              (integer))))))))
 
-=======================================================
+================================================================================
 More complicated function calls
-=======================================================
+================================================================================
 
 L := [function(x,y) return x + y; end function];
 (L[1])((1,2));
 
----
+--------------------------------------------------------------------------------
 
 (program
   (assignment

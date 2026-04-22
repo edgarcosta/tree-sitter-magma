@@ -2,14 +2,18 @@
 Basic if statement
 ================================================================================
 
+m := 15;
 if IsPrime(m) then
     m, "is prime";
 else
     Factorization(m);
-end if;   
----
+end if;
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (identifier)
+    right: (integer))
   (if_statement
     condition: (call
       function: (identifier)
@@ -31,6 +35,7 @@ end if;
 Complex nested if statements
 ================================================================================
 
+x := 3;
 if x gt 1 then
    if x lt 2 then
       	print -x;
@@ -41,9 +46,12 @@ if x gt 1 then
    end if;
 end if;
    
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (identifier)
+    right: (integer))
   (if_statement
     condition: (binary_operator
       left: (identifier)
@@ -84,7 +92,7 @@ case Sign(x):
       x, "is negative";
 end case;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (assignment
@@ -118,6 +126,7 @@ end case;
 Case statement with else
 ================================================================================
 
+x := 5;
 case Sign(x):
    when 1:
       x, "is positive";
@@ -125,9 +134,12 @@ case Sign(x):
       x, "is non-positive";
 end case;
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (identifier)
+    right: (integer))
   (case_statement
     matchee: (call
       function: (identifier)
@@ -153,7 +165,7 @@ myL:=func< A|
                    JacHyp  : LSeries(Curve(A) : LocalData:="Ogg"),
                    CrvEll  : LSeries(A),
                    default : false>>;
----
+--------------------------------------------------------------------------------
 
 (program
   (assignment
@@ -206,11 +218,15 @@ myL:=func< A|
 Ternary operator
 ================================================================================
 
+y := 5;
 s := (y gt 0) select 1 else -1;
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (identifier)
+    right: (integer))
   (assignment
     left: (identifier)
     right: (ternary_operator
@@ -225,11 +241,15 @@ s := (y gt 0) select 1 else -1;
 Nested ternary operator
 ================================================================================
 
+y := 5;
 y gt 0 select 1 else y eq 0 select 0 else -1;
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (identifier)
+    right: (integer))
   (expression_statement
     (ternary_operator
       conditional: (binary_operator
@@ -247,6 +267,7 @@ y gt 0 select 1 else y eq 0 select 0 else -1;
 Repeat statement
 ================================================================================
 
+x := 10; i := 0;
 repeat
     while IsEven(x) do
         i +:= 1;
@@ -259,9 +280,15 @@ repeat
     i +:= 1;
 until false;
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (assignment
+    left: (identifier)
+    right: (integer))
   (repeat_statement
     body: (block
       (while_statement
@@ -302,7 +329,7 @@ for i := 1 to 13 do
     i +:= 1;
 end for;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (for_statement
@@ -321,7 +348,7 @@ Basic for loop with by
 	
 for i:=1 to 10 by 2 do i; end for;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (for_statement
@@ -338,13 +365,17 @@ for i:=1 to 10 by 2 do i; end for;
 For loop with multiple iterations
 ================================================================================
 
+X := 0;
 for i in [0..2], j in [0..2] do
-    printf "%o,%o : %o\n",i,j,HodgeNumber(X,i,j);
+    printf "%o,%o : %o\n",i,j,X+i+j;
 end for;
 
----
+--------------------------------------------------------------------------------
 
 (program
+  (assignment
+    left: (identifier)
+    right: (integer))
   (for_statement
     quantifier: (for_quantifier
       (binary_operator
@@ -364,9 +395,8 @@ end for;
         (string)
         (identifier)
         (identifier)
-        (call
-          function: (identifier)
-          arguments: (argument_list
-            argument: (identifier)
-            argument: (identifier)
-            argument: (identifier)))))))
+        (binary_operator
+          left: (binary_operator
+            left: (identifier)
+            right: (identifier))
+          right: (identifier))))))
