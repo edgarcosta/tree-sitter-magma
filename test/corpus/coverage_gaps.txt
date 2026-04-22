@@ -174,16 +174,17 @@ end intrinsic;
 --------------------------------------------------------------------------------
 
 (program
-  (intrinsic_definition
-    name: (identifier)
-    parameters: (backtick_identifier
-      (identifier))
-    return_type: (type
-      (identifier))
-    docstring: (doc_string)
-    body: (block
-      (return_statement
-        (identifier)))))
+  (expression_statement
+    (intrinsic_definition
+      name: (identifier)
+      parameters: (backtick_identifier
+        (identifier))
+      return_type: (type
+        (identifier))
+      docstring: (doc_string)
+      body: (block
+        (return_statement
+          (identifier))))))
 
 ================================================================================
 Literal cycle

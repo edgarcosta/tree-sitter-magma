@@ -51,22 +51,23 @@ end intrinsic;
 
 (program
   (comment)
-  (intrinsic_definition
-    (identifier)
-    (typed_identifier
+  (expression_statement
+    (intrinsic_definition
       (identifier)
-      (type
-        (identifier)))
-    (type
-      (identifier))
-    (doc_string)
-    (block
-      (require_statement
+      (typed_identifier
         (identifier)
-        (integer)
-        (integer))
-      (return_statement
-        (identifier)))))
+        (type
+          (identifier)))
+      (type
+        (identifier))
+      (doc_string)
+      (block
+        (require_statement
+          (identifier)
+          (integer)
+          (integer))
+        (return_statement
+          (identifier))))))
 
 ================================================================================
 Readi statement

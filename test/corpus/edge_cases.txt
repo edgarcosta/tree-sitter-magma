@@ -410,49 +410,37 @@ cf := {* t : t in ChiefFactors(G) *};
 Indexed set comprehension
 ================================================================================
 
-Q := Rationals();
-f := hom<Q -> Q | x :-> x>;
-R := [1..3];
-leaders := {@ (Q!x)@@f : x in R @};
+leaders := {@ (Rationals()!x)@@Coercion(Integers(), Rationals()) : x in [1..3] @};
 
 --------------------------------------------------------------------------------
 
 (program
   (assignment
     left: (identifier)
-    right: (call
-      function: (identifier)
-      arguments: (argument_list)))
-  (assignment
-    left: (identifier)
-    right: (constructor
-      name: (identifier)
-      (two_tuple
-        left: (identifier)
-        right: (identifier))
-      (constructor_elements
-        (map_constructor
-          domain_element: (identifier)
-          image: (identifier)))))
-  (assignment
-    left: (identifier)
-    right: (seqenum
-      (range
-        start: (integer)
-        end: (integer))))
-  (assignment
-    left: (identifier)
     right: (indexed_set
       (binary_operator
         left: (parenthesized_expression
           (binary_operator
-            left: (identifier)
+            left: (call
+              function: (identifier)
+              arguments: (argument_list))
             right: (identifier)))
-        right: (identifier))
+        right: (call
+          function: (identifier)
+          arguments: (argument_list
+            argument: (call
+              function: (identifier)
+              arguments: (argument_list))
+            argument: (call
+              function: (identifier)
+              arguments: (argument_list)))))
       (iter_vars
         (iter_var
           variable: (identifier)
-          (identifier))))))
+          (seqenum
+            (range
+              start: (integer)
+              end: (integer))))))))
 
 ================================================================================
 Complex constructor with pipe and options

@@ -122,28 +122,11 @@ rec < CMF | gp:=G, rep:=f(M) >;
 Stupid group quo constructor
 ================================================================================
 
-F := FreeGroup(5);
-rels := [F.1, F.2];
-G<a,b,c,d,e> := quo< GrpPC : F | rels >;
+G<a,b,c,d,e> := quo< GrpFP : FreeGroup(5) | [] >;
 
 --------------------------------------------------------------------------------
 
 (program
-  (assignment
-    left: (identifier)
-    right: (call
-      function: (identifier)
-      arguments: (argument_list
-        argument: (integer))))
-  (assignment
-    left: (identifier)
-    right: (seqenum
-      (binary_operator
-        left: (identifier)
-        right: (integer))
-      (binary_operator
-        left: (identifier)
-        right: (integer))))
   (assignment
     left: (constructor
       name: (identifier)
@@ -157,5 +140,8 @@ G<a,b,c,d,e> := quo< GrpPC : F | rels >;
       (identifier)
       (constructor_elements
         (constructor_options
-          (identifier))
-        (identifier)))))
+          (call
+            function: (identifier)
+            arguments: (argument_list
+              argument: (integer))))
+        (seqenum)))))

@@ -1,23 +1,24 @@
-=======================================================
+================================================================================
 Simple and any types
-=======================================================
+================================================================================
 
 declare type Foo;
 declare type .;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (declare_statement
     (type_declaration
-      (type (identifier))))
+      (type
+        (identifier))))
   (declare_statement
     (type_declaration
       (type))))
 
-=======================================================
+================================================================================
 Base bracket types
-=======================================================
+================================================================================
 
 declare type [];
 declare type {};
@@ -26,19 +27,31 @@ declare type {@ @};
 declare type {* *};
 declare type <>;
 
----
+--------------------------------------------------------------------------------
 
 (program
-  (declare_statement (type_declaration (type)))
-  (declare_statement (type_declaration (type)))
-  (declare_statement (type_declaration (type)))
-  (declare_statement (type_declaration (type)))
-  (declare_statement (type_declaration (type)))
-  (declare_statement (type_declaration (type))))
+  (declare_statement
+    (type_declaration
+      (type)))
+  (declare_statement
+    (type_declaration
+      (type)))
+  (declare_statement
+    (type_declaration
+      (type)))
+  (declare_statement
+    (type_declaration
+      (type)))
+  (declare_statement
+    (type_declaration
+      (type)))
+  (declare_statement
+    (type_declaration
+      (type))))
 
-=======================================================
+================================================================================
 Composite bracket types
-=======================================================
+================================================================================
 
 declare type [ Foo ];
 declare type { Foo };
@@ -46,23 +59,43 @@ declare type {[ Foo ]};
 declare type {@ Foo @};
 declare type {* Foo *};
 
----
+--------------------------------------------------------------------------------
 
 (program
-  (declare_statement (type_declaration (type (type (identifier)))))
-  (declare_statement (type_declaration (type (type (identifier)))))
-  (declare_statement (type_declaration (type (type (identifier)))))
-  (declare_statement (type_declaration (type (type (identifier)))))
-  (declare_statement (type_declaration (type (type (identifier))))))
+  (declare_statement
+    (type_declaration
+      (type
+        (type
+          (identifier)))))
+  (declare_statement
+    (type_declaration
+      (type
+        (type
+          (identifier)))))
+  (declare_statement
+    (type_declaration
+      (type
+        (type
+          (identifier)))))
+  (declare_statement
+    (type_declaration
+      (type
+        (type
+          (identifier)))))
+  (declare_statement
+    (type_declaration
+      (type
+        (type
+          (identifier))))))
 
-=======================================================
+================================================================================
 Extended and nested extended types
-=======================================================
+================================================================================
 
 declare type SeqEnum[Map[Bar]];
 declare type Map[Foo, Bar];
 
----
+--------------------------------------------------------------------------------
 
 (program
   (declare_statement
@@ -71,94 +104,110 @@ declare type Map[Foo, Bar];
         (identifier)
         (type
           (identifier)
-          (type (identifier))))))
+          (type
+            (identifier))))))
   (declare_statement
     (type_declaration
       (type
         (identifier)
-        (type (identifier))
-        (type (identifier))))))
+        (type
+          (identifier))
+        (type
+          (identifier))))))
 
-=======================================================
+================================================================================
 Fan-inspired composite types
-=======================================================
+================================================================================
 
 declare type [ TorFan ];
 declare type SeqEnum[Map[TorLat, TorLat]];
 
----
+--------------------------------------------------------------------------------
 
 (program
   (declare_statement
     (type_declaration
-      (type (type (identifier)))))
+      (type
+        (type
+          (identifier)))))
   (declare_statement
     (type_declaration
       (type
         (identifier)
         (type
           (identifier)
-          (type (identifier))
-          (type (identifier)))))))
+          (type
+            (identifier))
+          (type
+            (identifier)))))))
 
-=======================================================
+================================================================================
 Intrinsic with multiple return types (Fan-like)
-=======================================================
+================================================================================
 
 intrinsic Fan(S::[TorFan])
     -> TorFan, SeqEnum[Map[TorLat, TorLat]], SeqEnum[Map[TorLat, TorLat]]
 {The product of the fans in S, together with the following sequences of lattice maps: the embeddings of ambient lattices of the fans in S, and the projections onto the ambient lattices of the fans in S.}
 end intrinsic;
 
----
+--------------------------------------------------------------------------------
 
 (program
-  (intrinsic_definition
-    name: (identifier)
-    parameters: (typed_identifier
-      (identifier)
-      (type (type (identifier))))
-    return_type: (type (identifier))
-    return_type: (type
-      (identifier)
-      (type
+  (expression_statement
+    (intrinsic_definition
+      name: (identifier)
+      parameters: (typed_identifier
         (identifier)
-        (type (identifier))
-        (type (identifier))))
-    return_type: (type
-      (identifier)
-      (type
+        (type
+          (type
+            (identifier))))
+      return_type: (type
+        (identifier))
+      return_type: (type
         (identifier)
-        (type (identifier))
-        (type (identifier))))
-    docstring: (doc_string)))
+        (type
+          (identifier)
+          (type
+            (identifier))
+          (type
+            (identifier))))
+      return_type: (type
+        (identifier)
+        (type
+          (identifier)
+          (type
+            (identifier))
+          (type
+            (identifier))))
+      docstring: (doc_string))))
 
-=======================================================
+================================================================================
 Complex declare statements with supertypes
-=======================================================
+================================================================================
 
 declare type GrpPSL2 [GrpPSL2Elt];
 declare type DivTor [DivTorElt] : DivSch;
 declare type TorLat[TorLatElt];
 
----
+--------------------------------------------------------------------------------
 
 (program
   (declare_statement
     (type_declaration
       (type
         (identifier)
-        (type (identifier)))))
+        (type
+          (identifier)))))
   (declare_statement
     (type_declaration
       (type
         (identifier)
-        (type (identifier)))
+        (type
+          (identifier)))
       supertype: (identifier)))
   (declare_statement
     (type_declaration
       (type
         (identifier)
-        (type (identifier))))))
-
-
+        (type
+          (identifier))))))

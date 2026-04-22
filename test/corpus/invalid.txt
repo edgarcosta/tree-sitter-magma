@@ -4,7 +4,7 @@ Identifier juxtaposed with set literal is not representative_of_set
 
 x := foo{1,2,3};
 
----
+--------------------------------------------------------------------------------
 
 (program
   (assignment
@@ -22,7 +22,7 @@ Word operators require spaces: div
 
 3div5;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (ERROR
@@ -36,7 +36,7 @@ Word operators with spaces: div
 
 3 div 5;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (expression_statement
@@ -50,7 +50,7 @@ Word operators with space only on right: div
 
 3div 5;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (expression_statement
@@ -64,7 +64,7 @@ Word operators require spaces: mod
 
 3mod5;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (ERROR
@@ -78,7 +78,7 @@ Word operators require spaces: in
 
 xin y;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (expression_statement
@@ -92,7 +92,7 @@ Word operators require spaces: cat
 
 3cat5;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (ERROR
@@ -106,7 +106,7 @@ Mismatched end keyword: function/procedure
 
 function test() end procedure;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (ERROR
@@ -120,7 +120,7 @@ Mismatched end keyword: if/while
 
 if x then end while;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (ERROR
@@ -133,7 +133,7 @@ Missing right-hand side of assignment
 
 x := ;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (expression_statement
@@ -146,7 +146,7 @@ Missing operand in binary expression
 
 x + ;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (expression_statement
@@ -159,7 +159,7 @@ Extra token after assignment
 
 x := 1 2;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (assignment
@@ -174,7 +174,7 @@ Missing do in for loop
 
 for i := 1 to 10 end for;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (ERROR
@@ -190,7 +190,7 @@ Unterminated string
 
 "unterminated string;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (ERROR
@@ -202,7 +202,7 @@ Elif after else
 
 if x then else elif y then end if;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (if_statement
@@ -218,7 +218,7 @@ Empty repeat-until body
 
 repeat until;
 
----
+--------------------------------------------------------------------------------
 
 (ERROR
   (block
@@ -231,7 +231,7 @@ Read statement with trailing comma and no prompt
 
 read u,;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (read_statement
@@ -246,14 +246,15 @@ intrinsic test() -> type
 { docstring }
 end intrinsic
 
----
+--------------------------------------------------------------------------------
 
 (program
-  (intrinsic_definition
-    name: (identifier)
-    return_type: (type
-      (identifier))
-    docstring: (doc_string))
+  (expression_statement
+    (intrinsic_definition
+      name: (identifier)
+      return_type: (type
+        (identifier))
+      docstring: (doc_string)))
   (MISSING ";"))
 
 ================================================================================
@@ -262,7 +263,7 @@ Tilde is not a binary operator
 
 x := a ~ b;
 
----
+--------------------------------------------------------------------------------
 
 (program
   (assignment
