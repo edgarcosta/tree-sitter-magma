@@ -725,14 +725,11 @@ module.exports = grammar({
 	    '>'
 	),
 
-	_simple_assignment: $ => seq(
-	    identifierOrRep($),
-	    ':=', $.primary_expression
+	simple_assignment: $ => seq(
+	    field('name', identifierOrRep($)),
+	    ':=',
+	    field('value', $.primary_expression)
 	),
-	// constructor_field: $ => seq(
-	//     choice(commaSep1($.primary_expression),
-	// 	   seq($.identifier, ':', $.primary_expression))
-	// ),
 
 	constructor_elements: $ => seq(
 	    optional($.constructor_options),
@@ -742,15 +739,15 @@ module.exports = grammar({
 	    '|',
 	    optional(commaSep1(
 		choice($.primary_expression,
-		       $._simple_assignment,
+		       $.simple_assignment,
 		       $.map_constructor)))
 	),
-	
+
 	constructor_options: $ => seq(
 	    ':',
 	    optional(commaSep1(
 		choice($.primary_expression,
-		       $._simple_assignment)))
+		       $.simple_assignment)))
 	),
 
 	map_constructor: $ => seq(

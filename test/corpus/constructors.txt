@@ -62,13 +62,15 @@ rec < CMF | gp:=G, rep:=f(M) >;
       name: (identifier)
       (identifier)
       (constructor_elements
-        (identifier)
-        (identifier)
-        (identifier)
-        (call
-          function: (identifier)
-          arguments: (argument_list
-            argument: (identifier)))))))
+        (simple_assignment
+          name: (identifier)
+          value: (identifier))
+        (simple_assignment
+          name: (identifier)
+          value: (call
+            function: (identifier)
+            arguments: (argument_list
+              argument: (identifier))))))))
 
 ============================
 Stupid group quo constructor
