@@ -4,5 +4,5 @@ function test(x, y)
 end function;
 
 procedure do_thing(~x)
-    x := x + 1;
+    x +:= 1;
 end procedure;

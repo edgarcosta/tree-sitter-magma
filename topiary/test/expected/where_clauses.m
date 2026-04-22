@@ -1,2 +1,2 @@
-z := x + y where x := 1;
+z := x + y where x is 1;
 w := a * b where a := 3;

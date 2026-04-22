@@ -123,17 +123,16 @@
   "end" @prepend_hardline @append_space
 )
 
-;; Spacing in for_quantifier (use @append_space only)
 (for_quantifier
-  ":=" @append_space
+  ":=" @prepend_space @append_space
 )
 
 (for_quantifier
-  "to" @append_space
+  "to" @prepend_space @append_space
 )
 
 (for_quantifier
-  "by" @append_space
+  "by" @prepend_space @append_space
 )
 
 ;; ============================================================
@@ -288,8 +287,10 @@
 ;; ============================================================
 
 (where_expression
-  "where" @append_space
-)
+ "where" @prepend_space @append_space
+ operator: [":=" "is"] @prepend_space @append_space
+ )
+
 ;; ============================================================
 ;; Statement keywords: space after
 ;; ============================================================
