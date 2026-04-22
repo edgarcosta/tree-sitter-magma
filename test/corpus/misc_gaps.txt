@@ -92,8 +92,9 @@ LieAlgebra< t | T : Rep:= "Dense" >;
       (constructor_elements
         (identifier))
       (constructor_options
-        (identifier)
-        (string)))))
+        (simple_assignment
+          name: (identifier)
+          value: (string))))))
 
 ================================================================================
 Time with multiple assignment targets

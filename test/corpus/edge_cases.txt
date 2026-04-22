@@ -263,11 +263,36 @@ cf := {* t : t in ChiefFactors(G) *};
 Indexed set comprehension
 ================================================================================
 
+Q := Rationals();
+f := hom<Q -> Q | x :-> x>;
+R := [1..3];
 leaders := {@ (Q!x)@@f : x in R @};
 
 ---
 
 (program
+  (assignment
+    left: (identifier)
+    right: (call
+      function: (identifier)
+      arguments: (argument_list)))
+  (assignment
+    left: (identifier)
+    right: (constructor
+      name: (identifier)
+      (two_tuple
+        left: (identifier)
+        right: (identifier))
+      (constructor_elements
+        (map_constructor
+          domain_element: (identifier)
+          image: (identifier)))))
+  (assignment
+    left: (identifier)
+    right: (seqenum
+      (range
+        start: (integer)
+        end: (integer))))
   (assignment
     left: (identifier)
     right: (indexed_set
@@ -301,5 +326,6 @@ G := quo< GrpPC : F | R : Order := n >;
           (identifier))
         (identifier))
       (constructor_options
-        (identifier)
-        (identifier)))))
+        (simple_assignment
+          name: (identifier)
+          value: (identifier))))))
