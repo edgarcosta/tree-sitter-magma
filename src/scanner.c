@@ -85,8 +85,7 @@ void tree_sitter_magma_external_scanner_destroy(void *payload) {}
 unsigned tree_sitter_magma_external_scanner_serialize(void *payload, char *buffer) {
   return 0;
 }
-void tree_sitter_magma_external_scanner_deserialize(void *payload, char *buffer) {
-  /* return NULL; */
+void tree_sitter_magma_external_scanner_deserialize(void *payload, const char *buffer, unsigned length) {
 }
   
 
