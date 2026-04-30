@@ -1,0 +1,195 @@
+// Regression set: vtime statement (and sister 'time' statement) - same-line, multi-line body, multi-LHS, with keyword args.
+// All tests must pass on the current grammar.
+
+================================================================================
+vtime basic same-line form
+================================================================================
+
+SetVerbose("LLL", 0);
+_ := 0;
+vtime LLL, 2: m := Identity(MatrixAlgebra(Rationals(), 2));
+
+--------------------------------------------------------------------------------
+
+(program
+  (expression_statement
+    (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (string)
+        argument: (integer))))
+  (assignment
+    left: (anonymous_identifier)
+    right: (integer))
+  (vtime_statement
+    flag: (identifier)
+    n: (integer)
+    (assignment
+      left: (identifier)
+      right: (call
+        function: (identifier)
+        arguments: (argument_list
+          argument: (call
+            function: (identifier)
+            arguments: (argument_list
+              argument: (call
+                function: (identifier)
+                arguments: (argument_list))
+              argument: (integer))))))))
+
+================================================================================
+vtime with multi-LHS assignment and keyword arg
+================================================================================
+
+SetVerbose("RelLLL", 0);
+L := IdentityMatrix(Rationals(), 3);
+vtime RelLLL, 2: LL, T := LLL(L : Sort := false);
+
+--------------------------------------------------------------------------------
+
+(program
+  (expression_statement
+    (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (string)
+        argument: (integer))))
+  (assignment
+    left: (identifier)
+    right: (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (call
+          function: (identifier)
+          arguments: (argument_list))
+        argument: (integer))))
+  (vtime_statement
+    flag: (identifier)
+    n: (integer)
+    (assignment
+      left: (identifier)
+      left: (identifier)
+      right: (call
+        function: (identifier)
+        arguments: (argument_list
+          argument: (identifier)
+          (optional_argument
+            argument: (identifier)
+            default_value: (false)))))))
+
+================================================================================
+vtime statement on next line after colon
+================================================================================
+
+SetVerbose("SEA", 0);
+NaiveEulerFactor := func< x | x >;
+C := 1;
+vtime SEA, 4:
+    charpol := NaiveEulerFactor(C);
+
+--------------------------------------------------------------------------------
+
+(program
+  (expression_statement
+    (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (string)
+        argument: (integer))))
+  (assignment
+    left: (identifier)
+    right: (constructor
+      name: (identifier)
+      (identifier)
+      (constructor_elements
+        (identifier))))
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (vtime_statement
+    flag: (identifier)
+    n: (integer)
+    (assignment
+      left: (identifier)
+      right: (call
+        function: (identifier)
+        arguments: (argument_list
+          argument: (identifier))))))
+
+================================================================================
+time statement (sister form, sanity)
+================================================================================
+
+f := func< x | x*x >;
+time _ := f(7);
+
+--------------------------------------------------------------------------------
+
+(program
+  (assignment
+    left: (identifier)
+    right: (constructor
+      name: (identifier)
+      (identifier)
+      (constructor_elements
+        (binary_operator
+          left: (identifier)
+          right: (identifier)))))
+  (time_statement
+    (assignment
+      left: (anonymous_identifier)
+      right: (call
+        function: (identifier)
+        arguments: (argument_list
+          argument: (integer))))))
+
+================================================================================
+vtime followed by call with multiple kwargs
+================================================================================
+
+SetVerbose("Groebner", 0);
+F := function(x : a := 1, b := 2) return x + a + b; end function;
+vtime Groebner, 1: y := F(3 : a := 5, b := 10);
+
+--------------------------------------------------------------------------------
+
+(program
+  (expression_statement
+    (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (string)
+        argument: (integer))))
+  (assignment
+    left: (identifier)
+    right: (function_definition
+      parameters: (parameters
+        (identifier)
+        (optional_parameter
+          name: (identifier)
+          value: (integer))
+        (optional_parameter
+          name: (identifier)
+          value: (integer)))
+      body: (block
+        (return_statement
+          (binary_operator
+            left: (binary_operator
+              left: (identifier)
+              right: (identifier))
+            right: (identifier))))))
+  (vtime_statement
+    flag: (identifier)
+    n: (integer)
+    (assignment
+      left: (identifier)
+      right: (call
+        function: (identifier)
+        arguments: (argument_list
+          argument: (integer)
+          (optional_argument
+            argument: (identifier)
+            default_value: (integer))
+          (optional_argument
+            argument: (identifier)
+            default_value: (integer)))))))

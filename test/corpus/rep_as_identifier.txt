@@ -1,0 +1,189 @@
+// Regression set: 'rep' as an ordinary identifier; the soft-keyword only triggers representative_of_set when followed by a set literal.
+// All tests must pass on the current grammar.
+
+================================================================================
+rep as assignment target
+================================================================================
+
+rep := true;
+
+--------------------------------------------------------------------------------
+
+(program
+  (assignment
+    left: (identifier)
+    right: (true)))
+
+================================================================================
+rep as assignment from function call
+================================================================================
+
+F := GF(7);
+rep := NonsquareRep(F);
+
+--------------------------------------------------------------------------------
+
+(program
+  (assignment
+    left: (identifier)
+    right: (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (integer))))
+  (assignment
+    left: (identifier)
+    right: (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (identifier)))))
+
+================================================================================
+rep as function argument
+================================================================================
+
+rep := 7;
+_ := Type(rep);
+_ := Parent(rep);
+
+--------------------------------------------------------------------------------
+
+(program
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (assignment
+    left: (anonymous_identifier)
+    right: (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (identifier))))
+  (assignment
+    left: (anonymous_identifier)
+    right: (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (identifier)))))
+
+================================================================================
+rep as for-loop variable
+================================================================================
+
+reps := [1, 2, 3];
+for rep in reps do
+    _ := rep;
+end for;
+
+--------------------------------------------------------------------------------
+
+(program
+  (assignment
+    left: (identifier)
+    right: (seqenum
+      (integer)
+      (integer)
+      (integer)))
+  (for_statement
+    quantifier: (for_quantifier
+      (binary_operator
+        left: (identifier)
+        right: (identifier)))
+    body: (block
+      (assignment
+        left: (anonymous_identifier)
+        right: (identifier)))))
+
+================================================================================
+rep in local declaration
+================================================================================
+
+procedure P()
+    local E, G, rep, U;
+    rep := 0;
+end procedure;
+
+--------------------------------------------------------------------------------
+
+(program
+  (expression_statement
+    (procedure_definition
+      name: (identifier)
+      parameters: (parameters)
+      body: (block
+        (local_statement
+          (identifier)
+          (identifier)
+          (identifier)
+          (identifier))
+        (assignment
+          left: (identifier)
+          right: (integer))))))
+
+================================================================================
+rep as function-valued assignment
+================================================================================
+
+rep := func< x | x + 1 >;
+
+--------------------------------------------------------------------------------
+
+(program
+  (assignment
+    left: (identifier)
+    right: (constructor
+      name: (identifier)
+      (identifier)
+      (constructor_elements
+        (binary_operator
+          left: (identifier)
+          right: (integer))))))
+
+================================================================================
+rep used in a select expression
+================================================================================
+
+T := [1, 2, 3];
+rep := 4 * #T lt 100 select "Sparse" else "Dense";
+
+--------------------------------------------------------------------------------
+
+(program
+  (assignment
+    left: (identifier)
+    right: (seqenum
+      (integer)
+      (integer)
+      (integer)))
+  (assignment
+    left: (identifier)
+    right: (ternary_operator
+      conditional: (binary_operator
+        left: (binary_operator
+          left: (integer)
+          right: (unary_operator
+            right: (identifier)))
+        right: (integer))
+      then: (string)
+      else: (string))))
+
+================================================================================
+Positive: rep keyword extracts a representative from a set
+================================================================================
+
+x := rep {n : n in [1..5]};
+
+--------------------------------------------------------------------------------
+
+(program
+  (assignment
+    left: (identifier)
+    right: (representative_of_set
+      (identifier)
+      (set
+        (identifier)
+        (iter_vars
+          (iter_var
+            variable: (identifier)
+            (seqenum
+              (range
+                start: (integer)
+                end: (integer)))))))))

@@ -1,0 +1,163 @@
+// Regression set: backslash escape sequences in strings (\n, \t, \r, \", \\) and printf-style format directives.
+// All tests must pass on the current grammar.
+
+================================================================================
+Bare top-level string with escape
+================================================================================
+
+"\nRegularModel: Not yet implemented for this number field.";
+
+--------------------------------------------------------------------------------
+
+(program
+  (expression_statement
+    (string)))
+
+================================================================================
+printf with newline only
+================================================================================
+
+printf "\n";
+
+--------------------------------------------------------------------------------
+
+(program
+  (print_statement
+    (string)))
+
+================================================================================
+print with multi-line escape sequences
+================================================================================
+
+print "\nThe right ideal is the null ideal. \n";
+
+--------------------------------------------------------------------------------
+
+(program
+  (print_statement
+    (string)))
+
+================================================================================
+vprintf with escape
+================================================================================
+
+SetVerbose("Hyperelliptic", 1);
+vprintf Hyperelliptic, 1 : "R1210 = 0\n";
+
+--------------------------------------------------------------------------------
+
+(program
+  (expression_statement
+    (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (string)
+        argument: (integer))))
+  (vprint_statement
+    flag: (identifier)
+    n: (integer)
+    (string)))
+
+================================================================================
+Escape sequences inside set literal
+================================================================================
+
+white := {" ", "\n", "\r", "\t"};
+
+--------------------------------------------------------------------------------
+
+(program
+  (assignment
+    left: (identifier)
+    right: (set
+      (string)
+      (string)
+      (string)
+      (string))))
+
+================================================================================
+error if with newline string
+================================================================================
+
+error if false, "\nBase field not finite\n";
+
+--------------------------------------------------------------------------------
+
+(program
+  (error_statement
+    condition: (false)
+    (string)))
+
+================================================================================
+Join with newline separator
+================================================================================
+
+S := ["a", "b"];
+_ := Join(S, "\n");
+
+--------------------------------------------------------------------------------
+
+(program
+  (assignment
+    left: (identifier)
+    right: (seqenum
+      (string)
+      (string)))
+  (assignment
+    left: (anonymous_identifier)
+    right: (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (identifier)
+        argument: (string)))))
+
+================================================================================
+printf with format directive percent o
+================================================================================
+
+x := 1;
+printf "value %o\n", x;
+
+--------------------------------------------------------------------------------
+
+(program
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (print_statement
+    (string)
+    (identifier)))
+
+================================================================================
+printf with width format directive
+================================================================================
+
+x := 1;
+printf "%4o", x;
+printf "%-3o", x;
+
+--------------------------------------------------------------------------------
+
+(program
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (print_statement
+    (string)
+    (identifier))
+  (print_statement
+    (string)
+    (identifier)))
+
+================================================================================
+String with double backslash and escaped quote
+================================================================================
+
+x := "say \"hi\" then \\";
+
+--------------------------------------------------------------------------------
+
+(program
+  (assignment
+    left: (identifier)
+    right: (string)))
