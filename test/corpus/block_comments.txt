@@ -1,0 +1,102 @@
+// Regression set: block comments (/* ... */) at file start, between statements, multi-line, and inline inside expressions.
+// All tests must pass on the current grammar.
+
+================================================================================
+File-leading block comment
+================================================================================
+
+/* hello world */
+function F() return 1; end function;
+
+_ := F();
+
+--------------------------------------------------------------------------------
+
+(program
+  (comment)
+  (expression_statement
+    (function_definition
+      name: (identifier)
+      parameters: (parameters)
+      body: (block
+        (return_statement
+          (integer)))))
+  (assignment
+    left: (anonymous_identifier)
+    right: (call
+      function: (identifier)
+      arguments: (argument_list))))
+
+================================================================================
+Multi-line block comment
+================================================================================
+
+/* hello
+   spans
+   multiple lines */
+x := 1;
+
+--------------------------------------------------------------------------------
+
+(program
+  (comment)
+  (assignment
+    left: (identifier)
+    right: (integer)))
+
+================================================================================
+Block comment between statements
+================================================================================
+
+x := 1;
+/* a note */
+y := 2;
+/* mid */ z := 3;
+
+--------------------------------------------------------------------------------
+
+(program
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (comment)
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (comment)
+  (assignment
+    left: (identifier)
+    right: (integer)))
+
+================================================================================
+Triple-asterisk header comment
+================================================================================
+
+/*** doc header
+ *  with leading asterisks
+ */
+x := 1;
+
+--------------------------------------------------------------------------------
+
+(program
+  (comment)
+  (assignment
+    left: (identifier)
+    right: (integer)))
+
+================================================================================
+Block comment inline inside an expression
+================================================================================
+
+x := 1 + /* note */ 2;
+
+--------------------------------------------------------------------------------
+
+(program
+  (assignment
+    left: (identifier)
+    right: (binary_operator
+      left: (integer)
+      (comment)
+      right: (integer))))

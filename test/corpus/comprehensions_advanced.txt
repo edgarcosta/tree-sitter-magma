@@ -1,0 +1,221 @@
+// Regression set: sequence/set comprehensions and seq_slice constructs (backquote-attribute universe, cat-prefixed, descending range, multi-iter+filter, by-step slice).
+// All tests must pass on the current grammar.
+
+================================================================================
+Comprehension with backquote-attribute universe
+================================================================================
+
+R := rec< recformat<L, H> | L := [], H := [1, 2] >;
+_ := [ R`L cat [b] : b in R`H ];
+
+--------------------------------------------------------------------------------
+
+(program
+  (assignment
+    left: (identifier)
+    right: (constructor
+      name: (identifier)
+      (recformat_constructor
+        (identifier)
+        (identifier))
+      (constructor_elements
+        (simple_assignment
+          name: (identifier)
+          value: (seqenum))
+        (simple_assignment
+          name: (identifier)
+          value: (seqenum
+            (integer)
+            (integer))))))
+  (assignment
+    left: (anonymous_identifier)
+    right: (seqenum
+      (binary_operator
+        left: (attribute
+          (identifier)
+          (identifier))
+        right: (seqenum
+          (identifier)))
+      (iter_vars
+        (iter_var
+          variable: (identifier)
+          (attribute
+            (identifier)
+            (identifier)))))))
+
+================================================================================
+Cat-prefixed comprehension
+================================================================================
+
+numones1 := 3;
+_ := &cat [[1] : i in [1..numones1] ];
+
+--------------------------------------------------------------------------------
+
+(program
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (assignment
+    left: (anonymous_identifier)
+    right: (reduct_operator
+      right: (seqenum
+        (seqenum
+          (integer))
+        (iter_vars
+          (iter_var
+            variable: (identifier)
+            (seqenum
+              (range
+                start: (integer)
+                end: (identifier)))))))))
+
+================================================================================
+Comprehension over descending range with by -1
+================================================================================
+
+N := 5;
+V := VectorSpace(Rationals(), N);
+pos := [V.i : i in [1..N]];
+_ := [ sub< V | pos[r] > : r in [N..1 by -1] ];
+
+--------------------------------------------------------------------------------
+
+(program
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (assignment
+    left: (identifier)
+    right: (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (call
+          function: (identifier)
+          arguments: (argument_list))
+        argument: (identifier))))
+  (assignment
+    left: (identifier)
+    right: (seqenum
+      (binary_operator
+        left: (identifier)
+        right: (identifier))
+      (iter_vars
+        (iter_var
+          variable: (identifier)
+          (seqenum
+            (range
+              start: (integer)
+              end: (identifier)))))))
+  (assignment
+    left: (anonymous_identifier)
+    right: (seqenum
+      (constructor
+        name: (identifier)
+        (identifier)
+        (constructor_elements
+          (seq_slice
+            parent: (identifier)
+            (seqenum
+              (identifier)))))
+      (iter_vars
+        (iter_var
+          variable: (identifier)
+          (seqenum
+            (range
+              start: (identifier)
+              end: (integer)
+              by: (integer))))))))
+
+================================================================================
+Comprehension with multi-iter and condition
+================================================================================
+
+S := [1, 2, 3];
+T := [4, 5, 6];
+_ := [ x*y : x in S, y in T | x ne y ];
+
+--------------------------------------------------------------------------------
+
+(program
+  (assignment
+    left: (identifier)
+    right: (seqenum
+      (integer)
+      (integer)
+      (integer)))
+  (assignment
+    left: (identifier)
+    right: (seqenum
+      (integer)
+      (integer)
+      (integer)))
+  (assignment
+    left: (anonymous_identifier)
+    right: (seqenum
+      (binary_operator
+        left: (identifier)
+        right: (identifier))
+      (iter_vars
+        (iter_var
+          variable: (identifier)
+          (identifier))
+        (iter_var
+          variable: (identifier)
+          (identifier)))
+      condition: (binary_operator
+        left: (identifier)
+        right: (identifier)))))
+
+================================================================================
+Sequence-slice with by step
+================================================================================
+
+S := [1..10];
+_ := S[1..#S by 2];
+
+--------------------------------------------------------------------------------
+
+(program
+  (assignment
+    left: (identifier)
+    right: (seqenum
+      (range
+        start: (integer)
+        end: (integer))))
+  (assignment
+    left: (anonymous_identifier)
+    right: (seq_slice
+      parent: (identifier)
+      (seqenum
+        (range
+          start: (integer)
+          end: (unary_operator
+            right: (identifier))
+          by: (integer))))))
+
+================================================================================
+Sequence-slice plain range
+================================================================================
+
+S := [1..10];
+_ := S[1..#S];
+
+--------------------------------------------------------------------------------
+
+(program
+  (assignment
+    left: (identifier)
+    right: (seqenum
+      (range
+        start: (integer)
+        end: (integer))))
+  (assignment
+    left: (anonymous_identifier)
+    right: (seq_slice
+      parent: (identifier)
+      (seqenum
+        (range
+          start: (integer)
+          end: (unary_operator
+            right: (identifier)))))))

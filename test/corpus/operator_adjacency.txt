@@ -1,0 +1,207 @@
+// Regression set: word-form binary operators (div, mod, cat, meet) parse correctly adjacent to parens/brackets without surrounding whitespace, and across line breaks.
+// All tests must pass on the current grammar.
+
+================================================================================
+div without space after closing paren
+================================================================================
+
+v := 7;
+_ := (v mod 4)div 2;
+
+--------------------------------------------------------------------------------
+
+(program
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (assignment
+    left: (anonymous_identifier)
+    right: (binary_operator
+      left: (parenthesized_expression
+        (binary_operator
+          left: (identifier)
+          right: (integer)))
+      right: (integer))))
+
+================================================================================
+div with space after closing paren
+================================================================================
+
+v := 7;
+_ := (v mod 4) div 2;
+
+--------------------------------------------------------------------------------
+
+(program
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (assignment
+    left: (anonymous_identifier)
+    right: (binary_operator
+      left: (parenthesized_expression
+        (binary_operator
+          left: (identifier)
+          right: (integer)))
+      right: (integer))))
+
+================================================================================
+mod adjacent to closing paren in nested expression
+================================================================================
+
+n := 30;
+_ := ((n-1)mod 26);
+
+--------------------------------------------------------------------------------
+
+(program
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (assignment
+    left: (anonymous_identifier)
+    right: (parenthesized_expression
+      (binary_operator
+        left: (parenthesized_expression
+          (binary_operator
+            left: (identifier)
+            right: (integer)))
+        right: (integer)))))
+
+================================================================================
+Comprehension mixing mod and div
+================================================================================
+
+n := 5;
+_ := [&cat [CodeToString(65 + ((j-1) mod 26)) : j in [1..n]] : i in [0..((n-1) div 26)]];
+
+--------------------------------------------------------------------------------
+
+(program
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (assignment
+    left: (anonymous_identifier)
+    right: (seqenum
+      (reduct_operator
+        right: (seqenum
+          (call
+            function: (identifier)
+            arguments: (argument_list
+              argument: (binary_operator
+                left: (integer)
+                right: (parenthesized_expression
+                  (binary_operator
+                    left: (parenthesized_expression
+                      (binary_operator
+                        left: (identifier)
+                        right: (integer)))
+                    right: (integer))))))
+          (iter_vars
+            (iter_var
+              variable: (identifier)
+              (seqenum
+                (range
+                  start: (integer)
+                  end: (identifier)))))))
+      (iter_vars
+        (iter_var
+          variable: (identifier)
+          (seqenum
+            (range
+              start: (integer)
+              end: (parenthesized_expression
+                (binary_operator
+                  left: (parenthesized_expression
+                    (binary_operator
+                      left: (identifier)
+                      right: (integer)))
+                  right: (integer))))))))))
+
+================================================================================
+div on its own line as continuation
+================================================================================
+
+x := 12;
+y := 4;
+_ := (x + y)
+    div (y + 1);
+
+--------------------------------------------------------------------------------
+
+(program
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (assignment
+    left: (anonymous_identifier)
+    right: (binary_operator
+      left: (parenthesized_expression
+        (binary_operator
+          left: (identifier)
+          right: (identifier)))
+      right: (parenthesized_expression
+        (binary_operator
+          left: (identifier)
+          right: (integer))))))
+
+================================================================================
+meet at end of line continuation
+================================================================================
+
+A := {1, 2, 3};
+B := {2, 3};
+C := {3, 4};
+_ := A meet
+     B meet
+     C;
+
+--------------------------------------------------------------------------------
+
+(program
+  (assignment
+    left: (identifier)
+    right: (set
+      (integer)
+      (integer)
+      (integer)))
+  (assignment
+    left: (identifier)
+    right: (set
+      (integer)
+      (integer)))
+  (assignment
+    left: (identifier)
+    right: (set
+      (integer)
+      (integer)))
+  (assignment
+    left: (anonymous_identifier)
+    right: (binary_operator
+      left: (binary_operator
+        left: (identifier)
+        right: (identifier))
+      right: (identifier))))
+
+================================================================================
+cat operator adjacent to closing bracket
+================================================================================
+
+_ := [1, 2]cat [3, 4];
+
+--------------------------------------------------------------------------------
+
+(program
+  (assignment
+    left: (anonymous_identifier)
+    right: (binary_operator
+      left: (seqenum
+        (integer)
+        (integer))
+      right: (seqenum
+        (integer)
+        (integer)))))

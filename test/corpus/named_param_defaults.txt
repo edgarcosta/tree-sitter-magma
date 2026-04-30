@@ -1,0 +1,221 @@
+// Regression set: function/intrinsic parameter defaults declared after ':' (named/keyword args), at definition and call sites.
+// All tests must pass on the current grammar.
+
+================================================================================
+function with named-param default
+================================================================================
+
+function Foo(JI : models := true)
+    return JI;
+end function;
+
+_ := Foo(7);
+
+--------------------------------------------------------------------------------
+
+(program
+  (expression_statement
+    (function_definition
+      name: (identifier)
+      parameters: (parameters
+        (identifier)
+        (optional_parameter
+          name: (identifier)
+          value: (true)))
+      body: (block
+        (return_statement
+          (identifier)))))
+  (assignment
+    left: (anonymous_identifier)
+    right: (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (integer)))))
+
+================================================================================
+function with multiple named-param defaults
+================================================================================
+
+function G(x, y, z : a := 1, b := 2)
+    return x + y + z + a + b;
+end function;
+
+_ := G(1, 2, 3 : a := 5);
+
+--------------------------------------------------------------------------------
+
+(program
+  (expression_statement
+    (function_definition
+      name: (identifier)
+      parameters: (parameters
+        (identifier)
+        (identifier)
+        (identifier)
+        (optional_parameter
+          name: (identifier)
+          value: (integer))
+        (optional_parameter
+          name: (identifier)
+          value: (integer)))
+      body: (block
+        (return_statement
+          (binary_operator
+            left: (binary_operator
+              left: (binary_operator
+                left: (binary_operator
+                  left: (identifier)
+                  right: (identifier))
+                right: (identifier))
+              right: (identifier))
+            right: (identifier))))))
+  (assignment
+    left: (anonymous_identifier)
+    right: (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (integer)
+        argument: (integer)
+        argument: (integer)
+        (optional_argument
+          argument: (identifier)
+          default_value: (integer))))))
+
+================================================================================
+function with no-space before := in kwarg default
+================================================================================
+
+function H(x : k:= 7)
+    return x + k;
+end function;
+
+_ := H(1);
+
+--------------------------------------------------------------------------------
+
+(program
+  (expression_statement
+    (function_definition
+      name: (identifier)
+      parameters: (parameters
+        (identifier)
+        (optional_parameter
+          name: (identifier)
+          value: (integer)))
+      body: (block
+        (return_statement
+          (binary_operator
+            left: (identifier)
+            right: (identifier))))))
+  (assignment
+    left: (anonymous_identifier)
+    right: (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (integer)))))
+
+================================================================================
+Anonymous function assigned with named-param defaults
+================================================================================
+
+F := function(x : max := true, Print := 0)
+    return x;
+end function;
+
+_ := F(7 : max := false, Print := 2);
+
+--------------------------------------------------------------------------------
+
+(program
+  (assignment
+    left: (identifier)
+    right: (function_definition
+      parameters: (parameters
+        (identifier)
+        (optional_parameter
+          name: (identifier)
+          value: (true))
+        (optional_parameter
+          name: (identifier)
+          value: (integer)))
+      body: (block
+        (return_statement
+          (identifier)))))
+  (assignment
+    left: (anonymous_identifier)
+    right: (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (integer)
+        (optional_argument
+          argument: (identifier)
+          default_value: (false))
+        (optional_argument
+          argument: (identifier)
+          default_value: (integer))))))
+
+================================================================================
+Intrinsic with typed param and named-param default
+================================================================================
+
+intrinsic FooBar(M::Mtrx : check := true) -> Mtrx
+{Trivial intrinsic.}
+    return M;
+end intrinsic;
+
+--------------------------------------------------------------------------------
+
+(program
+  (expression_statement
+    (intrinsic_definition
+      name: (identifier)
+      parameters: (typed_identifier
+        (identifier)
+        (type
+          (identifier)))
+      parameters: (optional_parameter
+        name: (identifier)
+        value: (true))
+      return_type: (type
+        (identifier))
+      docstring: (doc_string)
+      body: (block
+        (return_statement
+          (identifier))))))
+
+================================================================================
+Inline one-line function with identifier-valued kwarg at call site
+================================================================================
+
+f := function(x : k := 0) return x + k; end function;
+step := 9;
+_ := f(2 : k := step);
+
+--------------------------------------------------------------------------------
+
+(program
+  (assignment
+    left: (identifier)
+    right: (function_definition
+      parameters: (parameters
+        (identifier)
+        (optional_parameter
+          name: (identifier)
+          value: (integer)))
+      body: (block
+        (return_statement
+          (binary_operator
+            left: (identifier)
+            right: (identifier))))))
+  (assignment
+    left: (identifier)
+    right: (integer))
+  (assignment
+    left: (anonymous_identifier)
+    right: (call
+      function: (identifier)
+      arguments: (argument_list
+        argument: (integer)
+        (optional_argument
+          argument: (identifier)
+          default_value: (identifier))))))
