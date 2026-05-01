@@ -431,4 +431,4 @@
 
 (intrinsic_definition
   (doc_string) @prepend_hardline
-) @append_hardline
+)
