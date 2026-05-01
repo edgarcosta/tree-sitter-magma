@@ -103,11 +103,20 @@ test:
 # Parse external Magma files and report error rates
 # Usage: make parse-packages PACKAGE_DIR=/opt/magma/current/package
 #        make parse-examples EXAMPLES_DIR=examples
+#        make parse-spec SPEC=/opt/magma/current/package/spec
 PACKAGE_DIR ?= /opt/magma/current/package
 EXAMPLES_DIR ?= examples
+SPEC ?= $(PACKAGE_DIR)/spec
 MAGMA ?= magma
 TIMEOUT ?= 10
 CORPUS_DIR ?= test/corpus
+
+# Parse only the .m files actually loaded by SPEC (resolved recursively
+# through the spec tree). This avoids files in the package tree that are
+# never loaded — drafts, experiments, dead code — which often have bad
+# syntax and inflate the error count from `parse-packages`.
+parse-spec:
+	@python3 scripts/parse_spec.py $(SPEC) --check
 
 parse-packages:
 	@total=0; errors=0; \
@@ -168,4 +177,4 @@ validate-corpus:
 	echo "Validated: $$pass passed, $$fail syntax errors"; \
 	[ "$$fail" -eq 0 ]
 
-.PHONY: all install uninstall clean test parse-packages parse-examples validate-corpus
+.PHONY: all install uninstall clean test parse-packages parse-examples parse-spec validate-corpus
