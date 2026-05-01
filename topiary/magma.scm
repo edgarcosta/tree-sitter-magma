@@ -265,13 +265,25 @@
  ":" @prepend_space @append_space
  )
 
-(seqenum
- ":" @prepend_space @append_space
- )
+;; Comprehension separators ":" and "|" inside aggregates
+;; (one explicit rule per aggregate node — bracket-list-of-parents matched
+;;  ":" globally including in require_statement, so we list each parent).
+(seqenum     ":" @prepend_space @append_space)
+(list        ":" @prepend_space @append_space)
+(set         ":" @prepend_space @append_space)
+(indexed_set ":" @prepend_space @append_space)
+(formal_set  ":" @prepend_space @append_space)
+(multiset    ":" @prepend_space @append_space)
+(tuple       ":" @prepend_space @append_space)
 
-(seqenum
- "|" @prepend_space @append_space
- )
+(seqenum     "|" @prepend_space @append_space)
+(list        "|" @prepend_space @append_space)
+(set         "|" @prepend_space @append_space)
+(indexed_set "|" @prepend_space @append_space)
+(formal_set  "|" @prepend_space @append_space)
+(multiset    "|" @prepend_space @append_space)
+(tuple       "|" @prepend_space @append_space)
+
 (iter_var
  "in" @prepend_space @append_space)
 
