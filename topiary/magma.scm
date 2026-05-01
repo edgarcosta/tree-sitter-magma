@@ -454,7 +454,10 @@
 ;; ============================================================
 
 (binary_operator
-  operator: ["+" "-" "/" "*" "^" "^^" "@" "@@" "." "!" "!!" "mod" "in" "notin" "div" "join" "notin" "adj" "notadj" "subset" "notsubset" "gt" "lt" "ge" "le" "eq" "ne" "cmpeq" "cmpne"] @prepend_space @append_space
+  operator: ["+" "-" "/" "*" "^" "^^" "@" "@@" "." "!" "!!"
+             "mod" "div" "in" "notin" "adj" "notadj" "subset" "notsubset"
+             "join" "meet" "diff" "sdiff" "cat"
+             "gt" "lt" "ge" "le" "eq" "ne" "cmpeq" "cmpne"] @prepend_space @append_space
   )
 
 (boolean_operator
