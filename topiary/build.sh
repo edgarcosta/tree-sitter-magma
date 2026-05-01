@@ -31,10 +31,12 @@ format_file() {
     if [ ! -f "$SO_PATH" ]; then
         build
     fi
+    local input
+    input="$(realpath "$1")"
     (cd "$SCRIPT_DIR" && topiary format --language magma \
         --configuration "$SCRIPT_DIR/languages.ncl" \
         --query "$SCRIPT_DIR/magma.scm" \
-        < "$1")
+        < "$input")
 }
 
 run_tests() {
