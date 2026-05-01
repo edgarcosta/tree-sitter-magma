@@ -1,17 +1,13 @@
 #!/usr/bin/env bash
-# Parse all Magma package files and report error statistics
+# Parse all .m files under PACKAGE_DIR (recursive find) and report error
+# statistics. Note: this includes files that the official Magma release
+# never loads — drafts, MATLAB/R stubs, abandoned modules — so the error
+# count is inflated. For an apples-to-apples regression check on real
+# Magma source, prefer `make parse-spec`, which walks the spec tree and
+# only reports errors in actually-loaded files.
 #
 # Usage: ./scripts/parse_packages.sh [PACKAGE_DIR]
 # Default PACKAGE_DIR: /opt/magma/current/package
-#
-# Baseline (before grammar hardening): ~32.5% error rate (estimated from 200-file sample)
-# After grammar hardening: 21/3465 files (0.6%), 99.39% success rate
-#
-# Remaining 21 failures:
-#   6 files - MATLAB/R code, not Magma (benchmark.m, stab.m, conj_matlab.m, prospect.m)
-#   4 files - backslash continuation inside identifiers (DOrelations.m, Interpolations.m, g3twists*.m)
-#   4 files - missing semicolons after 'end case' (db.m, q_expansions.m, torsion_subgroups.m, prime_proof.m)
-#   6 files - misc edge cases (empty when body, when without case, ambiguous syntax, etc.)
 
 set -euo pipefail
 
