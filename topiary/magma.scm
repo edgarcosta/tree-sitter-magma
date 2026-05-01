@@ -335,6 +335,25 @@
 )
 
 ;; ============================================================
+;; Declare statements
+;; ============================================================
+
+(declare_statement
+  "declare" @append_space
+)
+(verbosity_declaration
+  "verbose" @append_space
+)
+(attribute_declaration
+  "attributes" @append_space
+  ":" @prepend_antispace @append_space
+)
+(type_declaration
+  "type" @append_space
+  ":" @prepend_antispace @append_space
+)
+
+;; ============================================================
 ;; Import directives
 ;; ============================================================
 
