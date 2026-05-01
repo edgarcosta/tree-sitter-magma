@@ -326,6 +326,14 @@
   ":" @append_space
 )
 
+(require_statement
+  "requirege" @append_space
+)
+
+(require_statement
+  "requirerange" @append_space
+)
+
 (local_statement
   "local" @append_space
 )
