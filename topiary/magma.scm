@@ -135,6 +135,13 @@
   "by" @prepend_space @append_space
 )
 
+;; range expression `a..b by c` (used inside aggregates: `[1..n by -1]`).
+;; The grammar's range rule has bare 'by' (no surrounding spaces in literal),
+;; so without this rule `[1..n by -1]` collapses to `[1..nby-1]`.
+(range
+  "by" @prepend_space @append_space
+)
+
 ;; ============================================================
 ;; Control flow: while
 ;; ============================================================
