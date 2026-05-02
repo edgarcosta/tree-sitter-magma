@@ -404,6 +404,8 @@
 )
 (type_declaration
   "type" @append_space
+)
+(type_declaration
   ":" @prepend_antispace @append_space
 )
 
