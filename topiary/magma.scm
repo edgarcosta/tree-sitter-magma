@@ -347,6 +347,11 @@
   "error" @append_space
 )
 
+;; error if cond, msg — the conditional form: `error if NOT separable, "..."`
+(error_statement
+  "if" @prepend_space @append_space
+)
+
 (assert_statement
   ["assert" "assert2" "assert3"] @append_space
 )
@@ -435,11 +440,7 @@
 ;; ============================================================
 
 (ternary_operator
-  "select" @append_space
-)
-
-(ternary_operator
-  "else" @append_space
+  ["select" "else"] @prepend_space @append_space
 )
 
 ;; ============================================================
