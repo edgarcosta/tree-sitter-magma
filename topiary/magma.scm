@@ -319,7 +319,16 @@
 )
 
 (print_statement
-  "print" @append_space
+  ["print" "printf" "fprintf"] @append_space
+)
+
+(vprint_statement
+  ["vprint" "vprintf"] @append_space
+  ":" @append_space
+)
+
+(eval_expression
+  "eval" @append_space
 )
 
 (error_statement
