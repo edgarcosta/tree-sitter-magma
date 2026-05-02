@@ -331,6 +331,18 @@
   "eval" @append_space
 )
 
+;; break / continue can take an optional label identifier:
+;;   break u;  break 2;  continue u;
+;; The keyword needs a trailing space when followed by an identifier.
+;; The existing program-level ";" @prepend_antispace rule strips the
+;; space when the statement is bare (`break;`).
+(break_statement
+  "break" @append_space
+)
+(continue_statement
+  "continue" @append_space
+)
+
 (error_statement
   "error" @append_space
 )
