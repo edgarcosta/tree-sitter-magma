@@ -327,7 +327,7 @@
 )
 
 (assert_statement
-  "assert" @append_space
+  ["assert" "assert2" "assert3"] @append_space
 )
 
 (require_statement
