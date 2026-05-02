@@ -442,7 +442,7 @@
 ;; ============================================================
 
 (unary_operator
-  operator: "not" @append_space
+  operator: ["not" "assigned"] @append_space
 )
 
 (unary_operator
