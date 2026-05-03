@@ -114,6 +114,8 @@
 
 (else_clause
   "else" @prepend_hardline @append_hardline
+)
+(else_clause
   consequence: (block) @prepend_indent_start @append_indent_end
 )
 
@@ -124,8 +126,10 @@
 (for_statement
   "for" @append_space
   "do" @prepend_space @append_hardline
-  body: (block) @prepend_indent_start @append_indent_end
   "end" @prepend_hardline @append_space
+)
+(for_statement
+  body: (block) @prepend_indent_start @append_indent_end
 )
 
 (for_quantifier
@@ -154,8 +158,10 @@
 (while_statement
   "while" @append_space
   "do" @prepend_space @append_hardline
-  body: (block) @prepend_indent_start @append_indent_end
   "end" @prepend_hardline @append_space
+)
+(while_statement
+  body: (block) @prepend_indent_start @append_indent_end
 )
 
 ;; ============================================================
@@ -164,8 +170,10 @@
 
 (repeat_statement
   "repeat" @append_hardline
-  body: (block) @prepend_indent_start @append_indent_end
   "until" @prepend_hardline @append_space
+)
+(repeat_statement
+  body: (block) @prepend_indent_start @append_indent_end
 )
 
 ;; ============================================================
@@ -183,11 +191,15 @@
 (when_clause
   "when" @prepend_hardline @append_space
   ":" @append_hardline
+)
+(when_clause
   consequence: (block) @prepend_indent_start @append_indent_end
 )
 
 (case_statement
   "else" @prepend_hardline @append_hardline
+)
+(case_statement
   else: (block) @prepend_indent_start @append_indent_end
 )
 
