@@ -65,8 +65,10 @@
 ;; Newline after parameters, indent body block
 (function_definition
   parameters: (parameters) @append_hardline
+)
+(function_definition
   body: (block) @prepend_indent_start @append_indent_end
-) 
+)
 
 (function_definition
   "end" @append_space
@@ -74,6 +76,8 @@
 
 (procedure_definition
   parameters: (parameters) @append_hardline
+)
+(procedure_definition
   body: (block) @prepend_indent_start @append_indent_end
 )
 
@@ -83,6 +87,8 @@
 
 (intrinsic_definition
   (doc_string) @append_hardline
+)
+(intrinsic_definition
   body: (block) @prepend_indent_start @append_indent_end
 )
 
