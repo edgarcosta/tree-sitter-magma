@@ -388,6 +388,11 @@
   "time" @append_space
 )
 
+(vtime_statement
+  "vtime" @append_space
+  ":" @append_space
+)
+
 ;; ============================================================
 ;; Declare statements
 ;; ============================================================
