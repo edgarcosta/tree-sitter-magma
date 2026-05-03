@@ -94,11 +94,16 @@
 ;; Control flow: if/elif/else
 ;; ============================================================
 
+;; Keyword spacing — fires regardless of whether the consequence is a block.
+;; A consequence of comments-only doesn't parse as (block), so combining the
+;; keyword and indent rules into one pattern breaks both.
 (if_statement
   "if" @append_space
   "then" @prepend_space @append_hardline
-  consequence: (block) @prepend_indent_start @append_indent_end
   "end" @prepend_hardline @append_space
+)
+(if_statement
+  consequence: (block) @prepend_indent_start @append_indent_end
 )
 
 (elif_clause
