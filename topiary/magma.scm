@@ -407,6 +407,14 @@
   "forward" @append_space
 )
 
+(read_statement
+  ["read" "readi"] @append_space
+)
+
+(exit_directive
+  ["quit" "exit"] @append_space
+)
+
 (time_statement
   "time" @append_space
 )
