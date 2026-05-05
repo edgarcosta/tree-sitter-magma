@@ -1,0 +1,50 @@
+--- a/src/lib.rs	2026-05-05 15:49:06.298044175 -0400
++++ b/src/lib.rs	2026-05-05 15:49:26.380184241 -0400
+@@ -7,7 +7,7 @@
+ #[cfg(target_arch = "wasm32")]
+ mod wasm_mod {
+     use std::sync::Mutex;
+-    use topiary_config::Configuration;
++    use topiary_config::{Configuration, GrammarSource, Language as ConfigLanguage, LanguageConfiguration};
+     use topiary_core::{formatter, FormatterResult, Language, Operation, TopiaryQuery};
+     use topiary_tree_sitter_facade::TreeSitter;
+     use wasm_bindgen::prelude::*;
+@@ -36,6 +36,38 @@
+     #[wasm_bindgen(js_name = queryInit)]
+     pub async fn query_init(query_content: String, language_name: String) -> Result<(), JsError> {
+         let language_normalized = language_name.replace('-', "_");
++
++        // Magma-specific branch: bypass Configuration::default() because
++        // topiary-config 0.5.1 does not bundle magma. We construct a
++        // ConfigLanguage directly so that grammar() resolves to
++        // /playground/scripts/tree-sitter-magma.wasm via the wasm32 impl.
++        if language_normalized == "magma" {
++            let config_lang = ConfigLanguage::new(
++                "magma".to_string(),
++                LanguageConfiguration {
++                    extensions: std::collections::HashSet::new(),
++                    indent: Some("    ".to_string()),
++                    grammar: GrammarSource {
++                        symbol: None,
++                        git: String::new(),
++                        rev: String::new(),
++                        subdir: None,
++                    },
++                },
++            );
++            let grammar = config_lang.grammar().await?;
++            let query = TopiaryQuery::new(&grammar, &query_content)?;
++            let mut guard = QUERY_STATE.lock().unwrap();
++            let language = Language {
++                name: "magma".to_string(),
++                query,
++                grammar,
++                indent: Some("    ".to_string()),
++            };
++            *guard = Some(QueryState { language });
++            return Ok(());
++        }
++
+         let configuration = Configuration::default();
+         let language = configuration.get_language(language_normalized)?.clone();
+         let grammar = language.grammar().await?;
