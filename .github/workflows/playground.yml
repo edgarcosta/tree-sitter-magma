@@ -26,16 +26,26 @@ jobs:
         with:
           node-version: '20'
 
-      - run: npm install -g tree-sitter-cli@^0.25.0
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
 
-      - name: Generate parser
-        run: tree-sitter generate
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: . -> target
 
-      - name: Build WASM
-        run: tree-sitter build --wasm
+      - name: Install wasm-pack and pinned wasm-bindgen-cli
+        run: |
+          cargo install wasm-pack --locked
+          cargo install --locked wasm-bindgen-cli --version 0.2.91
 
-      - name: Prepare playground directory
-        run: cp tree-sitter-magma.wasm docs/playground/
+      - name: Install tree-sitter-cli
+        run: npm install -g tree-sitter-cli@^0.25.0
+
+      - name: Build playground
+        env:
+          OUT_DIR: ${{ github.workspace }}/playground-dist
+        run: ./scripts/build-topiary-playground.sh
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -43,7 +53,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'docs/playground'
+          path: playground-dist
 
       - name: Deploy to GitHub Pages
         id: deployment
