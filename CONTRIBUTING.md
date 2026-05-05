@@ -23,8 +23,8 @@ npx tree-sitter test -u      # update expected trees from current parser output
 ## Workflow for grammar changes
 
 1. Edit `grammar.js` (or `src/scanner.c` for token-level work).
-2. Run `tree-sitter generate`.
-3. Run `tree-sitter test` and fix any regressions.
+2. Run `npx tree-sitter generate`.
+3. Run `npx tree-sitter test` and fix any regressions.
 4. Add or update corpus tests for the construct you touched.
 5. Verify with `make validate-corpus` (see below).
 6. Run `make parse-spec SPEC=/path/to/magma/package/spec` against a real
