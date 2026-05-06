@@ -115,6 +115,8 @@
 (elif_clause
   "elif" @prepend_hardline @append_space
   "then" @prepend_space @append_hardline
+)
+(elif_clause
   consequence: (block) @prepend_indent_start @append_indent_end
 )
 
