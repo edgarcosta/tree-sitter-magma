@@ -78,11 +78,14 @@ cp "${REPO_ROOT}/tree-sitter-magma.wasm" "${WASM_DEST}/"
 # ---------------------------------------------------------------------------
 # Phase 5: Build the topiary-playground crate to WASM
 # ---------------------------------------------------------------------------
-echo "==> [5/9] Building topiary-playground crate with wasm-pack"
+# Build inside the upstream flake's devShell so we get the exact rust +
+# wasm-pack + wasm-bindgen + WASI sysroot the topiary playground was
+# tested with. Avoids the wasm32-unknown-unknown / WASI subdir mismatch
+# we hit when trying to bridge cc-rs to wasi-sdk manually.
+echo "==> [5/9] Building topiary-playground crate with wasm-pack (inside nix develop)"
 (
   cd "${PLAYGROUND_DIR}"
-  rustup target add wasm32-unknown-unknown
-  wasm-pack build --target web --out-dir web-playground/src/wasm-app
+  nix develop --command wasm-pack build --target web --out-dir web-playground/src/wasm-app
 )
 
 # ---------------------------------------------------------------------------
