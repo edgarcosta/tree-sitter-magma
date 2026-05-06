@@ -38,6 +38,7 @@ jobs:
       - name: Build playground
         env:
           OUT_DIR: ${{ github.workspace }}/playground-dist
+          DEPLOY_BASE: /tree-sitter-magma/
         run: ./scripts/build-topiary-playground.sh
 
       - name: Setup Pages

@@ -5,7 +5,7 @@ A tree-sitter parser for the Magma computational algebra language.
 ## Playground
 
 Try the grammar and the Topiary formatter in your browser:
-<https://edgarcosta.github.io/tree-sitter-magma/playground/>
+<https://edgarcosta.github.io/tree-sitter-magma/>
 
 ## Installation
 

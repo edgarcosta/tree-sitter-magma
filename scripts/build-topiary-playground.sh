@@ -33,6 +33,12 @@ SAMPLE_FILE="${REPO_ROOT}/topiary/sample.m"
 
 OUT_DIR="${OUT_DIR:-${REPO_ROOT}/playground-dist}"
 
+# Public path the deployed playground will be served from. Used as the
+# Vite --base so all asset URLs in dist/index.html resolve correctly when
+# served under a Pages prefix like /tree-sitter-magma/. Must start and end
+# with a slash.
+DEPLOY_BASE="${DEPLOY_BASE:-/}"
+
 # ---------------------------------------------------------------------------
 # Work dir — cleaned up on exit
 # ---------------------------------------------------------------------------
@@ -121,8 +127,11 @@ echo "==> [6/8] Installing Vite frontend deps"
 # ---------------------------------------------------------------------------
 # Phase 7: Build the Vite frontend
 # ---------------------------------------------------------------------------
-echo "==> [7/8] Building Vite frontend"
-(cd "${PLAYGROUND_DIR}/web-playground" && npm run build)
+# Skip 'npm run build' (which is 'tsc && vite build') so we can pass an
+# explicit --base to vite. The upstream vite.config.ts hardcodes
+# base: '/playground' which 404s when served from a Pages project URL.
+echo "==> [7/8] Building Vite frontend with base=${DEPLOY_BASE}"
+(cd "${PLAYGROUND_DIR}/web-playground" && npx tsc && npx vite build --base "${DEPLOY_BASE}")
 
 # ---------------------------------------------------------------------------
 # Phase 8: Copy dist/ to $OUT_DIR
