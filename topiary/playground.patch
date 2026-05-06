@@ -8,6 +8,20 @@
  topiary-tree-sitter-facade = "0.5.1"
  wasm-bindgen = "=0.2.91"
  wasm-bindgen-futures = "=0.4"
+--- a/web-playground/src/App.tsx
++++ b/web-playground/src/App.tsx
+@@ -15,4 +15,4 @@ const debounceDelay = 500;
+ function App() {
+-    const defaultLanguage = "json";
++    const defaultLanguage = "magma";
+     const defaultQuery = languages[defaultLanguage].query;
+     const defaultInput = languages[defaultLanguage].input;
+@@ -187,4 +187,4 @@
+-                <select id="languageMenu" onChange={e => changeLanguage(e.target.value)}>
++                <select id="languageMenu" value={currentLanguage} onChange={e => changeLanguage(e.target.value)}>
+                     <option value="">Choose a reference language</option>
+                     {languageOptions}
+                 </select>
 --- a/src/lib.rs
 +++ b/src/lib.rs
 @@ -36,6 +36,31 @@ mod wasm_mod {

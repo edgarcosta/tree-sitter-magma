@@ -63,15 +63,30 @@ patch -p1 -d "${PLAYGROUND_DIR}" < "${PATCH_FILE}"
 # ---------------------------------------------------------------------------
 # Phase 3: Build tree-sitter-magma.wasm and copy into the playground
 # ---------------------------------------------------------------------------
-echo "==> [3/8] Generating and building tree-sitter-magma.wasm"
+# Topiary 0.5.1 ships tree-sitter 0.22.6, which only accepts LANGUAGE_VERSION
+# 13-14 at query-parse time. tree-sitter-cli @^0.25 produces v15 parsers
+# which load fine but fail later with "Error parsing query file". Pin to
+# tree-sitter-cli @^0.22 here so the WASM is v14 and topiary can parse
+# queries against it. The repo's other tooling can still use the default
+# 0.25 cli; this override is local to the playground build.
+echo "==> [3/8] Generating and building tree-sitter-magma.wasm (cli @^0.22 for v14 ABI)"
 (
   cd "${REPO_ROOT}"
-  tree-sitter generate
-  tree-sitter build --wasm
+  npx --yes tree-sitter-cli@^0.22.0 generate
+  npx --yes tree-sitter-cli@^0.22.0 build --wasm
 )
 WASM_DEST="${PLAYGROUND_DIR}/web-playground/public/scripts"
 mkdir -p "${WASM_DEST}"
 cp "${REPO_ROOT}/tree-sitter-magma.wasm" "${WASM_DEST}/"
+
+# Upstream's web-playground/index.html has <script src="/scripts/tree-sitter.js"></script>
+# but the upstream public/ doesn't ship that file — their build pulls it in
+# elsewhere. Fetch the runtime + wasm from upstream's deployed playground;
+# pinned-SHA pairing with our pinned playground checkout means the API is
+# compatible.
+echo "    Fetching web-tree-sitter runtime from upstream playground"
+curl -fsSL https://topiary.tweag.io/playground/scripts/tree-sitter.js  -o "${WASM_DEST}/tree-sitter.js"
+curl -fsSL https://topiary.tweag.io/playground/scripts/tree-sitter.wasm -o "${WASM_DEST}/tree-sitter.wasm"
 
 # ---------------------------------------------------------------------------
 # Phase 4: Build the topiary-playground crate to WASM
