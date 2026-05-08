@@ -517,12 +517,26 @@
 ;; Binary operators
 ;; ============================================================
 
+;; High-precedence punctuation — tight, no surrounding space.
+;; (Per style.md: "Space around binary operators matching order of
+;; operation 3*x^2 + a".)
 (binary_operator
-  operator: ["+" "-" "/" "*" "^" "^^" "@" "@@" "." "!" "!!"
-             "mod" "div" "in" "notin" "adj" "notadj" "subset" "notsubset"
-             "join" "meet" "diff" "sdiff" "cat"
+  operator: ["*" "/" "^" "!" "!!" "@" "@@" "."] @prepend_antispace @append_antispace
+)
+
+;; Low/mid precedence and word operators — spaced.
+;; ^^ (group conjugation) is precedence 7 in grammar.js, lower than
+;; or/and/comparisons, so it stays spaced.
+;; mod/div/cat and the rest are word operators; the lexer requires
+;; whitespace so they must stay spaced.
+(binary_operator
+  operator: ["+" "-" "^^"
+             "mod" "div" "cat"
+             "join" "meet" "diff" "sdiff"
+             "adj" "notadj" "subset" "notsubset"
+             "in" "notin"
              "gt" "lt" "ge" "le" "eq" "ne" "cmpeq" "cmpne"] @prepend_space @append_space
-  )
+)
 
 (boolean_operator
  operator: ["or" "xor" "and"] @prepend_space @append_space)
