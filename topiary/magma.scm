@@ -48,15 +48,37 @@
 ;; Function/procedure/intrinsic definitions
 ;; ============================================================
 
-;; Space after opening keyword (anchored as first child)
+;; Named function definition: hardline before, space after `function`
 (function_definition
   .
   "function" @append_space
+  .
+  name: (identifier)
 ) @prepend_hardline
 
+;; Anonymous function (used as expression): no hardline, strip
+;; whitespace after `function` so it abuts the parameter list.
+(function_definition
+  .
+  "function" @append_antispace
+  .
+  parameters: (parameters)
+)
+
+;; Named procedure: space after `procedure`.
 (procedure_definition
   .
   "procedure" @append_space
+  .
+  name: (identifier)
+)
+
+;; Anonymous procedure: strip whitespace after `procedure`.
+(procedure_definition
+  .
+  "procedure" @append_antispace
+  .
+  parameters: (parameters)
 )
 
 (intrinsic_definition
