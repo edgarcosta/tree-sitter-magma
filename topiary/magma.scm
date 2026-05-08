@@ -488,7 +488,19 @@
 ;; ============================================================
 
 (optional_parameter
-  ":=" @append_space
+  ":=" @prepend_space @append_space
+)
+
+;; ============================================================
+;; Optional argument at call sites: f(req, req : opt := val, ...)
+;; ============================================================
+
+(argument_list
+  ":" @prepend_space @append_space
+)
+
+(optional_argument
+  ":=" @prepend_space @append_space
 )
 
 ;; ============================================================
