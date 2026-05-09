@@ -2,9 +2,9 @@
 members = [
     "bindings/rust",
     "crates/lava-core",
-    # "crates/lava",
+    "crates/lava",
 ]
-default-members = ["bindings/rust"]
+default-members = ["crates/lava"]
 resolver = "2"
 
 [workspace.package]
