@@ -309,6 +309,39 @@
   ">" @prepend_antispace
 )
 
+;; Constructor `|` separates options/parameters from elements:
+;;   quo<F | r1, r2>  or  quo<GrpFP : F1, F2 | R : opt := val>
+(constructor_elements
+  "|" @prepend_space @append_space
+)
+
+;; Map constructor `:->` separates domain element from image:
+;;   map< X -> Y | x :-> x^2 >
+(map_constructor
+  ":->" @prepend_space @append_space
+)
+
+;; two_tuple `->` (e.g., the `X -> Y` in `map<X -> Y | ...>`):
+;; mirrors the `intrinsic_definition` `->` rule so the arrow has
+;; consistent spacing wherever it appears as a structural separator.
+(two_tuple
+  "->" @prepend_space @append_space
+)
+
+;; constructor_options `:` separates the options block (e.g., the
+;; `: F1, F2` in `quo<GrpFP : F1, F2 | ...>` and the trailing
+;; `: opt := val`).
+(constructor_options
+  ":" @prepend_space @append_space
+)
+
+;; simple_assignment `name := value` appears inside constructor
+;; options/elements (e.g., `R : opt := val`). Space around `:=`
+;; mirrors the global assignment rule.
+(simple_assignment
+  ":=" @prepend_space @append_space
+)
+
 ;; field_definition: "name : Type"
 (field_definition
  ":" @prepend_space @append_space
