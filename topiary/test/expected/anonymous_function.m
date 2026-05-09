@@ -7,6 +7,6 @@ end function;
 p := procedure(~x)
     x +:= 1;
 end procedure;
-q := Apply(function(x)
+q := function(x)
     return x + 1;
-end function, [1, 2, 3]);
+end function(2);
