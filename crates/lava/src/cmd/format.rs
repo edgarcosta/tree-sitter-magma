@@ -8,9 +8,6 @@ pub async fn run(args: FormatArgs) -> Result<i32> {
     if args.recursive {
         anyhow::bail!("--recursive not yet implemented (Task 10)");
     }
-    if args.check {
-        anyhow::bail!("--check not yet implemented (Task 9)");
-    }
 
     let opts = FormatOptions {
         query_override: args.query.clone(),
@@ -18,6 +15,39 @@ pub async fn run(args: FormatArgs) -> Result<i32> {
         tolerate_parse_errors: args.tolerate_parse_errors,
         skip_idempotence: false,
     };
+
+    if args.check {
+        if args.paths.is_empty() {
+            anyhow::bail!("--check requires at least one path");
+        }
+        let mut changed: Vec<&Path> = Vec::new();
+        for path in &args.paths {
+            let source = std::fs::read_to_string(path)
+                .with_context(|| format!("reading {}", path.display()))?;
+            let formatted = format_one(&source, &path.display().to_string(), &opts)?;
+            if formatted != source {
+                changed.push(path);
+                if args.diff {
+                    let diff = similar::TextDiff::from_lines(&source, &formatted);
+                    eprintln!(
+                        "--- {}\n+++ {} (formatted)",
+                        path.display(),
+                        path.display()
+                    );
+                    for hunk in diff.unified_diff().context_radius(3).iter_hunks() {
+                        eprint!("{hunk}");
+                    }
+                }
+            }
+        }
+        if changed.is_empty() {
+            return Ok(0);
+        }
+        for p in &changed {
+            eprintln!("{} would be reformatted", p.display());
+        }
+        return Ok(1);
+    }
 
     // Reading from stdin: zero paths, or a single `-`.
     let read_stdin = args.paths.is_empty()
