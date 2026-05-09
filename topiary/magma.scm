@@ -290,6 +290,20 @@
   ")" @prepend_antispace
 )
 
+;; Preserve user-chosen multi-line argument formatting.
+;; @append_input_softline expands to a newline only if the comma
+;; was followed by a newline in the input; otherwise it's a space
+;; (which the global "," rule already provides).
+;; This is the closest topiary's input-driven softline model gets
+;; to "wrap if too long" — see topiary/README.md for context.
+(parameters
+  "," @append_input_softline
+)
+
+(argument_list
+  "," @append_input_softline
+)
+
 ;; ============================================================
 ;; Constructors — angle brackets: no space inside
 ;; ============================================================
