@@ -1,0 +1,19 @@
+[package]
+name = "lava-core"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Library powering the lava CLI for Magma source code"
+
+[dependencies]
+topiary-core = "0.7"
+topiary-tree-sitter-facade = "0.7"
+tree-sitter-magma = { path = "../../bindings/rust", version = "0.1.0" }
+thiserror = "1"
+tracing = "0.1"
+dirs = "5"
+
+[dev-dependencies]
+tokio = { version = "1", features = ["rt", "macros"] }
+pretty_assertions = "1"

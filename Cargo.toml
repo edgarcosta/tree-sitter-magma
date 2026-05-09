@@ -1,7 +1,7 @@
 [workspace]
 members = [
     "bindings/rust",
-    # "crates/lava-core",
+    "crates/lava-core",
     # "crates/lava",
 ]
 default-members = ["bindings/rust"]
