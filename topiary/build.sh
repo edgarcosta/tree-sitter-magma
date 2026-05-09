@@ -5,11 +5,6 @@
 #   ./topiary/build.sh build          # Compile grammar .so
 #   ./topiary/build.sh format <file>  # Format a Magma file
 #   ./topiary/build.sh test           # Run formatter tests
-#
-# NOTE: Due to how tree-sitter exposes anonymous token byte ranges,
-# Topiary preserves source spacing before operators (:=, +, -, etc.).
-# The formatter normalizes indentation, line breaks, and structural
-# formatting. Operator spacing is preserved from the source input.
 
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
