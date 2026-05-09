@@ -4,7 +4,7 @@ use crate::error::{Error, QuerySource, Result};
 use crate::queries;
 use std::borrow::Cow;
 use std::path::PathBuf;
-use topiary_core::{formatter, Language, Operation, TopiaryQuery};
+use topiary_core::{Language, Operation, TopiaryQuery, formatter};
 
 /// Options for `format_str`.
 #[derive(Debug, Default, Clone)]
@@ -25,10 +25,7 @@ pub struct FormatOptions {
 ///
 /// Returns the formatted source plus the resolved query source so callers
 /// can log/display where the query came from.
-pub fn format_str(
-    source: &str,
-    opts: &FormatOptions,
-) -> Result<(String, QuerySource)> {
+pub fn format_str(source: &str, opts: &FormatOptions) -> Result<(String, QuerySource)> {
     let cwd: PathBuf = match &opts.cwd {
         Some(p) => p.clone(),
         None => std::env::current_dir().map_err(|source| Error::Io {

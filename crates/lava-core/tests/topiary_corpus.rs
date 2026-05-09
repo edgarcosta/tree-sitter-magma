@@ -2,7 +2,7 @@
 //! round-trip through lava-core::format_str unchanged. This is the regression
 //! net keeping lava and the upstream topiary CLI in agreement.
 
-use lava_core::{format_str, FormatOptions};
+use lava_core::{FormatOptions, format_str};
 use std::fs;
 use std::path::PathBuf;
 

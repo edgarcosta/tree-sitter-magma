@@ -1,6 +1,6 @@
 use crate::cli::FormatArgs;
-use anyhow::{anyhow, Context, Result};
-use lava_core::{format_str, FormatOptions};
+use anyhow::{Context, Result, anyhow};
+use lava_core::{FormatOptions, format_str};
 use std::io::{Read, Write};
 use std::path::Path;
 
@@ -31,11 +31,7 @@ pub async fn run(args: FormatArgs) -> Result<i32> {
                 changed.push(path);
                 if args.diff {
                     let diff = similar::TextDiff::from_lines(&source, &formatted);
-                    eprintln!(
-                        "--- {}\n+++ {} (formatted)",
-                        path.display(),
-                        path.display()
-                    );
+                    eprintln!("--- {}\n+++ {} (formatted)", path.display(), path.display());
                     for hunk in diff.unified_diff().context_radius(3).iter_hunks() {
                         eprint!("{hunk}");
                     }
@@ -88,8 +84,8 @@ pub async fn run(args: FormatArgs) -> Result<i32> {
 
     // Single file → stdout.
     let path = &expanded_paths[0];
-    let source = std::fs::read_to_string(path)
-        .with_context(|| format!("reading {}", path.display()))?;
+    let source =
+        std::fs::read_to_string(path).with_context(|| format!("reading {}", path.display()))?;
     let formatted = format_one(&source, &path.display().to_string(), &opts)?;
     std::io::stdout()
         .write_all(formatted.as_bytes())

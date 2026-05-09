@@ -5,4 +5,4 @@ pub mod format;
 pub mod queries;
 
 pub use error::{Error, QuerySource, Result};
-pub use format::{format_str, FormatOptions};
+pub use format::{FormatOptions, format_str};

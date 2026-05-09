@@ -16,10 +16,7 @@ pub enum Error {
     Parse { path: String, message: String },
 
     #[error("query error from {from:?}: {message}")]
-    Query {
-        from: QuerySource,
-        message: String,
-    },
+    Query { from: QuerySource, message: String },
 
     #[error("I/O error at {path}: {source}")]
     Io {
