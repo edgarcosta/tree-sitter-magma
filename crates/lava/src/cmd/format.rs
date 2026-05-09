@@ -5,10 +5,6 @@ use std::io::{Read, Write};
 use std::path::Path;
 
 pub async fn run(args: FormatArgs) -> Result<i32> {
-    if args.recursive {
-        anyhow::bail!("--recursive not yet implemented (Task 10)");
-    }
-
     let opts = FormatOptions {
         query_override: args.query.clone(),
         cwd: None,
@@ -16,12 +12,18 @@ pub async fn run(args: FormatArgs) -> Result<i32> {
         skip_idempotence: false,
     };
 
+    let expanded_paths: Vec<std::path::PathBuf> = if args.recursive {
+        expand_recursive(&args.paths)?
+    } else {
+        args.paths.clone()
+    };
+
     if args.check {
-        if args.paths.is_empty() {
+        if expanded_paths.is_empty() {
             anyhow::bail!("--check requires at least one path");
         }
         let mut changed: Vec<&Path> = Vec::new();
-        for path in &args.paths {
+        for path in &expanded_paths {
             let source = std::fs::read_to_string(path)
                 .with_context(|| format!("reading {}", path.display()))?;
             let formatted = format_one(&source, &path.display().to_string(), &opts)?;
@@ -50,8 +52,8 @@ pub async fn run(args: FormatArgs) -> Result<i32> {
     }
 
     // Reading from stdin: zero paths, or a single `-`.
-    let read_stdin = args.paths.is_empty()
-        || (args.paths.len() == 1 && args.paths[0].as_os_str() == "-");
+    let read_stdin = expanded_paths.is_empty()
+        || (expanded_paths.len() == 1 && expanded_paths[0].as_os_str() == "-");
     if read_stdin {
         if args.write {
             anyhow::bail!("-w cannot be used with stdin");
@@ -67,14 +69,14 @@ pub async fn run(args: FormatArgs) -> Result<i32> {
         return Ok(0);
     }
 
-    if !args.write && args.paths.len() > 1 {
+    if !args.write && expanded_paths.len() > 1 {
         return Err(anyhow!(
             "refusing to concatenate multiple files to stdout; pass -w or one path at a time"
         ));
     }
 
     if args.write {
-        for path in &args.paths {
+        for path in &expanded_paths {
             let source = std::fs::read_to_string(path)
                 .with_context(|| format!("reading {}", path.display()))?;
             let formatted = format_one(&source, &path.display().to_string(), &opts)?;
@@ -85,7 +87,7 @@ pub async fn run(args: FormatArgs) -> Result<i32> {
     }
 
     // Single file → stdout.
-    let path = &args.paths[0];
+    let path = &expanded_paths[0];
     let source = std::fs::read_to_string(path)
         .with_context(|| format!("reading {}", path.display()))?;
     let formatted = format_one(&source, &path.display().to_string(), &opts)?;
@@ -113,4 +115,38 @@ fn atomic_write(target: &Path, contents: &str) -> std::io::Result<()> {
     tmp.flush()?;
     tmp.persist(target).map_err(|e| e.error)?;
     Ok(())
+}
+
+fn expand_recursive(roots: &[std::path::PathBuf]) -> Result<Vec<std::path::PathBuf>> {
+    use ignore::WalkBuilder;
+    if roots.is_empty() {
+        anyhow::bail!("--recursive requires at least one path");
+    }
+    let mut out: Vec<std::path::PathBuf> = Vec::new();
+    for root in roots {
+        if root.is_file() {
+            out.push(root.clone());
+            continue;
+        }
+        let mut wb = WalkBuilder::new(root);
+        wb.require_git(false);
+        wb.add_custom_ignore_filename(".lavaignore");
+        for result in wb.build() {
+            let entry = result.with_context(|| format!("walking {}", root.display()))?;
+            if !entry.file_type().is_some_and(|t| t.is_file()) {
+                continue;
+            }
+            let p = entry.path();
+            let is_magma = p
+                .extension()
+                .map(|e| e == "m" || e == "magma")
+                .unwrap_or(false);
+            if is_magma {
+                out.push(p.to_path_buf());
+            }
+        }
+    }
+    out.sort();
+    out.dedup();
+    Ok(out)
 }
