@@ -11,7 +11,7 @@ name = "lava"
 path = "src/main.rs"
 
 [dependencies]
-lava-core = { path = "../lava-core", version = "0.1.0" }
+lava-core = { path = "../lava-core" }
 clap = { version = "4", features = ["derive", "wrap_help"] }
 tokio = { version = "1", features = ["rt", "macros"] }
 tracing = "0.1"

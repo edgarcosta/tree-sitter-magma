@@ -5,6 +5,7 @@ edition.workspace = true
 license.workspace = true
 repository.workspace = true
 description = "Library powering the lava CLI for Magma source code"
+publish = false
 
 [dependencies]
 topiary-core = "0.7"
