@@ -3,11 +3,6 @@ build/
 node_modules/
 prebuilds/
 
-# Generated files
-src/parser.c
-src/tree_sitter/
-src/node-types.json
-src/grammar.json
 
 # OS files
 .DS_Store
@@ -53,3 +48,36 @@ jspm_packages/
 
 # Topiary build artifact
 topiary/magma.so
+
+# Swift artifacts
+.build/
+
+# Go artifacts
+_obj/
+
+# Python artifacts
+.venv/
+dist/
+*.egg-info
+*.whl
+
+# C artifacts
+*.a
+*.so
+*.so.*
+*.dylib
+*.dll
+*.pc
+
+# Example dirs
+/examples/*/
+
+# Grammar volatiles
+*.wasm
+*.obj
+*.o
+
+# Archives
+*.tar.gz
+*.tgz
+*.zip
