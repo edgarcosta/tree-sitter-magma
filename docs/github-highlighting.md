@@ -165,8 +165,11 @@ syntax highlighting only.
   matched positionally rather than through a `parameters` node.
 - `declare verbose`, `print ... : Hex` and similar directive tails highlight
   the keyword and the operand, not the directive as a unit.
-- No `injections.scm` (Magma embeds no other languages) and no `tags.scm`
-  (code navigation is out of scope for this request).
+- No `injections.scm` (Magma embeds no other languages).
+- A draft `tags.scm` supports code navigation; see the README for coverage and
+  limitations. GitHub's separate [code-navigation contribution guide](https://github.com/github/code-navigation#adding-code-navigation-for-a-new-language)
+  requires Linguist recognition, a published Rust crate, and tags queries.
+  This does not establish the same submission process for syntax highlighting.
 - The queries do not perform semantic name resolution. Parameter declarations
   are `@variable.parameter`; ordinary identifiers are `@variable`, and calls
   are `@function`. Forward bindings and shadowing use the same rules as every

@@ -22,7 +22,7 @@ From this checkout:
 ```bash
 tree-sitter generate          # generate src/ from grammar.js
 tree-sitter build             # compile the native parser
-tree-sitter test              # parser corpus and highlight assertions
+tree-sitter test              # parser corpus, highlight and tag assertions
 tree-sitter parse examples/highlighting.m
 ```
 
@@ -117,6 +117,30 @@ python3 scripts/parse_corpus.py --spec "$MAGMA_ROOT/package/spec"
 ```
 
 Results and GitHub integration notes are in [docs/github-highlighting.md](docs/github-highlighting.md).
+
+## Reviewing code navigation
+
+`queries/tags.scm` extracts routine definitions and named calls, declared types,
+and attribute and record field definitions. Intrinsic tags include their
+documentation. The Rust binding exposes the query as `TAGS_QUERY`.
+
+Inspect the extracted symbols without executing the Magma source:
+
+```bash
+tree-sitter tags test/tags/navigation.m
+tree-sitter tags examples/highlighting.m
+tree-sitter test
+cargo test
+```
+
+This first draft recognizes named routines and single-target assignments of
+anonymous functions, procedures, and `func`/`proc` expressions.
+It omits forward declarations, imports, aliases, multiple assignments, and
+dynamically selected callees such as `handlers[1](x)`. Parenthesized definitions
+and callees are not yet covered. Record formats contribute field definitions;
+their assigned names are not classified as types.
+Calls through attributes use the final field name. These are syntactic tags:
+they do not resolve overloads or associate fields with a particular record type.
 
 ## Contributing
 
