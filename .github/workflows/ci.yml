@@ -14,14 +14,49 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
-      - run: npm install -g tree-sitter-cli@^0.25.0
+      - run: npm install -g tree-sitter-cli@0.25.10
 
       - name: Generate parser
         run: tree-sitter generate
 
-      - run: npm ci
-
-      - name: Run tests
+      - name: Run parser corpus and highlight tests
         run: tree-sitter test
+
+      - name: Validate every shipped query file
+        run: |
+          for query in queries/*.scm; do
+            echo "== $query"
+            tree-sitter query "$query" examples/highlighting.m > /dev/null
+          done
+
+      - name: Check generated sources are up to date
+        run: git diff --exit-code -- src/
+
+  bindings:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - run: npm ci
+      - run: npm test
+
+      - name: Test Rust binding and documentation
+        run: cargo test
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install and test Python binding
+        run: |
+          python -m pip install '.[core]'
+          python -m unittest discover bindings/python/tests

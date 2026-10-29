@@ -49,5 +49,10 @@ mod tests {
         parser
             .set_language(&super::LANGUAGE.into())
             .expect("Error loading Magma parser");
+        let tree = parser
+            .parse("R<x> := PolynomialRing(Rationals());\ny := 0.5;\n", None)
+            .expect("Error parsing Magma");
+        assert!(!tree.root_node().has_error());
+        assert!(tree.root_node().to_sexp().contains("(real)"));
     }
 }
