@@ -37,9 +37,7 @@
         "-Wno-implicit-fallthrough",
       ],
       "xcode_settings": {
-        "OTHER_CFLAGS": [
-          "-std=c99",
-        ]
+        "GCC_C_LANGUAGE_STANDARD": "c99"
       }
     }
   ]

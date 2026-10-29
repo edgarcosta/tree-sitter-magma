@@ -15,7 +15,7 @@ jobs:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
 
-      - run: npm install -g tree-sitter-cli@^0.25.0
+      - run: npm install -g tree-sitter-cli@0.25.10
 
       - name: Generate parser
         run: tree-sitter generate

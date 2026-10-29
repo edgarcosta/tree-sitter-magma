@@ -155,10 +155,11 @@ parse-examples:
 # like "not declared", "Illegal declaration (must be done in package only)", etc.
 # Skipped corpora:
 #   invalid.txt - intentionally bad syntax
+#   malformed.txt - intentionally truncated or malformed input
 #   types.txt   - `declare type` is package-only and Magma rejects it outside
 #                 of a package context even before reaching the parser
 validate-corpus:
-	@python3 scripts/extract_corpus_code.py $(CORPUS_DIR) .corpus_tmp --skip invalid types
+	@python3 scripts/extract_corpus_code.py $(CORPUS_DIR) .corpus_tmp --skip invalid malformed types
 	@pass=0; fail=0; skip=0; \
 	for f in .corpus_tmp/*.m; do \
 		name=$$(basename "$$f"); \

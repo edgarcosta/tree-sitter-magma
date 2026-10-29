@@ -5,8 +5,9 @@ import tree_sitter_magma
 
 
 class TestLanguage(TestCase):
-    def test_can_load_grammar(self):
-        try:
-            tree_sitter.Language(tree_sitter_magma.language())
-        except Exception:
-            self.fail("Error loading Magma grammar")
+    def test_can_parse_with_external_scanner(self):
+        language = tree_sitter.Language(tree_sitter_magma.language())
+        parser = tree_sitter.Parser(language)
+        tree = parser.parse(b"R<x> := PolynomialRing(Rationals());\ny := 0.5;\n")
+        self.assertFalse(tree.root_node.has_error)
+        self.assertIn("(real)", str(tree.root_node))
