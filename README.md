@@ -126,6 +126,10 @@ documentation. The Rust binding exposes the query as `TAGS_QUERY`.
 
 Inspect the extracted symbols without executing the Magma source:
 
+For one-time CLI language discovery, run `tree-sitter init-config` if you do
+not have a config yet. In that config's `parser-directories`, add the parent
+directory of a checkout named `tree-sitter-magma`.
+
 ```bash
 tree-sitter tags test/tags/navigation.m
 tree-sitter tags examples/highlighting.m

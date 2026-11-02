@@ -97,7 +97,7 @@ def main():
             ap.error("spec contains no source files")
         count = min(args.sample, len(package_files))
         indices = {round(i * (len(package_files) - 1) / (count - 1)) for i in range(count)} if count > 1 else {0}
-        cases.extend((str(package_files[i].relative_to(args.spec.resolve().parent)), package_files[i]) for i in sorted(indices))
+        cases.extend((os.path.relpath(package_files[i], args.spec.parent), package_files[i]) for i in sorted(indices))
         report["package_population"] = len(package_files)
         report["package_selection"] = "Evenly spaced ranks after sorting by byte size, then path; includes smallest and largest"
 
