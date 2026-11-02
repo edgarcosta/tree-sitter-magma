@@ -53,6 +53,8 @@ update := proc<~x | Bump(~x)>;
 
 declare type Widget: Parent;
 //           ^ definition.type
+declare type GrpPSL2[GrpPSL2Elt]: Parent;
+//           ^ definition.type
 declare attributes Widget: value, action;
 //                         ^ definition.field
 //                                ^ definition.field

@@ -64,11 +64,12 @@ Add(1, 2 : offset := 3);
 //         ^ variable.parameter
 //                   ^ number
 
-declare attributes Rec: field;
+declare attributes Rec: field, other;
 // <- keyword.directive
 //      ^ keyword.directive
 //                 ^ type
 //                      ^ property
+//                             ^ property
 
 declare type ExampleType: Parent;
 //      ^ keyword.directive

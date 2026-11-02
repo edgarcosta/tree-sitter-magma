@@ -23,7 +23,7 @@
  (#match? @definition.function "^(func|proc)\\b"))
 
 ;; Only the declared type is a definition, not its supertypes or annotations.
-(type_declaration (type . (identifier) @name .)) @definition.type
+(type_declaration (type . (identifier) @name)) @definition.type
 
 ;; The repeated `attribute` field query selects only its first element on
 ;; CLI 0.25.10. Matching identifiers after the colon includes every attribute.

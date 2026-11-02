@@ -97,7 +97,7 @@
 (type_declaration supertype: (identifier) @type)
 
 (attribute "`" . (identifier) @property)
-(attribute_declaration attribute: (identifier) @property)
+(attribute_declaration ":" (identifier) @property)
 (field_definition name: (identifier) @property)
 (recformat_constructor (identifier) @property)
 (field_definition type: (identifier) @type)

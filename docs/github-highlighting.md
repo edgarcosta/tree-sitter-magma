@@ -25,8 +25,8 @@ that request. Update the numbers when re-running the commands.
   proof of a popularity threshold, recent activity, or unique code ownership.
   See the reproducible query and independently maintained projects below.
 - GitHub's deployed Tree-sitter runtime, ABI, and capture configuration have
-  not been confirmed. Earlier local checks passed at ABI 14 and 15; confirm
-  which artifact the highlighting team wants.
+  not been confirmed. Confirm which parser artifact the highlighting team
+  wants.
 
 ### Suggested route
 
@@ -45,7 +45,7 @@ Sources:
 - Repository: <https://github.com/edgarcosta/tree-sitter-magma>, MIT license.
 - Generated sources are committed (`src/parser.c`, `src/grammar.json`,
   `src/node-types.json`) with an external scanner (`src/scanner.c`, real
-  literals only). CLI 0.25.10 now reproduces all generated files byte-for-byte,
+  literals only). CLI 0.25.10 reproduces all generated files byte-for-byte,
   including `src/tree_sitter/array.h`. All workflows and the npm development
   dependency pin that generator; CI checks the entire `src/` diff.
 - Submit `queries/highlights.scm`. `queries/locals.scm` is deliberately
@@ -57,22 +57,21 @@ Sources:
 - Node.js, Rust, and Python binding tests parse a generator declaration and
   a real literal, exercising the external scanner. Verified locally with
   Node 26.8.2 / runtime 0.25.1, Rust runtime 0.25.10, and Python 3.12 /
-  runtime 0.25.2 on macOS arm64. CI adds Linux/macOS coverage for these
-  bindings; the hosted run is pending publication of the changes.
-- Node's language type tag now matches the runtime, and macOS C flags no
-  longer apply C99 to C++ sources. The Node and Python dependency ranges
-  exclude runtimes older than 0.25, which cannot consume this ABI 15 parser.
-  The Rust crate declares its missing test dependency.
-- Earlier checks built the C/Make and CMake bindings. Swift and Go remain
-  outside this validation pass; their release compatibility is not claimed.
+  runtime 0.25.2 on macOS arm64. CI tests these bindings on Linux and macOS.
+- Node's language type tag matches the runtime. C99 compiler settings apply
+  to C sources. The Node and Python dependency ranges exclude runtimes older
+  than 0.25, which cannot consume this ABI 15 parser.
+  The Rust test dependency is Tree-sitter 0.25.10.
+- Swift and Go binding compatibility has not been verified.
 - Language reference: the Magma Handbook, chapter "The Magma Language"
   (<https://magma.maths.usyd.edu.au/magma/handbook/>). Grammar notes live in
   `grammar-docs/`.
 
-## Verification results (revision 75b31f4 plus the changes in this branch)
+## Verification results
 
-Final toolchain: Tree-sitter CLI 0.25.10, parser ABI 15, macOS arm64.
-The Python binding was rebuilt from the same `src/`.
+Tree-sitter CLI 0.25.10, parser ABI 15. The binding and benchmark observations
+below were collected on macOS arm64. The Python binding was rebuilt from the
+same `src/`.
 
 ### Parser and highlight tests
 
@@ -82,7 +81,7 @@ tree-sitter test
 
 - 281 corpus tests across 32 files pass, including 7 malformed-input cases
   in `test/corpus/malformed.txt`.
-- 8 highlight fixtures in `test/highlight/` with 320 assertions pass. They
+- 8 highlight fixtures in `test/highlight/` with 321 assertions pass. They
   cover keywords, operators, constructors, directives, definitions, bindings,
   and context-sensitive cases (`rep`, quoted identifiers, fields and
   parameters sharing names), including negative cases. `scopes.m` contains 52 assertions for
@@ -110,8 +109,8 @@ The single failure is `.../prospector/R/prospect.m`, an R script with `%`
 comments that ships in the tree but is not Magma. The slowest file in that parse run was
 `Group/GrpFin/SimpleAutGp/authn.m`, parsed in 0.72 s. The largest spec-loaded
 file is `Geometry/CrvG3/reconstruction/Interpolations.m` (22.6 MB).
-These are parse-only measurements from the earlier pass; see the end-to-end
-benchmark below for highlighting cost.
+These measurements cover parsing only; the end-to-end benchmark below
+includes highlighting cost.
 
 Note: the package sources are proprietary and must not be attached to a
 public request. Use `examples/highlighting.m` and `test/highlight/*.m` as

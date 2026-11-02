@@ -63,6 +63,7 @@ mod tests {
     fn test_tags_select_names_without_false_definitions() {
         let source = r#"
 declare type Widget: Parent;
+declare type GrpPSL2[GrpPSL2Elt]: Parent;
 declare attributes Widget: first, second, third;
 format := recformat<typed: RngIntElt, bare, other: MonStgElt>;
 inline := func<x | x>;
@@ -108,6 +109,7 @@ handlers[1](2);
             symbols,
             vec![
                 ("Widget", "definition.type"),
+                ("GrpPSL2", "definition.type"),
                 ("first", "definition.field"),
                 ("second", "definition.field"),
                 ("third", "definition.field"),

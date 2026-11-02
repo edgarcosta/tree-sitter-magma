@@ -121,7 +121,7 @@ Practical implications:
 
 `validate-corpus` is a coarse safety net, not a full runtime check:
 
-- The Makefile invokes `extract_corpus_code.py … --skip invalid malformed types`, so
+- The Makefile invokes `extract_corpus_code.py ... --skip invalid malformed types`, so
   `test/corpus/invalid.txt` and `test/corpus/malformed.txt` (intentionally bad syntax), and
   `test/corpus/types.txt` (`declare type` is package-only and is rejected
   before reaching the parser) are excluded from extraction. Keep the
