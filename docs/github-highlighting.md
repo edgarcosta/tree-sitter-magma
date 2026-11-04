@@ -133,19 +133,15 @@ spec-loaded files, including the smallest and largest. It also checks the
 shareable example, all eight highlight fixtures, and eight generated stress
 inputs. No package source text is written to the report.
 
-The initial run exposed slow operator field queries: a 20,000-term sum took
-4.4 seconds and the largest package file exceeded 30 seconds. Matching the
-operator tokens directly reduced these to about 0.06 seconds and 1.8 seconds,
-respectively, without changing their capture roles.
+Operator queries match tokens directly.
 
-Final run (2026-10-29): all 29 cases completed within the timeout. The largest
+Run on 2026-10-29: all 29 cases completed within the timeout. The largest
 file took 1.79 seconds and peaked at 662 MB RSS. The 20,000-term arithmetic
 and boolean expressions took 0.056 and 0.054 seconds. The unterminated block
 comment took 1.50 seconds; the other synthetic cases completed under 0.4 seconds.
 
-The final per-file results, hashes of the parser and queries, CLI version,
+The per-file results for 2026-10-29, hashes of the parser and queries, CLI version,
 status, wall time, and peak RSS are in local `build/highlight-benchmark.json`.
-The initial results are retained in `build/highlight-benchmark-before.json`.
 A timeout reports no peak RSS because the measuring process is terminated.
 These local build artifacts are ignored by Git; regenerate them for the
 revision submitted to GitHub.
