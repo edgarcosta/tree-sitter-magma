@@ -79,8 +79,8 @@ same `src/`.
 tree-sitter test
 ```
 
-- 281 corpus tests across 32 files pass, including 7 malformed-input cases
-  in `test/corpus/malformed.txt`.
+- 281 corpus tests across 31 files pass, including 7 error-detection cases
+  for malformed input in `test/corpus/invalid.txt`.
 - 8 highlight fixtures in `test/highlight/` with 321 assertions pass. They
   cover keywords, operators, constructors, directives, definitions, bindings,
   and context-sensitive cases (`rep`, quoted identifiers, fields and
