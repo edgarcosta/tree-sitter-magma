@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Benchmark CLI parsing, highlight/locals queries, and HTML rendering.
 
-Requires Python 3 and the Tree-sitter CLI on macOS or Linux. No Python binding
-is needed. Package sources remain local; the JSON report contains metrics and
-file names, not source text. Timings include CLI startup and HTML rendering.
+Requires Python 3 and the Tree-sitter CLI on macOS or Linux.
+On Linux, GNU time is required at /usr/bin/time. macOS uses the system BSD time.
+No Python binding is needed. Package sources remain local; the JSON report
+contains metrics and file names, not source text. Timings include CLI startup and HTML rendering.
 """
 
 import argparse
@@ -43,15 +44,15 @@ def measure(command, timeout, cwd):
     elapsed = time.perf_counter() - started
     if sys.platform == "darwin":
         match = re.search(r"(\d+)\s+maximum resident set size", stderr)
-        divisor = 1_000_000
+        bytes_per_unit = 1
     else:
         match = re.search(r"Maximum resident set size \(kbytes\):\s*(\d+)", stderr)
-        divisor = 1000
+        bytes_per_unit = 1024
     result = {
         "status": "timeout" if timed_out else "ok" if process.returncode == 0 else "failed",
         "exit_code": process.returncode,
         "wall_seconds": round(elapsed, 4),
-        "peak_rss_mb": round(int(match[1]) / divisor, 2) if match else None,
+        "peak_rss_mb": round(int(match[1]) * bytes_per_unit / 1_000_000, 2) if match else None,
     }
     if result["status"] != "ok":
         result["stderr"] = stderr[-4000:]

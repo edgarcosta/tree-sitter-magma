@@ -93,8 +93,9 @@ Run parser and highlight regression tests with:
 tree-sitter test
 ```
 
-To benchmark parsing, highlight/locals queries, and HTML rendering (Python 3,
-the CLI, and macOS or Linux; no Python binding needed):
+The highlighting benchmark requires Python 3 and the CLI on macOS or Linux;
+no Python binding is needed. On Linux, GNU time is required at /usr/bin/time.
+macOS uses the system BSD time.
 
 ```bash
 python3 scripts/benchmark_highlighting.py

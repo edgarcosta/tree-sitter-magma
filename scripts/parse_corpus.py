@@ -70,7 +70,10 @@ def main():
             err = first_error(tree.root_node)
             print(f"FAIL {path}: {err.type} at {err.start_point}: {err.text[:60]!r}")
     wall = time.perf_counter() - started
-    rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / (1e6 if sys.platform == "darwin" else 1e3)
+    rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    if sys.platform != "darwin":
+        rss *= 1024
+    rss /= 1_000_000
     print(f"files: {files}  with errors: {failures}  bytes: {total}  abi: {language.abi_version}")
     print(f"wall: {wall:.1f}s  throughput: {total / wall / 1e6:.1f} MB/s  peak RSS: {rss:.0f} MB")
     print(f"slowest: {slowest[1]} ({slowest[0] * 1000:.0f} ms)")
