@@ -108,18 +108,27 @@
 (constructor name: (identifier) @function.builtin)
 ;; Generator declarations share the constructor node, but declare a variable.
 (assignment left: (constructor name: (identifier) @variable))
+;; Keep each constructor's parameters in one match: overlapping name captures
+;; can discard pending parameter colors in tree-sitter-highlight.
 ((constructor
   name: (identifier) @function.builtin
-  (identifier) @variable.parameter)
- (#any-of? @function.builtin "func" "proc"))
-((constructor
-  name: (identifier) @function.builtin
+  "<"
+  [(identifier) @variable.parameter "," (comment)]*
   (constructor_elements
-    (constructor_options (identifier) @variable.parameter)))
- (#any-of? @function.builtin "func" "proc"))
+    (constructor_options
+      ":"
+      [(identifier) @variable.parameter "," (comment) (simple_assignment)]*))?)
+ (#eq? @function.builtin "func"))
 ((constructor
   name: (identifier) @function.builtin
-  (unary_operator operator: "~" right: (identifier) @variable.parameter))
+  "<"
+  [(identifier) @variable.parameter
+   (unary_operator operator: "~" right: (identifier) @variable.parameter)
+   "," (comment)]*
+  (constructor_elements
+    (constructor_options
+      ":"
+      [(identifier) @variable.parameter "," (comment) (simple_assignment)]*))?)
  (#eq? @function.builtin "proc"))
 (map_constructor domain_element: (identifier) @variable.parameter)
 "recformat" @function.builtin
