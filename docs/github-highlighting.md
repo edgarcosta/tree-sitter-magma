@@ -2,7 +2,7 @@
 
 This file collects what we learned about getting tree-sitter-magma used for
 syntax highlighting on github.com, and the verification results to attach to
-that request. Update the numbers when re-running the commands.
+that request. The counts, timings, and tool versions record the runs described below; rerun the commands for the revision sent to GitHub.
 
 ## How GitHub integrates tree-sitter grammars
 

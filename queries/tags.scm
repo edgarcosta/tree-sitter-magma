@@ -12,6 +12,7 @@
 ;; establish which target receives a callable. Unnamed literals have no tag.
 (assignment
   . left: (identifier) @name
+  . (comment)* . ":=" . (comment)*
   . right: [(function_definition !name) (procedure_definition !name)] .)
   @definition.function
 
@@ -19,6 +20,7 @@
 ;; capture names, so a private helper capture for the constructor is not used.
 ((assignment
    . left: (identifier) @name
+   . (comment)* . ":=" . (comment)*
    . right: (constructor) @definition.function .)
  (#match? @definition.function "^(func|proc)\\b"))
 

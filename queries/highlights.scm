@@ -77,6 +77,7 @@
 (forward (identifier) @function)
 (assignment
   . left: (identifier) @function
+  . (comment)* . ":=" . (comment)*
   . right: [(function_definition) (procedure_definition)] .)
 
 (parameters (identifier) @variable.parameter)

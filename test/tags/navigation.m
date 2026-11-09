@@ -80,6 +80,18 @@ ordinary := 1;
 alias := Sum;
 record := rec<format | value := 1>;
 mapping := map<domain -> codomain | x :-> x>;
-left, right := func<x | x>, 1;
-single := func<x | x>, 1;
+left, right := /* before */ func<x | x>, 1;
+single := /* before */ func<x | x> /* trailing */, 1;
 handlers[1](answer);
+
+/* leading */ commented_func /* before */ := /* after */ func<x | x> /* trailing */;
+//            ^ definition.function
+commented_proc := /* first */ /* second */ proc<~x | x := 1>;
+// <- definition.function
+commented_function /* before */ := function(x) return x; end function;
+// <- definition.function
+commented_procedure := /* after */ procedure(~x) x := 1; end procedure;
+// <- definition.function
+commented_left, commented_right := /* before */ function(x) return x; end function, 1;
+wrapped := /* before */ (func<x | x>);
+(square)(answer);

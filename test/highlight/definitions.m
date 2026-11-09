@@ -75,3 +75,10 @@ declare type ExampleType: Parent;
 //      ^ keyword.directive
 //           ^ type
 //                        ^ type
+
+commented_function /* before */ := function(x) return x; end function;
+// <- function
+commented_procedure := /* after */ procedure(~x) x := 1; end procedure;
+// <- function
+many, other := /* before */ function(x) return x; end function, 1;
+// <- !function
