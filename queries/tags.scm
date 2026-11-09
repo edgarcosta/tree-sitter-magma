@@ -37,7 +37,7 @@
 ;; References are syntactic call sites, not resolved bindings. For record
 ;; attributes, use the final field name, not the object or earlier fields.
 (call function: (identifier) @name) @reference.call
-(call function: (attribute "`" . (identifier) @name .)) @reference.call
+(call function: (attribute "`" . (comment)* . (identifier) @name .)) @reference.call
 
 ;; Forward declarations, imports, ordinary assignments, and dynamically
 ;; selected callees are deliberately omitted. These queries do not infer

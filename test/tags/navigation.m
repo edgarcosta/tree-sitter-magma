@@ -95,3 +95,11 @@ commented_procedure := /* after */ procedure(~x) x := 1; end procedure;
 commented_left, commented_right := /* before */ function(x) return x; end function, 1;
 wrapped := /* before */ (func<x | x>);
 (square)(answer);
+
+item /* receiver */`/* selected */invoke /* arguments */(1);
+//                                ^ reference.call
+item`/* first */child`/* middle */make(1)`/* final */finish(2);
+//                                ^ reference.call
+//                                                   ^ reference.call
+item`/* selected */field;
+(item`/* selected */hidden)(1);

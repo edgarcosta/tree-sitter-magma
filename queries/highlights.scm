@@ -97,7 +97,7 @@
 (attribute_declaration category: (identifier) @type)
 (type_declaration supertype: (identifier) @type)
 
-(attribute "`" . (identifier) @property)
+(attribute "`" . (comment)* . (identifier) @property)
 (attribute_declaration ":" (identifier) @property)
 (field_definition name: (identifier) @property)
 (recformat_constructor (identifier) @property)

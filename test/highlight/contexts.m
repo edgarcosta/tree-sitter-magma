@@ -92,3 +92,13 @@ rep{1};
 
 "text with \"quotes\" and \n";
 // <- string
+
+item`/* selected */field;
+// <- variable
+//                 ^ property
+item /* receiver */`/* selected */invoke /* arguments */(1);
+//                                ^ property
+item`/* first */child`/* middle */make(1)`/* final */finish(2);
+//              ^ property
+//                                ^ property
+//                                                   ^ property
