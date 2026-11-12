@@ -1,0 +1,3 @@
+/*
+  Header without code.
+*/

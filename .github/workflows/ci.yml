@@ -25,3 +25,24 @@ jobs:
 
       - name: Run tests
         run: tree-sitter test
+
+  formatter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - run: npm install -g tree-sitter-cli@0.25.10
+      - run: cargo install topiary-cli --version 0.7.3 --locked
+
+      - name: Check formatter output, idempotence, and syntax preservation
+        run: ./topiary/build.sh test
