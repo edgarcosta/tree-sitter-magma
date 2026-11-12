@@ -10,22 +10,37 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_DIR="$(dirname "$SCRIPT_DIR")"
 SO_PATH="$SCRIPT_DIR/magma.so"
+if [ -z "${TREE_SITTER:-}" ]; then
+    if [ -x "$REPO_DIR/node_modules/.bin/tree-sitter" ]; then
+        TREE_SITTER="$REPO_DIR/node_modules/.bin/tree-sitter"
+    else
+        TREE_SITTER="tree-sitter"
+    fi
+fi
+export TREE_SITTER
 
 build() {
-    echo "Generating parser..."
-    (cd "$REPO_DIR" && npx tree-sitter generate)
-    echo "Compiling shared library..."
+    echo "Generating parser..." >&2
+    (cd "$REPO_DIR" && "$TREE_SITTER" generate) >&2
+    echo "Compiling shared library..." >&2
     cc -shared -fPIC -o "$SO_PATH" \
         "$REPO_DIR/src/parser.c" \
         "$REPO_DIR/src/scanner.c" \
         -I "$REPO_DIR/src/"
-    echo "Built: $SO_PATH"
+    echo "Built: $SO_PATH" >&2
+}
+
+ensure_built() {
+    if [ ! -f "$SO_PATH" ] ||
+       [ "$REPO_DIR/grammar.js" -nt "$SO_PATH" ] ||
+       [ "$REPO_DIR/src/parser.c" -nt "$SO_PATH" ] ||
+       [ "$REPO_DIR/src/scanner.c" -nt "$SO_PATH" ]; then
+        build
+    fi
 }
 
 format_file() {
-    if [ ! -f "$SO_PATH" ]; then
-        build
-    fi
+    ensure_built
     local input
     input="$(realpath "$1")"
     (cd "$SCRIPT_DIR" && topiary format --language magma \
@@ -35,30 +50,9 @@ format_file() {
 }
 
 run_tests() {
-    if [ ! -f "$SO_PATH" ]; then
-        build
-    fi
-    local pass=0 fail=0
-    for input in "$SCRIPT_DIR/test/input/"*.m; do
-        name=$(basename "$input")
-        expected="$SCRIPT_DIR/test/expected/$name"
-        if [ ! -f "$expected" ]; then
-            echo "SKIP: $name (no expected file)"
-            continue
-        fi
-        actual=$(format_file "$input")
-        if diff -q <(echo "$actual") "$expected" > /dev/null 2>&1; then
-            echo "PASS: $name"
-            pass=$((pass + 1))
-        else
-            echo "FAIL: $name"
-            diff <(echo "$actual") "$expected" || true
-            fail=$((fail + 1))
-        fi
-    done
-    echo "---"
-    echo "Passed: $pass, Failed: $fail"
-    [ "$fail" -eq 0 ]
+    ensure_built
+    python3 "$SCRIPT_DIR/test_checks.py"
+    python3 "$SCRIPT_DIR/test.py"
 }
 
 case "${1:-build}" in

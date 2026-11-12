@@ -1,7 +1,7 @@
 intrinsic Foo(x::BoolElt) -> RngIntElt
 {Doc.}
     if not x then
-    // print "no";
+        // print "no";
     else
         return 1;
     end if;

@@ -3,7 +3,7 @@ intrinsic Foo(j::FldFinElt, success::BoolElt) -> BoolElt
     if not IsField(j) then
         return false;
     elif success then
-    // checking j in GF(p) span
+        // checking j in GF(p) span
         return true;
     elif Degree(j) eq 1 then
         return false;
