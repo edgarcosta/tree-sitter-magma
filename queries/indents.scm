@@ -1,79 +1,47 @@
-;; Indentation queries for Magma (nvim-treesitter format)
+;; Indentation queries for Magma (nvim-treesitter format).
+;; @indent.begin must capture whole multi-line nodes; a keyword token that
+;; starts and ends on one line never indents anything.
 
-;; Definitions — indent body
-(function_definition
-  "function" @indent.begin
-  "end" @indent.end)
+[
+  (function_definition)
+  (procedure_definition)
+  (intrinsic_definition)
+  (if_statement)
+  (for_statement)
+  (while_statement)
+  (repeat_statement)
+  (case_statement)
+  (try_catch_statement)
+  (constructor)
+  (recformat_constructor)
+  (case_constructor)
+  (parenthesized_expression)
+  (argument_list)
+  (parameters)
+  (assignment)
+] @indent.begin
 
-(procedure_definition
-  "procedure" @indent.begin
-  "end" @indent.end)
+[
+  "end"
+  "until"
+  ")"
+  ">"
+] @indent.end
 
-(intrinsic_definition
-  "intrinsic" @indent.begin
-  "end" @indent.end)
+[
+  "end"
+  "until"
+  ")"
+  ">"
+  "catch"
+  (elif_clause)
+  (else_clause)
+  (when_clause)
+] @indent.branch
 
-;; Control flow — indent after keyword, dedent at end
-(if_statement
-  "then" @indent.begin
-  "end" @indent.end)
+;; `when` and `else:` sit level with `case`, as in the Magma package library.
+(case_statement "else" @indent.branch)
 
-;; elif/else are both dedent and re-indent
-(elif_clause
-  "elif" @indent.branch)
-
-(else_clause
-  "else" @indent.branch)
-
-(for_statement
-  "do" @indent.begin
-  "end" @indent.end)
-
-(while_statement
-  "do" @indent.begin
-  "end" @indent.end)
-
-(repeat_statement
-  "repeat" @indent.begin
-  "until" @indent.end)
-
-(case_statement
-  "case" @indent.begin
-  "end" @indent.end)
-
-(when_clause
-  "when" @indent.branch)
-
-(try_catch_statement
-  "try" @indent.begin
-  "catch" @indent.branch
-  "end" @indent.end)
-
-;; Constructors — indent between < >
-;; Scoped to constructor nodes to avoid matching comparison operators
-(constructor
-  "<" @indent.begin
-  ">" @indent.end)
-
-(recformat_constructor
-  "<" @indent.begin
-  ">" @indent.end)
-
-(case_constructor
-  "<" @indent.begin
-  ">" @indent.end)
-
-;; Continuation lines: multi-line expressions wrapped in parentheses
-(parenthesized_expression
-  "(" @indent.begin
-  ")" @indent.end)
-
-;; Multi-line argument lists
-(argument_list
-  "(" @indent.begin
-  ")" @indent.end)
-
-;; Multi-line parameter lists
-(parameters
-  "(" @indent.begin
-  ")" @indent.end)
+;; Docstrings sit level with `intrinsic`; their continuation lines are text.
+(doc_string) @indent.branch
+[(doc_string) (comment) (string)] @indent.auto

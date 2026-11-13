@@ -1,180 +1,134 @@
-;; Highlighting queries
-
-;; The highlight group names (e.g. @keyword.function)
-;; are specific to neovim, but queries are quite general.
+;; Capture names follow the upstream tree-sitter convention. Consumers choose
+;; which names and dotted prefixes their themes recognize.
+;; Generic captures precede the more specific identifier roles below.
+(identifier) @variable
+(anonymous_identifier) @variable.builtin
+(dollar) @variable.builtin
+(double_dollar) @function.builtin
 
 (comment) @comment
-
-";" @delimiter
-
-[
- "."
- ".."
- ","
- ] @punctuation.special
-
-[
-  "("
-  ")"
-  "["
-  "]"
-  "{"
-  "}"
-] @punctuation.bracket
-
 (string) @string
-
-(identifier) @variable
-
+(doc_string) @string.documentation
 (integer) @number
 (real) @number.float
+[(true) (false)] @constant.builtin
 
-(call
- function: (identifier) @function)
-
-;; types 
-(type) @type
-(typed_identifier
- "::" @operator)
-
-
-
-;; constructors
-
-(constructor
- name: (identifier) @variable.builtin
- ["<" ">"] @punctuation.special
- (constructor_elements
-  "|" @punctuation.special)?
-  (constructor_options
-   ":" @punctuation.special)?
- )
-
-;; definitions
-
-(assignment
-":=" @operator)
-
-(intrinsic_definition
-  "intrinsic" @keyword.function
- docstring: (doc_string) @string.documentation
- ["intrinsic" "end"] @keyword.function
- )
-
-(function_definition
- ["function" "end"] @keyword.function)
-
-(procedure_definition
- ["procedure" "end"] @keyword.function)
-
-(return_statement
- "return" @keyword.return)
-
-[(break_statement)
- (continue_statement)] @keyword.repeat
-
-
-
-
-;; directives and special statements
-
-[(clear) 
- (freeze)
- (delete)
- (load_directive)
- (save_directive)
- (import_directive)
- ] @keyword.directive
-
-(declare_statement
- "declare" @keyword.directive)
-
-(attribute_declaration
- "attributes" @attribute.declaration)
-
-(type_declaration
- "type" @attribute.declaration)
-
-(verbosity_declaration
- "verbose" @attribute.declaration)
-
-
-[(print_statement)
- (vprint_statement)
- (read_statement)
- (print_level_statement)
- (assert_statement)
- (require_statement)
- (time_statement)
- (vtime_statement)
- (local_statement)
-  ] @keyword.directive
-
-
-;; expressions
-
-(eval_expression
- "eval" @keyword.return)
-
-
-;; control flow
-
-(for_statement
- ["for" "do" "end"] @keyword.repeat)
-
-(for_quantifier
- [":=" "to" "by" "in"] @keyword.repeat)
-
-(while_statement
- ["while" "end"] @keyword.repeat)
-
-(repeat_statement
- ["repeat" "end"] @keyword.repeat)
-
-(if_statement
- ["if" "end" "then" "elif" "else"] @keyword.conditional)
-
-(case_statement
- ["case" "end" "else"] @keyword.conditional)
-
-(ternary_operator
- ["select" "else"] @keyword.conditional.ternary)
-
-
-;; operators
-
-(attribute) @attribute
-
-;; distinguish between symbol operators (+, * ...) and
-;; word operators (in, div,...)
-
-(
- (binary_operator
-  operator: _ @keyword.operator)
- (#match? @keyword.operator "[a-zA-Z]+")
- )
-
-(
- (binary_operator
-  operator: _ @operator)
- (#not-match? @operator "[a-zA-Z]+")
- )
-
-(
- (unary_operator
-  operator: _ @keyword.operator)
- (#match? @keyword.operator "[a-zA-Z]+")
- )
-
-(
- (unary_operator
-  operator: _ @operator)
- (#not-match? @operator "[a-zA-Z]+")
- )
-
+[";" "," ":"] @punctuation.delimiter
+[".." "|" "..."] @punctuation.special
 [
- (true) 
- (false)
- ] @boolean
+  "(" ")" "[" "]" "{" "}" "<" ">"
+  "[*" "*]" "{@" "@}" "{!" "!}" "{*" "*}" "{[" "]}"
+  "\\[" "\\("
+] @punctuation.bracket
 
+;; Match operator tokens directly. Parent/field patterns on left-nested binary
+;; expressions make highlighting long polynomial expressions much slower.
+[
+  ":=" "::" ":->" "->" "=" "~" "`" "``" "[~]"
+  "+" "-" "*" "/" "^" "^^" "@" "@@" "!" "!!" "." "#"
+] @operator
+[
+  "div" "mod" "join" "diff" "sdiff" "meet" "cat"
+  "in" "notin" "adj" "notadj" "subset" "notsubset"
+  "gt" "ge" "lt" "le" "eq" "ne" "cmpeq" "cmpne"
+  "and" "or" "xor" "not" "assigned"
+] @keyword.operator
+(reduct_operator operator: _ @operator)
+(augmented_assignment operator: _ @operator)
 
+["function" "procedure" "intrinsic" "end"] @keyword.function
+"return" @keyword.return
+["if" "then" "elif" "else" "case" "when" "select" "default"] @keyword.conditional
+["for" "to" "by" "do" "while" "repeat" "until" "break" "continue"] @keyword.repeat
+["try" "catch" "error"] @keyword.exception
+["where" "is" "eval"] @keyword
+["exists" "forall" "random" "in"] @keyword.operator
+
+;; `end` takes its role from the enclosing construct.
+(if_statement "end" @keyword.conditional)
+(case_statement "end" @keyword.conditional)
+(for_statement "end" @keyword.repeat)
+(while_statement "end" @keyword.repeat)
+(try_catch_statement "end" @keyword.exception)
+
+;; After a comma, the current parser represents `default` as a match identifier.
+((case_constructor match: (identifier) @keyword.conditional)
+ (#eq? @keyword.conditional "default"))
+
+;; `rep` is an ordinary identifier except when extracting a representative.
+(representative_of_set . (identifier) @keyword.operator)
+
+;; Capture keywords, not whole statements: operands retain their own colors.
+(clear) @keyword.directive
+(freeze) @keyword.directive
+[
+  "forward" "delete" "quit" "exit" "load" "iload" "save" "restore" "import"
+  "declare" "attributes" "type" "verbose" "local"
+  "print" "printf" "fprintf" "vprint" "vprintf" "read" "readi"
+  "assert" "assert2" "assert3" "require" "requirege" "requirerange"
+  "time" "vtime"
+] @keyword.directive
+["Default" "Maximal" "Minimal" "Magma" "Hex" "Latex"] @constant.builtin
+
+(call function: (identifier) @function)
+(function_definition name: (identifier) @function)
+(procedure_definition name: (identifier) @function)
+(intrinsic_definition name: (identifier) @function)
+(forward (identifier) @function)
+(assignment
+  . left: (identifier) @function
+  . (comment)* . ":=" . (comment)*
+  . right: [(function_definition) (procedure_definition)] .)
+
+(parameters (identifier) @variable.parameter)
+(typed_identifier (identifier) @variable.parameter)
+(ref_identifier (identifier) @variable.parameter)
+(ref_typed_identifier (identifier) @variable.parameter)
+(backtick_identifier (identifier) @variable.parameter)
+(optional_parameter name: (identifier) @variable.parameter)
+(optional_argument argument: (identifier) @variable.parameter)
+;; Match the inlined parameter list without including the intrinsic's name.
+(intrinsic_definition "(" (identifier) @variable.parameter)
+(intrinsic_definition ":" (identifier) @variable.parameter)
+
+(type (identifier) @type)
+(type (string) @type)
+(type "." @type)
+(attribute_declaration category: (identifier) @type)
+(type_declaration supertype: (identifier) @type)
+
+(attribute "`" . (comment)* . (identifier) @property)
+(attribute_declaration ":" (identifier) @property)
+(field_definition name: (identifier) @property)
+(recformat_constructor (identifier) @property)
+(field_definition type: (identifier) @type)
+(simple_assignment name: (identifier) @property)
+(constructor_options (simple_assignment name: (identifier) @variable.parameter))
+
+(constructor name: (identifier) @function.builtin)
+;; Generator declarations share the constructor node, but declare a variable.
+(assignment left: (constructor name: (identifier) @variable))
+;; Keep each constructor's parameters in one match: overlapping name captures
+;; can discard pending parameter colors in tree-sitter-highlight.
+((constructor
+  name: (identifier) @function.builtin
+  "<"
+  [(identifier) @variable.parameter "," (comment)]*
+  (constructor_elements
+    (constructor_options
+      ":"
+      [(identifier) @variable.parameter "," (comment) (simple_assignment)]*))?)
+ (#eq? @function.builtin "func"))
+((constructor
+  name: (identifier) @function.builtin
+  "<"
+  [(identifier) @variable.parameter
+   (unary_operator operator: "~" right: (identifier) @variable.parameter)
+   "," (comment)]*
+  (constructor_elements
+    (constructor_options
+      ":"
+      [(identifier) @variable.parameter "," (comment) (simple_assignment)]*))?)
+ (#eq? @function.builtin "proc"))
+(map_constructor domain_element: (identifier) @variable.parameter)
+"recformat" @function.builtin

@@ -15,6 +15,10 @@ Thumbs.db
 *.swo
 *~
 
+# Keep query fixtures even when a global editor rule ignores TAGS/tags.
+!/test/tags/
+!/test/tags/*.m
+
 # Logs
 *.log
 npm-debug.log*

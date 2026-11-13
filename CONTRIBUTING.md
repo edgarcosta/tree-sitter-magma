@@ -6,25 +6,50 @@ contributors don't have to rediscover them.
 
 ## Setup
 
-Tree-sitter CLI pin: `^0.25.0` (see `devDependencies` in `package.json`,
-alongside the runtime peer dep `tree-sitter: ^0.20.0`). Stick to the pinned
-CLI — running `tree-sitter generate` from a different version will produce
-a different `src/parser.c` and may not match the committed
-`src/tree_sitter/parser.h`. Bump intentionally, in its own commit.
+Use Tree-sitter CLI 0.25.10 and a C compiler; see the README for installation.
+The npm lockfile selects the same CLI. npm is optional for grammar work.
+Changing the CLI version can change generated sources, so bump it intentionally
+in its own commit.
 
 ```bash
-npm install
-npx tree-sitter generate    # regenerate src/parser.c
-npx tree-sitter test         # run all corpus tests
-npx tree-sitter test -f "name"   # run a single test
-npx tree-sitter test -u      # update expected trees from current parser output
+tree-sitter generate         # regenerate src/parser.c
+tree-sitter build            # compile the native parser
+tree-sitter test             # run corpus and highlight tests
+tree-sitter test -i "name"   # select corpus tests by name
+tree-sitter test -u          # update expected trees from current parser output
 ```
+
+## Highlight query changes
+
+Add assertions in `test/highlight/*.m` when changing `queries/highlights.scm`
+or `queries/locals.scm`. `tree-sitter test` runs these alongside the parser
+corpus, including in CI. Highlight fixtures test syntax and captures; they may
+include package declarations or identifiers without runtime definitions.
+
+Test the keyword or operator and nearby operands. A capture spanning a whole
+statement can hide the intended highlights for strings and identifiers.
+Include examples where fields, types, and parameters share names. Highlighting
+uses syntactic roles: parameter declarations are distinct, while ordinary uses
+are variables or function calls. Keep `locals.scm` capture-free; source-order
+local propagation miscolors Magma's forward bindings. Add comprehension and
+`where` cases when changing identifier captures.
+
+Use `python3 scripts/highlight_preview.py` for a visual comparison, or pass
+paths to your own examples. See the README for preview options.
+
+Use upstream Tree-sitter capture names or dotted refinements of them.
+Consumers configure which captures their themes recognize; do not assume
+GitHub's private highlighter uses a particular editor's configuration.
+
+CI compiles every file in `queries/` and checks that the pinned CLI reproduces
+all of `src/`, including headers. Run `tree-sitter generate` before committing.
+A separate CI job tests Node.js, Rust, and Python bindings on Linux and macOS.
 
 ## Workflow for grammar changes
 
 1. Edit `grammar.js` (or `src/scanner.c` for token-level work).
-2. Run `npx tree-sitter generate`.
-3. Run `npx tree-sitter test` and fix any regressions.
+2. Run `tree-sitter generate`.
+3. Run `tree-sitter test` and fix any regressions.
 4. Add or update corpus tests for the construct you touched.
 5. Verify with `make validate-corpus` (see below).
 6. Run `make parse-spec SPEC=/path/to/magma/package/spec` against a real
@@ -96,8 +121,8 @@ Practical implications:
 
 `validate-corpus` is a coarse safety net, not a full runtime check:
 
-- The Makefile invokes `extract_corpus_code.py … --skip invalid types`, so
-  only `test/corpus/invalid.txt` (intentionally bad syntax) and
+- The Makefile invokes `extract_corpus_code.py ... --skip invalid types`, so
+  `test/corpus/invalid.txt` (intentionally bad syntax) and
   `test/corpus/types.txt` (`declare type` is package-only and is rejected
   before reaching the parser) are excluded from extraction. Keep the
   skip list short and document the reason in the Makefile when you add to
@@ -197,8 +222,8 @@ the `extras` rule. Don't bake whitespace into the operator literal.
 
 ## PR checklist
 
-- [ ] `npx tree-sitter generate` produces no errors.
-- [ ] `npx tree-sitter test` is green.
+- [ ] `tree-sitter generate` produces no errors.
+- [ ] `tree-sitter test` is green.
 - [ ] `make validate-corpus` is green (or explicitly notes which tests are
       skip-listed and why).
 - [ ] New grammar features are covered by both a positive corpus test and,
