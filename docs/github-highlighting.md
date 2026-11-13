@@ -53,7 +53,7 @@ Sources:
   use syntactic variable/function captures. This avoids source-order binding
   errors without requiring a custom highlighting engine. `folds.scm`,
   `indents.scm`, and `textobjects.scm` are editor extras.
-  Highlight predicates used are `#eq?` and `#any-of?` only.
+  Highlight predicates used are `#eq?` only.
 - Node.js, Rust, and Python binding tests parse a generator declaration and
   a real literal, exercising the external scanner. Verified locally with
   Node 26.8.2 / runtime 0.25.1, Rust runtime 0.25.10, and Python 3.12 /
@@ -81,7 +81,7 @@ tree-sitter test
 
 - 281 corpus tests across 31 files pass, including 7 error-detection cases
   for malformed input in `test/corpus/invalid.txt`.
-- 8 highlight fixtures in `test/highlight/` with 321 assertions pass. They
+- 8 highlight fixtures in `test/highlight/` with 330 assertions pass. They
   cover keywords, operators, constructors, directives, definitions, bindings,
   and context-sensitive cases (`rep`, quoted identifiers, fields and
   parameters sharing names), including negative cases. `scopes.m` contains 52 assertions for
